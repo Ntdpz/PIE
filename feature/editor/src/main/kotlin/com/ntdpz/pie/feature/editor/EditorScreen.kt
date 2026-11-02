@@ -87,7 +87,9 @@ fun EditorScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 when {
-                    state.loading -> CircularProgressIndicator()
+                    state.loading -> Box(Modifier.fillMaxWidth().heightIn(min = 180.dp), contentAlignment = Alignment.Center) {
+                        PieLoader("กำลังเปิดบันทึก…")
+                    }
                     state.loadFailed -> TextButton(onClick = onRetryLoad) { Text("เปิดบันทึกไม่สำเร็จ · ลองอีกครั้ง") }
                     else -> BasicTextField(
                         value = field,
@@ -104,7 +106,7 @@ fun EditorScreen(
                         },
                     )
                 }
-                if (state.importing) LinearProgressIndicator(Modifier.fillMaxWidth())
+                if (state.importing) PieLoader("กำลังเก็บรูปและวิดีโอ…", compact = true)
                 state.message?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
                 if (state.media.isNotEmpty()) MediaGallery(state.media, onDeleteMedia)
             }

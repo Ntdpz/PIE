@@ -48,7 +48,7 @@ fun HomeScreen(state: HomeUiState, onWrite: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            if (state.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+            if (state.loading) PieLoader("กำลังเปิดหน้าของวันนี้…", compact = true)
             if (state.loadFailed) Text("เปิดบันทึกไม่สำเร็จ ลองเปิดหน้าของวันนี้อีกครั้ง")
             if (hasEntry) TodayPreview(state)
             WritingInvitation(hasEntry, invitationHeight, !state.loading, onWrite)

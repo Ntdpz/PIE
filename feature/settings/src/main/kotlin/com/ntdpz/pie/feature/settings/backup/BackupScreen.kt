@@ -97,7 +97,7 @@ fun BackupScreen(
             if (state.busy) "กำลังทำรายการ…" else if (restoring) "เลือกไฟล์และนำเข้า" else "เลือกที่เก็บและส่งออก",
             onChoose, enabled = valid && !state.busy, icon = PieGlyph.Download,
         )
-        if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (state.busy) PieLoader(if (restoring) "กำลังนำเข้าบันทึก…" else "กำลังเข้ารหัสไฟล์สำรอง…", compact = true)
         Text(
             state.message ?: if (restoring) "กรอกรหัสผ่านของไฟล์ที่ต้องการนำเข้า" else "กรอกรหัสผ่านอย่างน้อย 8 ตัวให้ตรงกันเพื่อส่งออก",
             style = MaterialTheme.typography.labelSmall,

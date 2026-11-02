@@ -67,7 +67,7 @@ fun HistoryScreen(
             Box(Modifier.size(5.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
             Text("วันที่มีบันทึก", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        if (state.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
+        if (state.loading) PieLoader("กำลังเปิดเรื่องเล่า…", compact = true)
         if (state.loadFailed) Text("เปิดรายการบันทึกไม่สำเร็จ")
         Surface(modifier = Modifier.pieReveal(1), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface) {
             Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {

@@ -58,7 +58,7 @@ fun PinScreen(state: PinUiState, onDigit: (Int) -> Unit, onDelete: () -> Unit, o
             }
         }
         Box(Modifier.height(40.dp), contentAlignment = Alignment.Center) {
-            if (state.busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+            if (state.busy) PieLoader("กำลังตรวจสอบ…", compact = true)
             else state.error?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center) }
         }
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {

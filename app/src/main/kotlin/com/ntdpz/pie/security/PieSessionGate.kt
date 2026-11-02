@@ -18,6 +18,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.ntdpz.pie.core.designsystem.component.PiePrimaryButton
+import com.ntdpz.pie.core.designsystem.component.PieLoader
 import com.ntdpz.pie.di.AppContainer
 import com.ntdpz.pie.feature.settings.pin.*
 
@@ -53,7 +54,7 @@ fun PieSessionGate(container: AppContainer, content: @Composable () -> Unit) {
                 if (state.error) {
                     Text("เปิดการตั้งค่าไม่สำเร็จ")
                     PiePrimaryButton("ลองอีกครั้ง", session::retry)
-                } else CircularProgressIndicator()
+                } else PieLoader("กำลังเปิดพื้นที่ของคุณ…")
             }
         }
     } else Box(Modifier.fillMaxSize()) {

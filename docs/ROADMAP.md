@@ -1,5 +1,21 @@
 # Roadmap
 
+## UI Preview 0.2.0
+
+- [x] ปรับ Home 2 states, Editor, Calendar, Settings, PIN, Reminders และ Backup ตาม Pen R2
+- [x] โลโก้จาก Pen, Noto Sans Thai, Lucide, design tokens และวันที่ พ.ศ.
+- [x] ยืนยันลบและคิวลบที่รอ write เดิมก่อน
+- [x] รูป/วิดีโอ: picker, สำเนาไฟล์, gallery, viewer, ลบสำเนา
+- [x] Room migration 1→2 พร้อมทดสอบคงข้อความเดิม
+- [x] PIN: ตั้ง/ยืนยัน/เปลี่ยน/ปิด, lock lifecycle, privacy และ rate limiting
+- [x] แจ้งเตือน: สิทธิ์, วัน/หลายเวลา, custom/รายวัน, test และ reschedule
+- [x] Backup/Restore: file password, authenticated encryption, staging validation และ empty-database guard
+- [x] 19 unit/integration/UI tests ผ่าน ดู UI_V0_2_VERIFICATION.md
+
+งานที่ยังเหลือก่อนเรียก V1 เสร็จ: Local usage metrics, การทดสอบหลายอุปกรณ์/IME/Accessibility, low-storage/process-death/ไฟล์ขนาดใหญ่, power-management delivery, signing และ acceptance
+
+รายการด้านล่างเก็บบริบทและจุดตรวจรับของ Foundation เดิม หลายส่วนมี implementation ใน 0.2.0 แล้ว แต่ยังต้องขยายการตรวจรับตามรายการข้างบน
+
 ## Foundation ที่ทำในรอบวางโครง
 
 - [x] Gradle wrapper + version catalog + Kotlin/Compose

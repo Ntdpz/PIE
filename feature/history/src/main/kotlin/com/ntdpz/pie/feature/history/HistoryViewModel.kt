@@ -41,6 +41,6 @@ class HistoryViewModel(repository: DiaryRepository, private val clock: Clock) : 
 
     fun jumpToToday() {
         val date = LocalDate.now(clock)
-        mutableState.update { it.copy(month = YearMonth.from(date), selectedDate = date) }
+        mutableState.update { it.copy(month = YearMonth.from(date), selectedDate = date, today = date) }
     }
 }

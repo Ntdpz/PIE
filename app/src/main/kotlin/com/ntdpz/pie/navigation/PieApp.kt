@@ -32,7 +32,15 @@ import com.ntdpz.pie.feature.history.HistoryRoute
 import com.ntdpz.pie.feature.history.HistoryViewModel
 import com.ntdpz.pie.feature.home.HomeRoute
 import com.ntdpz.pie.feature.home.HomeViewModel
-import com.ntdpz.pie.feature.settings.SettingsScreen
+import com.ntdpz.pie.feature.settings.SettingsRoute
+import com.ntdpz.pie.feature.settings.SettingsViewModel
+import com.ntdpz.pie.feature.settings.SettingsAction
+import com.ntdpz.pie.feature.settings.reminder.ReminderRoute
+import com.ntdpz.pie.feature.settings.pin.PinRoute
+import com.ntdpz.pie.feature.settings.pin.PinPurpose
+import com.ntdpz.pie.feature.settings.pin.PinViewModel
+import com.ntdpz.pie.feature.settings.backup.BackupRoute
+import com.ntdpz.pie.feature.settings.backup.BackupViewModel
 import java.time.LocalDate
 
 @Composable
@@ -44,20 +52,11 @@ fun PieApp(container: AppContainer) {
     Scaffold(
         bottomBar = {
             if (PieDestination.entries.any { it.route == route }) {
-                NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
-                    PieDestination.entries.forEach { destination ->
-                        NavigationBarItem(
-                            selected = route == destination.route,
-                            onClick = {
-                                nav.navigate(destination.route) {
-                                    popUpTo(nav.graph.startDestinationId) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = { Icon(destination.icon, contentDescription = null) },
-                            label = { Text(destination.label) },
-                        )
+                PieBottomBar(route) { destination ->
+                    nav.navigate(destination.route) {
+                        popUpTo(nav.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 }
             }
@@ -72,7 +71,7 @@ fun PieApp(container: AppContainer) {
         ) {
             composable("home") {
                 val vm: HomeViewModel = viewModel(factory = viewModelFactory {
-                    initializer { HomeViewModel(container.diaryRepository, container.clock) }
+                    initializer { HomeViewModel(container.diaryRepository, container.clock, container.mediaRepository) }
                 })
                 HomeRoute(vm, openDiary)
             }
@@ -82,14 +81,51 @@ fun PieApp(container: AppContainer) {
                 })
                 HistoryRoute(vm, openDiary)
             }
-            composable("settings") { SettingsScreen(BuildConfig.VERSION_NAME) }
+            composable("settings") {
+                val vm: SettingsViewModel = viewModel(factory = viewModelFactory {
+                    initializer { SettingsViewModel(container.settingsRepository, container.backupRepository, container.applicationScope) }
+                })
+                SettingsRoute(vm, BuildConfig.VERSION_NAME) { action ->
+                    nav.navigate(when (action) {
+                        SettingsAction.SetupPin -> "pin/setup"
+                        SettingsAction.ChangePin -> "pin/change"
+                        SettingsAction.DisablePin -> "pin/disable"
+                        SettingsAction.Reminders -> "reminders"
+                        SettingsAction.ExportBackup -> "backup/export"
+                        SettingsAction.RestoreBackup -> "backup/restore"
+                    })
+                }
+            }
+            composable("reminders") {
+                val vm: SettingsViewModel = viewModel(factory = viewModelFactory {
+                    initializer { SettingsViewModel(container.settingsRepository, container.backupRepository, container.applicationScope) }
+                })
+                ReminderRoute(vm, LocalDate.now(container.clock), { nav.popBackStack() }, container.reminders::notifyNow)
+            }
+            composable("pin/{purpose}") { entry ->
+                val purpose = when (entry.arguments?.getString("purpose")) {
+                    "change" -> PinPurpose.Change
+                    "disable" -> PinPurpose.Disable
+                    else -> PinPurpose.Setup
+                }
+                val vm: PinViewModel = viewModel(factory = viewModelFactory {
+                    initializer { PinViewModel(container.settingsRepository, purpose) }
+                })
+                PinRoute(vm, onComplete = { nav.popBackStack() }, onBack = { nav.popBackStack() })
+            }
+            composable("backup/{mode}") { entry ->
+                val vm: BackupViewModel = viewModel(factory = viewModelFactory {
+                    initializer { BackupViewModel(container.backupRepository, container.diaryWriter) }
+                })
+                BackupRoute(vm, entry.arguments?.getString("mode") == "restore") { nav.popBackStack() }
+            }
             composable(
                 route = "editor/{date}",
                 arguments = listOf(navArgument("date") { type = NavType.StringType }),
             ) { entry ->
                 val date = LocalDate.parse(requireNotNull(entry.arguments?.getString("date")))
                 val vm: EditorViewModel = viewModel(factory = viewModelFactory {
-                    initializer { EditorViewModel(date, container.diaryRepository, container.diaryWriter) }
+                    initializer { EditorViewModel(date, container.diaryRepository, container.diaryWriter, container.mediaRepository) }
                 })
                 EditorRoute(vm, onBack = { nav.popBackStack() })
             }

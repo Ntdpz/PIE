@@ -1,5 +1,7 @@
 # Foundation verification — 2026-11-02
 
+Historical verification for 0.1.0. Current results: [0.2.0 UI verification](UI_V0_2_VERIFICATION.md).
+
 Checked on Windows using JDK 21, Gradle wrapper 9.4.1 and Android SDK 37.
 
 | Check | Result |

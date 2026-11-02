@@ -8,7 +8,7 @@ $allowed = @{
     'feature/home' = @(':core:domain', ':core:designsystem')
     'feature/editor' = @(':core:domain', ':core:designsystem')
     'feature/history' = @(':core:domain', ':core:designsystem')
-    'feature/settings' = @(':core:designsystem')
+    'feature/settings' = @(':core:domain', ':core:designsystem')
 }
 $failures = [System.Collections.Generic.List[string]]::new()
 foreach ($module in $allowed.Keys) {

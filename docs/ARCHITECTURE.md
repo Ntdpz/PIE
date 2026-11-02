@@ -23,6 +23,7 @@ flowchart TD
   Editor --> DS
   History --> DS
   Settings --> DS
+  Settings --> Domain
   Data --> Domain
 ```
 
@@ -53,6 +54,22 @@ flowchart TD
 อายุ writer เท่ากับแอป ไม่เท่ากับหน้าจอ จึงไม่ยกเลิกงานที่รับไว้แล้วเมื่อกดย้อนกลับ อย่างไรก็ตาม draft ที่ยังไม่ Saved ยังเสี่ยงหายเมื่อ process ถูกปิดหรือเครื่องดับ การแสดงสถานะต้องไม่สัญญาเกินจริง
 
 คิวเริ่มต้นเขียนทุก edit แบบเรียงลำดับ เพื่อให้ตรวจสอบและทดสอบง่าย หาก profiling พบปัญหาที่ข้อความยาวมาก ให้เปลี่ยนเป็น coalescing รายวันโดยเพิ่ม ordering / flush tests ก่อน ห้าม debounce ใน Composable หรือปล่อย coroutine เขียนแข่งกัน
+
+ตั้งแต่ 0.2.0 คิวรับคำสั่ง Delete และ Barrier ด้วย การลบรอ write ที่รับไว้แล้วก่อน เพื่อไม่ให้ข้อความเก่ากลับมาหลังลบ ส่วน Backup รอ Barrier และไม่ส่งออกถ้ายังมี draft ที่บันทึกล้มเหลว
+
+การตั้งค่าแจ้งเตือนมีคิวเขียนแยกใน SettingsViewModel ปิดคิวเมื่อออกจากหน้า แต่ให้ app scope ทำรายการที่รับไว้แล้วจนเสร็จ
+
+## Persistence และไฟล์ใน 0.2.0
+
+- Room schema 2 เพิ่ม diary_media และ migration 1 → 2 โดยคง diary_entries เดิม
+- LocalMediaRepository คัดลอกผ่านไฟล์ staging แล้ว commit metadata และไฟล์เข้าด้วยกัน ไม่เก็บ URI ต้นฉบับเป็นแหล่งข้อมูลหลัก
+- สื่อของแต่ละวันมี FK cascade เมื่อวันที่ถูกลบ และไฟล์ต้นฉบับภายนอกไม่ถูกแตะต้อง
+- LocalSettingsRepository ใช้ DataStore; PIN เก็บเฉพาะ PBKDF2 hash/salt พร้อมจำกัดความถี่การลองผิด
+- SessionViewModel/PieSessionGate ดูแล lifecycle lock และ FLAG_SECURE แยกจาก feature UI
+- AndroidReminders/ReminderReceiver เป็น adapter สำหรับ notification, alarm, reboot และ timezone changes
+- BackupManifestIO ดูแล schema archive; BackupCipher ดูแล PBKDF2 + AES-256-GCM; LocalBackupRepository ประกอบงานไฟล์และฐานข้อมูล
+- Restore decrypt/authenticate จบก่อนอ่าน ZIP ตรวจชื่อไฟล์/ข้อมูลลง staging และ commit เฉพาะเมื่อ database ยังว่าง การเตือนที่นำเข้ามาปิดอยู่ และไม่สำรอง PIN
+- ฐานข้อมูลในเครื่องยังไม่มีการเข้ารหัสระดับแอป; PIN เป็น access gate ไม่ใช่ encryption
 
 ## ขอบเขตและ lifetime
 

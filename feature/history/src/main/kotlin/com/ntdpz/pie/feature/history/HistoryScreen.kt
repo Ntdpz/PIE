@@ -1,31 +1,21 @@
 package com.ntdpz.pie.feature.history
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ntdpz.pie.core.designsystem.component.PiePrimaryButton
+import com.ntdpz.pie.core.designsystem.component.*
+import com.ntdpz.pie.core.designsystem.format.PieDates
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 fun HistoryScreen(
@@ -35,44 +25,47 @@ fun HistoryScreen(
     onToday: () -> Unit,
     onOpenDiary: () -> Unit,
 ) {
-    val locale = Locale.forLanguageTag("th")
     val entry = state.entries.firstOrNull { it.date == state.selectedDate }
+    val today = state.selectedDate == state.today
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+            .padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("ย้อนวัน", modifier = Modifier.weight(1f), style = MaterialTheme.typography.headlineMedium)
-            TextButton(onClick = onToday) { Text("วันนี้") }
+            Text("ย้อนวัน", Modifier.weight(1f), style = MaterialTheme.typography.headlineMedium)
+            FilledTonalButton(onClick = onToday, shape = RoundedCornerShape(12.dp), contentPadding = PaddingValues(horizontal = 18.dp)) {
+                Text("วันนี้", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+            }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { onChangeMonth(-1) }) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "เดือนก่อน")
-            }
-            Text(
-                state.month.format(DateTimeFormatter.ofPattern("MMMM yyyy", locale)),
-                modifier = Modifier.weight(1f),
-            )
-            IconButton(onClick = { onChangeMonth(1) }) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "เดือนถัดไป")
-            }
+            IconButton(onClick = { onChangeMonth(-1) }) { PieIcon(PieGlyph.Previous, "เดือนก่อน", color = MaterialTheme.colorScheme.onSurfaceVariant, size = 20.dp) }
+            Text(PieDates.month(state.month), Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+            IconButton(onClick = { onChangeMonth(1) }) { PieIcon(PieGlyph.Next, "เดือนถัดไป", color = MaterialTheme.colorScheme.onSurfaceVariant, size = 20.dp) }
         }
-        MonthCalendar(
-            month = state.month,
-            selectedDate = state.selectedDate,
-            entryDates = state.entries.map { it.date }.toSet(),
-            onSelectDate = onSelectDate,
-        )
-        if (state.loading) CircularProgressIndicator()
+        MonthCalendar(state.month, state.selectedDate, state.entries.map { it.date }.toSet(), onSelectDate)
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(5.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
+            Text("วันที่มีบันทึก", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        if (state.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
         if (state.loadFailed) Text("เปิดรายการบันทึกไม่สำเร็จ")
-        Card(Modifier.fillMaxWidth()) {
-            Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(state.selectedDate.format(DateTimeFormatter.ofPattern("d MMMM yyyy", locale)))
-                Text(entry?.preview?.takeIf(String::isNotBlank) ?: "วันนี้ยังไม่มีเรื่องเล่า", maxLines = 3)
+        Surface(shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface) {
+            Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(PieDates.shortEntry(state.selectedDate), Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
+                    if (entry?.hasMedia == true) PieIcon(PieGlyph.Media, color = MaterialTheme.colorScheme.onSurfaceVariant, size = 18.dp)
+                }
+                Text(
+                    entry?.preview?.takeIf(String::isNotBlank) ?: if (entry?.hasMedia == true) "ภาพความทรงจำของวันนี้" else "วันนี้ยังไม่มีเรื่องเล่า",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 PiePrimaryButton(
-                    label = if (entry == null) "เขียนบันทึกวันนี้" else "เปิดบันทึก",
-                    onClick = onOpenDiary,
-                    enabled = !state.loading && !state.loadFailed,
+                    if (entry == null) "เขียนบันทึกวันนี้" else if (today) "เปิดบันทึกวันนี้" else "เปิดบันทึก",
+                    onOpenDiary, enabled = !state.loading && !state.loadFailed, icon = PieGlyph.Book,
                 )
             }
         }

@@ -6,15 +6,18 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.ntdpz.pie.core.designsystem.theme.PieTheme
 import com.ntdpz.pie.navigation.PieApp
+import com.ntdpz.pie.security.PieSessionGate
+import android.view.WindowManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         enableEdgeToEdge()
         val container = (application as PieApplication).container
         setContent {
             PieTheme {
-                PieApp(container)
+                PieSessionGate(container) { PieApp(container) }
             }
         }
     }

@@ -8,4 +8,5 @@ data class HomeUiState(
     val entry: DiaryEntry? = null,
     val loading: Boolean = true,
     val loadFailed: Boolean = false,
+    val hasMedia: Boolean = false,
 )

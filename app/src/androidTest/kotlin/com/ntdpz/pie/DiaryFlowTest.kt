@@ -35,7 +35,7 @@ class DiaryFlowTest {
         }
         compose.onNodeWithContentDescription("กลับ").performClick()
         compose.onNodeWithText("ย้อนวัน").performClick()
-        compose.onNodeWithText("เปิดบันทึก").performClick()
+        compose.onNodeWithText("เปิดบันทึกวันนี้").performClick()
         compose.onNode(hasSetTextAction()).assertTextEquals(text)
         compose.activityRule.scenario.recreate()
         compose.waitUntil(15_000) {

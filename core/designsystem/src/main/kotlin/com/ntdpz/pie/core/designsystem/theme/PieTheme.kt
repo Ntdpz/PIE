@@ -18,11 +18,11 @@ private val PieColors = lightColorScheme(
     onBackground = Color(0xFF352D32),
     surface = Color.White,
     onSurface = Color(0xFF352D32),
-    onSurfaceVariant = Color(0xFF756E76),
+    onSurfaceVariant = Color(0xFF77717A),
     outlineVariant = Color(0xFFE6E4E8),
 )
 
 @Composable
 fun PieTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = PieColors, content = content)
+    MaterialTheme(colorScheme = PieColors, typography = PieTypography, content = content)
 }

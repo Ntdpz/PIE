@@ -15,6 +15,11 @@ android {
 }
 
 dependencies {
+    implementation(libs.activity.compose)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.video)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
     implementation(project(":core:domain"))
     implementation(project(":core:designsystem"))
     implementation(platform(libs.compose.bom))

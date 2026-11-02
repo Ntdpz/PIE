@@ -35,10 +35,12 @@ internal fun MonthCalendar(
     val cells = (0 until 42).map { index ->
         (index - offset + 1).takeIf { it in 1..month.lengthOfMonth() }?.let(month::atDay)
     }
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(Modifier.fillMaxWidth()) {
             listOf("จ", "อ", "พ", "พฤ", "ศ", "ส", "อา").forEach { label ->
-                Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { Text(label) }
+                Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                    Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
             }
         }
         cells.chunked(7).forEach { week ->
@@ -64,7 +66,7 @@ private fun CalendarDay(
     val background = if (active) colors.primary else colors.background
     val foreground = if (active) colors.onPrimary else colors.onBackground
     Box(
-        modifier = modifier.heightIn(min = 48.dp)
+        modifier = modifier.heightIn(min = 44.dp)
             .background(background, RoundedCornerShape(12.dp))
             .then(
                 if (date == null) Modifier else Modifier
@@ -79,7 +81,7 @@ private fun CalendarDay(
     ) {
         if (date != null) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(date.dayOfMonth.toString(), color = foreground)
+                Text(date.dayOfMonth.toString(), color = foreground, style = MaterialTheme.typography.bodySmall)
                 if (date in entryDates) Box(Modifier.size(4.dp).background(foreground, CircleShape))
             }
         }

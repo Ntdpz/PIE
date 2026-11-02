@@ -1,6 +1,7 @@
 package com.ntdpz.pie.core.domain.diary
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runCurrent
@@ -96,6 +97,36 @@ class DiaryWriterTest {
         runCurrent()
         assertEquals("", repository.writes.last().text)
     }
+
+    @Test
+    fun deleteWaitsForAcceptedWritesAndDoesNotResurrectTheDay() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        val repository = RecordingRepository(beforeWrite = { gate.await() })
+        val writer = DiaryWriter(repository, backgroundScope, clock)
+        writer.submit(date, "pending")
+        runCurrent()
+        val deletion = async { writer.delete(date) }
+        runCurrent()
+        assertFalse(deletion.isCompleted)
+        gate.complete(Unit)
+        runCurrent()
+        assertTrue(deletion.await().isSuccess)
+        assertTrue(repository.writes.isEmpty())
+        assertNull(writer.pendingText(date))
+        assertNull(writer.states.value[date])
+    }
+
+    @Test
+    fun backupBarrierRejectsAnUnpersistedDraft() = runTest {
+        val repository = RecordingRepository(beforeWrite = { throw IOException("disk") })
+        val writer = DiaryWriter(repository, backgroundScope, clock)
+        writer.submit(date, "not saved")
+        runCurrent()
+        val barrier = async { runCatching { writer.awaitIdle() } }
+        runCurrent()
+        assertTrue(barrier.await().isFailure)
+        assertEquals("not saved", writer.pendingText(date))
+    }
 }
 
 private class RecordingRepository(
@@ -105,6 +136,7 @@ private class RecordingRepository(
     override fun observeEntry(date: LocalDate): Flow<DiaryEntry?> = flowOf(null)
     override fun observeSummaries(): Flow<List<DiarySummary>> = flowOf(emptyList())
     override suspend fun readEntry(date: LocalDate): DiaryEntry? = null
+    override suspend fun deleteEntry(date: LocalDate) { writes.removeAll { it.date == date } }
     override suspend fun saveEntry(entry: DiaryEntry) {
         beforeWrite(entry)
         writes += entry

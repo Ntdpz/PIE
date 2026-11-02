@@ -7,4 +7,5 @@ data class DiarySummary(
     val date: LocalDate,
     val preview: String,
     val updatedAt: Instant,
+    val hasMedia: Boolean = false,
 )

@@ -8,10 +8,12 @@ internal data class DiarySummaryRow(
     val date: String,
     val preview: String,
     val updatedAtEpochMillis: Long,
+    val hasMedia: Boolean,
 )
 
 internal fun DiarySummaryRow.toDomain() = DiarySummary(
     date = LocalDate.parse(date),
     preview = preview,
     updatedAt = Instant.ofEpochMilli(updatedAtEpochMillis),
+    hasMedia = hasMedia,
 )

@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="downloads/PIE-v0.1.0-debug.apk"><strong>⬇ ดาวน์โหลด APK ทดลอง · v0.1.0</strong></a>
+  <a href="downloads/PIE-v0.2.0-debug.apk"><strong>⬇ ดาวน์โหลด APK ทดลอง · v0.2.0</strong></a>
   &nbsp; · &nbsp;
   <a href="#getting-started">เริ่มพัฒนา</a>
   &nbsp; · &nbsp;
@@ -25,7 +25,7 @@
 
 PIE เป็นแอปไดอารี่ส่วนตัวสำหรับ Android แต่ละวันมีกระดาษหนึ่งหน้า กลับมาเขียนต่อได้กี่รอบก็ได้ รองรับข้อความ Emoji และ `#` แบบข้อความธรรมดา ข้อมูลหลักอยู่บนเครื่องและเริ่มใช้งานได้โดยไม่ต้องสร้างบัญชี
 
-**สถานะ: Foundation / รุ่นทดลอง `0.1.0`** — เขียน บันทึกอัตโนมัติ และย้อนอ่านได้แล้ว ส่วนรูป/วิดีโอ, PIN, การแจ้งเตือน และไฟล์สำรองยังอยู่ในแผนพัฒนา V1
+**สถานะ: UI Preview `0.2.0`** — ปรับตามแบบ Pen R2 พร้อมแนบรูป/วิดีโอ, PIN, แจ้งเตือน และ Backup/Restore เข้ารหัส งานวัดการใช้งานในเครื่องและการตรวจรับ V1 บนอุปกรณ์หลายรุ่นยังอยู่ในแผน
 
 ## สิ่งที่ทำได้ตอนนี้
 
@@ -37,26 +37,30 @@ PIE เป็นแอปไดอารี่ส่วนตัวสำหร�
 | บันทึกอัตโนมัติ | แสดงกำลังบันทึก / บันทึกแล้ว / ล้มเหลว พร้อมลองใหม่ |
 | ย้อนวัน | ปฏิทินเลือกวัน จุดแสดงวันที่มีบันทึก และข้อความตัวอย่าง |
 | ข้อมูลในเครื่อง | Room / SQLite ไม่ต้อง Login และไม่มี INTERNET permission |
-| จังหวะการใช้งาน | เปลี่ยนหน้าด้วย Compose animation และใช้ธีมพีชของ PIE |
+| จังหวะการใช้งาน | Pen R2, Noto Sans Thai, Lucide และ Compose animation |
+| สื่อของวันนี้ | เลือกจากเครื่อง เก็บสำเนา เปิดดูรูป/วิดีโอ และลบหลังยืนยัน |
+| PIN ส่วนตัว | ตั้ง/เปลี่ยน/ปิด PIN 6 หลัก ล็อกเมื่อออกจากแอป และจำกัดการลองผิด |
+| แจ้งเตือน | เลือกวัน/หลายเวลา ข้อความเองหรือประจำวัน พร้อมขอสิทธิ์และทดสอบ |
+| ไฟล์สำรอง | Export เข้ารหัสด้วยรหัสผ่านแยกจาก PIN และ Restore เมื่อแอปว่าง |
 
 <p align="center">
   <img src="docs/assets/home-android.png" alt="หน้าแรก PIE ที่รันจริงบน Android emulator" width="280" />
   <br />
-  <sub>ภาพจากแอปที่รันจริงบน Android emulator · รุ่น Foundation</sub>
+  <sub>ภาพจากแอปที่รันจริงบน Android emulator · รุ่น UI Preview</sub>
 </p>
 
 <a id="download"></a>
 
 ## ดาวน์โหลดและติดตั้ง
 
-**[ดาวน์โหลด PIE v0.1.0 — Debug APK](downloads/PIE-v0.1.0-debug.apk)**
+**[ดาวน์โหลด PIE v0.2.0 — Debug APK](downloads/PIE-v0.2.0-debug.apk)**
 
 | รายการ | รายละเอียด |
 |---|---|
-| ชื่อไฟล์ | `PIE-v0.1.0-debug.apk` |
-| เวอร์ชัน / Build | `0.1.0` / `1` |
+| ชื่อไฟล์ | `PIE-v0.2.0-debug.apk` |
+| เวอร์ชัน / Build | `0.2.0` / `2` |
 | Android ขั้นต่ำ | Android 8.0 · API 26 |
-| ขนาดไฟล์ | 12,611,281 bytes · ประมาณ 12.6 MB |
+| ขนาดไฟล์ | 17,754,066 bytes · ประมาณ 17.8 MB |
 | Package | `com.ntdpz.pie` |
 | การเซ็น | Android debug key ของเครื่องที่ build |
 | ตรวจความถูกต้อง | [SHA256SUMS](downloads/SHA256SUMS) |
@@ -71,24 +75,24 @@ PIE เป็นแอปไดอารี่ส่วนตัวสำหร�
 
 ```powershell
 adb devices
-adb install -r downloads/PIE-v0.1.0-debug.apk
+adb install -r downloads/PIE-v0.2.0-debug.apk
 ```
 
 ถ้ามีหลายอุปกรณ์ ให้เลือก serial จาก `adb devices` แล้วใส่ `-s SERIAL` ก่อน `install`
 
-**ขอบเขตของรุ่นทดลอง:** ยังไม่มี PIN, การเข้ารหัสฐานข้อมูล หรือ Backup/Restore จึงเหมาะกับการทดลองด้วยข้อมูลทดสอบก่อน หากล้างข้อมูลแอปหรือถอนการติดตั้ง บันทึกในเครื่องจะหาย การอัปเดตทับแอปเดิมต้องใช้ package และ signing key ที่เข้ากัน
+**ขอบเขตของรุ่นทดลอง:** มี PIN และไฟล์สำรองเข้ารหัสแล้ว แต่ยังอยู่ในช่วงทดสอบ UI/อุปกรณ์ ฐานข้อมูลในเครื่องยังไม่ได้เข้ารหัสระดับแอป หากถอนหรือล้างข้อมูล ต้องมีไฟล์สำรองและรหัสผ่านของตนเองจึงนำกลับมาได้ การอัปเดตทับต้องใช้ package และ signing key ที่เข้ากัน
 
 ### ตรวจ SHA-256
 
 ```powershell
-Get-FileHash downloads/PIE-v0.1.0-debug.apk -Algorithm SHA256
+Get-FileHash downloads/PIE-v0.2.0-debug.apk -Algorithm SHA256
 Get-Content downloads/SHA256SUMS
 ```
 
 ค่า SHA-256 ของไฟล์ใน repo ชุดนี้:
 
 ```text
-4c6bc129f29295ce523312206027c9f6324336521ceb7a797321c714620aaca8
+83f9f3c133c177ed89357b68fb2304926d45c1eaa12e832692b00124375d5023
 ```
 
 ## สารบัญสำหรับนักพัฒนา
@@ -118,14 +122,17 @@ Get-Content downloads/SHA256SUMS
 | State / Lifecycle | ViewModel · immutable UiState · StateFlow |
 | งาน asynchronous | Kotlin Coroutines `1.10.2` |
 | Navigation | Navigation Compose `2.9.5` |
-| ฐานข้อมูล | Room `2.8.5` / SQLite · KSP `2.3.13` |
+| ฐานข้อมูล | Room `2.8.5` / SQLite · schema 2 พร้อม migration 1→2 · KSP `2.3.13` |
+| การตั้งค่า | DataStore Preferences `1.1.7` |
+| สื่อ | Coil `3.3.0` + Media3 `1.8.0` |
+| Backup | ZIP + PBKDF2 + AES-256-GCM |
 | Dependency injection | Manual constructor injection ผ่าน `AppContainer` |
 | Build | Gradle `9.4.1` · Android Gradle Plugin `9.2.1` |
 | Android | minSdk `26` · compileSdk `37` · targetSdk `37` |
 | Quality checks | JUnit · Coroutines Test · Compose UI Test · Android Lint |
 | CI | GitHub Actions สำหรับ build, unit tests, lint และตรวจขอบเขตโมดูล |
 
-เวอร์ชันอ้างอิงจาก [Version Catalog](gradle/libs.versions.toml) การเพิ่ม dependency ต้องมีงานใช้งานจริงรองรับ DataStore, Coil, Media3 และ Google Drive SDK ยังไม่ถูกเพิ่มเข้ามาในฐานนี้
+เวอร์ชันอ้างอิงจาก [Version Catalog](gradle/libs.versions.toml) การเพิ่ม dependency ต้องมีงานใช้งานจริงรองรับ DataStore, Coil และ Media3 ใช้งานแล้ว ส่วน Google Drive SDK ยังไม่ถูกเพิ่ม
 
 <a id="prerequisites"></a>
 
@@ -269,7 +276,7 @@ flowchart LR
 
 หนึ่งวันที่มี primary key เดียวจึงถูก upsert เป็นหน้าเดิม ปฏิทินอ่านเฉพาะวันที่ เวลา และ preview สูงสุด 160 ตัวอักษรจาก SQL แทนการโหลดเนื้อหาทั้งหมดของทุกวัน
 
-Schema เวอร์ชัน 1 เก็บที่ [core/data/schemas](core/data/schemas) การแก้ schema ต้องเพิ่ม migration และทดสอบ ห้ามใช้ destructive migration กับข้อมูลผู้ใช้
+Schema เวอร์ชัน 1 และ 2 เก็บที่ [core/data/schemas](core/data/schemas) การแก้ schema ต้องเพิ่ม migration และทดสอบ ห้ามใช้ destructive migration กับข้อมูลผู้ใช้
 
 ### ลำดับ Auto Save
 
@@ -289,8 +296,8 @@ Writer มีอายุเท่ากับ process ของแอป กา
 - ไม่มี Login, INTERNET permission หรือการส่ง analytics
 - ปิด Android automatic backup และกำหนด extraction rules สำหรับ cloud backup / device transfer
 - ข้อความหลักเก็บในฐานข้อมูลบนเครื่อง
-- ยังไม่มี PIN หรือการเข้ารหัสฐานข้อมูลในเครื่อง
-- ยังไม่มีระบบกู้บันทึกหลังล้างข้อมูลหรือถอนการติดตั้ง
+- PIN เก็บเฉพาะ hash/salt และล็อกเมื่อออกจากแอป ส่วนฐานข้อมูลในเครื่องยังไม่เข้ารหัสระดับแอป
+- นำเข้าจากไฟล์สำรองของตนเองพร้อมรหัสผ่านได้เมื่อแอปยังว่าง ไม่มีระบบกู้ PIN หรือรหัสผ่านไฟล์สำรอง
 
 ข้อกำหนดปลายทางของ V1 ดูที่ [Product V1](docs/PRODUCT_V1.md)
 
@@ -353,11 +360,13 @@ adb devices
 
 | ชุด | ตรวจอะไร | ผลที่บันทึกไว้ |
 |---|---|---|
-| `DiaryWriterTest` | เรียงลำดับข้อความ, ไม่แสดง Saved ก่อน draft ล่าสุดเสร็จ, แยกวันที่, failure/retry และล้างข้อความ | 5 ผ่าน |
-| `DiaryPersistenceTest` | upsert วันเดิม และอ่านได้หลังปิด/เปิดฐานข้อมูล | 1 ผ่าน |
-| `DiaryFlowTest` | เขียน → บันทึก → ย้อนอ่าน → recreate Activity | 1 ผ่าน |
+| `DiaryWriterTest` | ลำดับเขียน วันที่ failure/retry ล้างข้อความ และ delete/backup barrier | 7 ผ่าน |
+| `BackupCipherTest` | เข้ารหัส/ถอดรหัส รหัสผิด และไฟล์ถูกแก้ไข | 3 ผ่าน |
+| `SettingsWriterTest` | ลำดับแก้ข้อความแจ้งเตือนและการเขียนต่อหลังออกจากหน้า | 2 ผ่าน |
+| Android data tests | Persistence, migration 1→2, Backup round trip และสื่อหลังลบต้นฉบับ | 4 ผ่าน |
+| Android UI tests | เขียน/ย้อนอ่าน/recreate, หน้าตาม Pen และ PIN หลังออกจากแอป | 3 ผ่าน |
 
-ผลนี้มาจากการตรวจ Foundation เมื่อ **2 พฤศจิกายน 2026** บน Android 17 emulator ไม่ได้หมายถึง CI ของ GitHub ผ่านแล้ว หรือทดสอบครบทุกอุปกรณ์ อ่านรายละเอียดและข้อจำกัดที่ [Verification](docs/VERIFICATION.md)
+รวม **19 กรณีผ่าน** ผลนี้มาจากการตรวจ UI Preview เมื่อ **2 พฤศจิกายน 2026** บน Android 17 emulator ไม่ได้หมายถึง CI ของ GitHub ผ่านแล้ว หรือทดสอบครบทุกอุปกรณ์ อ่านรายละเอียดและข้อจำกัดที่ [Verification](docs/UI_V0_2_VERIFICATION.md)
 
 ### CI
 
@@ -373,18 +382,18 @@ Workflow ปัจจุบันยังไม่รัน emulator tests ไ�
 |---|---|---|
 | Debug | `app/build/outputs/apk/debug/app-debug.apk` | ติดตั้งทดสอบ เซ็นด้วย debug key |
 | Release | `app/build/outputs/apk/release/app-release-unsigned.apk` | เปิด R8/resource shrinking แต่ต้องเซ็นก่อนติดตั้งเผยแพร่ |
-| ไฟล์ดาวน์โหลดใน repo | `downloads/PIE-v0.1.0-debug.apk` | สำเนา Debug ที่ตรวจแล้วสำหรับชุดนี้ |
+| ไฟล์ดาวน์โหลดใน repo | `downloads/PIE-v0.2.0-debug.apk` | สำเนา Debug ที่ตรวจแล้วสำหรับชุดนี้ |
 
-Release Foundation ที่ตรวจไว้มีขนาด 1,500,964 bytes หรือประมาณ 1.5 MB **เป็นไฟล์ unsigned** ขนาดนี้ยังไม่รวมฟีเจอร์ V1 ที่เหลือ และไม่ใช่ผลวัด RAM หรือความลื่นบนโทรศัพท์จริง
+Release UI Preview ที่ตรวจไว้มีขนาด 3,044,651 bytes หรือประมาณ 3.0 MB **เป็นไฟล์ unsigned** ขนาดนี้ยังไม่รวมฟีเจอร์ V1 ที่เหลือ และไม่ใช่ผลวัด RAM หรือความลื่นบนโทรศัพท์จริง
 
 ### อัปเดตไฟล์ดาวน์โหลดหลัง build ใหม่
 
 หลังรันทดสอบแล้ว ให้ใช้ชื่อไฟล์ให้ตรงกับเวอร์ชัน:
 
 ```powershell
-Copy-Item app/build/outputs/apk/debug/app-debug.apk downloads/PIE-v0.1.0-debug.apk
-$apkHash = (Get-FileHash downloads/PIE-v0.1.0-debug.apk -Algorithm SHA256).Hash.ToLowerInvariant()
-Set-Content downloads/SHA256SUMS "$apkHash  PIE-v0.1.0-debug.apk" -Encoding utf8NoBOM
+Copy-Item app/build/outputs/apk/debug/app-debug.apk downloads/PIE-v0.2.0-debug.apk
+$apkHash = (Get-FileHash downloads/PIE-v0.2.0-debug.apk -Algorithm SHA256).Hash.ToLowerInvariant()
+Set-Content downloads/SHA256SUMS "$apkHash  PIE-v0.2.0-debug.apk" -Encoding utf8NoBOM
 ```
 
 เมื่อเปลี่ยนเวอร์ชัน ให้อัปเดตชื่อไฟล์ ปุ่มดาวน์โหลด ขนาด และ checksum ใน README ด้วย การเซ็น Release ต้องเก็บ keystore นอก repo และใช้ signing key เดิมสำหรับการอัปเดตแอป
@@ -434,11 +443,12 @@ Set-Content downloads/SHA256SUMS "$apkHash  PIE-v0.1.0-debug.apk" -Encoding utf8
 |---|---|
 | [Product V1](docs/PRODUCT_V1.md) | ขอบเขตที่ตกลงไว้ทั้งหมด |
 | [Architecture](docs/ARCHITECTURE.md) | ทิศทาง dependency, lifetime และจุดต่อยอด |
+| [Pen R2](docs/DESIGN_REFERENCE.md) | ภาพต้นแบบและ design tokens ที่ใช้ทำ UI |
 | [Roadmap](docs/ROADMAP.md) | สถานะ Foundation และงานที่เหลือ |
 | [Verification](docs/VERIFICATION.md) | สิ่งที่ทดสอบจริงและข้อจำกัด |
 | [Engineering rules](AGENTS.md) | กติกาเขียนโค้ดแบบสายพาน |
 
-ลำดับถัดไป: ความทนทานของ Editor/UX → รูปและวิดีโอ → PIN/การปกป้องข้อมูล → แจ้งเตือน → Backup/Restore → Local usage และ Release
+ลำดับถัดไป: Local usage ในเครื่อง → ทดสอบอุปกรณ์/IME/Accessibility/พื้นที่เต็มและ process death → ตรวจรับและเซ็น Release
 
 **V2:** Google Drive Sync / Backup และการย้ายเครื่อง โดยยังให้ฐานข้อมูลในเครื่องเป็นแหล่งข้อมูลหลัก
 

@@ -16,11 +16,20 @@ android {
     }
 }
 
+androidComponents {
+    onVariants { variant ->
+        variant.androidTest?.sources?.assets?.addStaticSourceDirectory("schemas")
+    }
+}
+
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
+    implementation(libs.datastore.preferences)
+    implementation(libs.coroutines.android)
+    testImplementation(libs.junit)
     implementation(project(":core:domain"))
     implementation(libs.coroutines.core)
     implementation(libs.room.runtime)

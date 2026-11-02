@@ -1,13 +1,9 @@
 package com.ntdpz.pie.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
+import com.ntdpz.pie.core.designsystem.component.PieGlyph
 
-internal enum class PieDestination(val route: String, val label: String, val icon: ImageVector) {
-    Home("home", "หน้าแรก", Icons.Filled.Home),
-    History("history", "ย้อนวัน", Icons.Filled.DateRange),
-    Settings("settings", "ตั้งค่า", Icons.Filled.Settings),
+internal enum class PieDestination(val route: String, val label: String, val glyph: PieGlyph) {
+    Home("home", "หน้าแรก", PieGlyph.Home),
+    History("history", "ย้อนวัน", PieGlyph.Calendar),
+    Settings("settings", "ตั้งค่า", PieGlyph.Settings),
 }

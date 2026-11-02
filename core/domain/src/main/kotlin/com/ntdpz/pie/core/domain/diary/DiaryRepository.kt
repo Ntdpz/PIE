@@ -8,4 +8,5 @@ interface DiaryRepository {
     fun observeSummaries(): Flow<List<DiarySummary>>
     suspend fun readEntry(date: LocalDate): DiaryEntry?
     suspend fun saveEntry(entry: DiaryEntry)
+    suspend fun deleteEntry(date: LocalDate)
 }

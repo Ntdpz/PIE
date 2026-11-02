@@ -1,6 +1,6 @@
 # PIE R2 — design reference
 
-The approved source is the R2 set in the active Pen document. These PNGs were exported through PEN MCP, not redrawn from memory.
+The approved source is the R2 set in [design/PIE.pen](../design/PIE.pen), committed with its referenced images. See [how to open the editable source](../design/README.md). These PNGs were exported through PEN MCP, not redrawn from memory.
 
 | Screen / state | Pen node | Reference |
 |---|---|---|

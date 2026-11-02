@@ -103,7 +103,7 @@ fun ReminderScreen(
                     Text(ReminderMessages.forDay(today, r))
                 }
             }
-            Text("สุ่มข้อความใหม่แต่ละวัน\nหากตั้งหลายเวลา จะใช้ข้อความเดียวกันในวันนั้น", style = MaterialTheme.typography.labelSmall, color = colors.onSurfaceVariant)
+            Text("หมุนเวียน ${ReminderMessages.defaultCount} ประโยคตามวัน\nหากตั้งหลายเวลา จะใช้ข้อความเดียวกันในวันนั้น", style = MaterialTheme.typography.labelSmall, color = colors.onSurfaceVariant)
         }
         PiePrimaryButton("ทดสอบแจ้งเตือน", onTest, icon = PieGlyph.Ring, enabled = state.settings.loaded)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -10,6 +10,8 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ntdpz.pie.core.data.settings.LocalSettingsRepository
 import com.ntdpz.pie.core.domain.settings.ReminderSettings
+import com.ntdpz.pie.core.domain.settings.ReminderMessages
+import java.time.LocalDate
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Rule
@@ -30,6 +32,8 @@ class PenUiFlowTest {
     @Test
     fun settingsReminderAndBackupScreensAreUsable() {
         waitText("วันนี้เป็นยังไงบ้าง?")
+        val dailyMessage = ReminderMessages.defaultForDay(LocalDate.now())
+        compose.onNodeWithText(dailyMessage).assertIsDisplayed()
         saveScreen("home")
         compose.onNode(hasText("ย้อนวัน") and hasClickAction()).performClick()
         waitText("วันที่มีบันทึก")
@@ -39,6 +43,8 @@ class PenUiFlowTest {
         saveScreen("settings")
         compose.onNodeWithText("แจ้งเตือนให้เขียน").performClick()
         waitText("ข้อความที่จะได้รับ")
+        compose.onNodeWithText(dailyMessage).assertIsDisplayed()
+        compose.onNodeWithText("หมุนเวียน 240 ประโยคตามวัน\nหากตั้งหลายเวลา จะใช้ข้อความเดียวกันในวันนั้น").assertIsDisplayed()
         saveScreen("reminders")
         compose.onNodeWithText("เขียนข้อความเอง").performClick()
         compose.onNode(hasSetTextAction()).performTextReplacement("ทดสอบการบันทึกข้อความแจ้งเตือน")

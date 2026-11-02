@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ntdpz.pie.core.designsystem.component.*
 import com.ntdpz.pie.core.designsystem.format.PieDates
+import com.ntdpz.pie.core.domain.settings.ReminderMessages
 import com.ntdpz.pie.core.designsystem.motion.pieReveal
 import com.ntdpz.pie.core.designsystem.motion.pieSheen
 import java.time.ZoneId
@@ -44,7 +45,7 @@ fun HomeScreen(state: HomeUiState, onWrite: () -> Unit) {
             Column(Modifier.pieReveal(1), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("วันนี้เป็นยังไงบ้าง?", style = MaterialTheme.typography.headlineMedium)
                 Text(
-                    "จะบ่น จะเล่า หรือแค่อยากพักใจ\nตรงนี้เขียนได้ทุกอย่างเลย",
+                    ReminderMessages.defaultForDay(state.date),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }

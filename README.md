@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="downloads/PIE-v0.3.1-debug.apk"><strong>⬇ ดาวน์โหลด APK ทดลอง · v0.3.1</strong></a>
+  <a href="downloads/PIE-v0.3.2-debug.apk"><strong>⬇ ดาวน์โหลด APK ทดลอง · v0.3.2</strong></a>
   &nbsp; · &nbsp;
   <a href="#getting-started">เริ่มพัฒนา</a>
   &nbsp; · &nbsp;
@@ -25,13 +25,13 @@
 
 PIE เป็นแอปไดอารี่ส่วนตัวสำหรับ Android แต่ละวันมีกระดาษหนึ่งหน้า กลับมาเขียนต่อได้กี่รอบก็ได้ รองรับข้อความ Emoji และ `#` แบบข้อความธรรมดา ข้อมูลหลักอยู่บนเครื่องและเริ่มใช้งานได้โดยไม่ต้องสร้างบัญชี
 
-**สถานะ: UI Preview `0.3.1`** — ปรับตามแบบ Pen R2 พร้อม PIE loader และ motion ใหม่ ปุ่มสปริง แถบเมนูเลื่อน การ์ดไล่จังหวะ และการเปลี่ยนเดือน พร้อมแนบรูป/วิดีโอ, PIN, แจ้งเตือน และ Backup/Restore เข้ารหัส งานวัดการใช้งานในเครื่องและการตรวจรับ V1 บนอุปกรณ์หลายรุ่นยังอยู่ในแผน
+**สถานะ: UI Preview `0.3.2`** — ปรับตามแบบ Pen R2 พร้อม PIE loader และ motion ใหม่ ปุ่มสปริง แถบเมนูเลื่อน การ์ดไล่จังหวะ และการเปลี่ยนเดือน พร้อมแนบรูป/วิดีโอ, PIN, แจ้งเตือน และ Backup/Restore เข้ารหัส งานวัดการใช้งานในเครื่องและการตรวจรับ V1 บนอุปกรณ์หลายรุ่นยังอยู่ในแผน
 
 ## สิ่งที่ทำได้ตอนนี้
 
 | ประสบการณ์ | พฤติกรรมที่มีแล้ว |
 |---|---|
-| เปิดมาเล่าเรื่อง | หน้าแรกชวนเขียน และแสดงตัวอย่างบันทึกวันนี้ |
+| เปิดมาเล่าเรื่อง | คำชวนเล่า/กำลังใจหมุนเวียน 240 ประโยคตามวัน และตัวอย่างบันทึกวันนี้ |
 | หนึ่งวัน หนึ่งหน้า | เขียนต่อวันเดิมได้หลายรอบ และเปิดวันย้อนหลังได้ |
 | เขียนตามใจ | ข้อความ Emoji และ `#` โดยไม่ต้องตั้งหัวข้อ |
 | บันทึกอัตโนมัติ | แสดงกำลังบันทึก / บันทึกแล้ว / ล้มเหลว พร้อมลองใหม่ |
@@ -40,10 +40,12 @@ PIE เป็นแอปไดอารี่ส่วนตัวสำหร�
 | จังหวะการใช้งาน | Pen R2, Noto Sans Thai, Lucide, spring feedback, sliding tabs และ staged entrances · [Motion](docs/MOTION.md) |
 | สื่อของวันนี้ | เลือกจากเครื่อง เก็บสำเนา เปิดดูรูป/วิดีโอ และลบหลังยืนยัน |
 | PIN ส่วนตัว | ตั้ง/เปลี่ยน/ปิด PIN 6 หลัก ล็อกเมื่อออกจากแอป และจำกัดการลองผิด |
-| แจ้งเตือน | เลือกวัน/หลายเวลา ข้อความเองหรือประจำวัน พร้อมขอสิทธิ์และทดสอบ |
+| แจ้งเตือน | 240 ประโยคฮีลใจ/ชวนเล่า หรือข้อความที่ตั้งเอง เลือกวัน/หลายเวลา พร้อมขอสิทธิ์และทดสอบ · [คลังข้อความ](docs/DAILY_MESSAGES.md) |
 | ไฟล์สำรอง | Export เข้ารหัสด้วยรหัสผ่านแยกจาก PIN และ Restore เมื่อแอปว่าง |
 
 [ดูวิดีโอ motion v0.3.0 จากแอปจริง](docs/assets/motion-v0.3.mp4) · [ดู PIE loader v0.3.1](docs/assets/loader-v0.3.1.gif)
+
+**[เปิดไฟล์ออกแบบ PIE.pen](design/PIE.pen)** · [วิธีเปิดและรายการไฟล์รูปประกอบ](design/README.md) — เก็บต้นฉบับ R2 พร้อมโลโก้และรูปที่อ้างอิงไว้ใน repo แล้ว
 
 <p align="center">
   <img src="docs/assets/home-android.png" alt="หน้าแรก PIE ที่รันจริงบน Android emulator" width="280" />
@@ -55,14 +57,14 @@ PIE เป็นแอปไดอารี่ส่วนตัวสำหร�
 
 ## ดาวน์โหลดและติดตั้ง
 
-**[ดาวน์โหลด PIE v0.3.1 — Debug APK](downloads/PIE-v0.3.1-debug.apk)**
+**[ดาวน์โหลด PIE v0.3.2 — Debug APK](downloads/PIE-v0.3.2-debug.apk)**
 
 | รายการ | รายละเอียด |
 |---|---|
-| ชื่อไฟล์ | `PIE-v0.3.1-debug.apk` |
-| เวอร์ชัน / Build | `0.3.1` / `4` |
+| ชื่อไฟล์ | `PIE-v0.3.2-debug.apk` |
+| เวอร์ชัน / Build | `0.3.2` / `5` |
 | Android ขั้นต่ำ | Android 8.0 · API 26 |
-| ขนาดไฟล์ | 17,618,486 bytes · ประมาณ 17.6 MB |
+| ขนาดไฟล์ | 17,634,870 bytes · ประมาณ 17.6 MB |
 | Package | `com.ntdpz.pie` |
 | การเซ็น | Android debug key ของเครื่องที่ build |
 | ตรวจความถูกต้อง | [SHA256SUMS](downloads/SHA256SUMS) |
@@ -77,7 +79,7 @@ PIE เป็นแอปไดอารี่ส่วนตัวสำหร�
 
 ```powershell
 adb devices
-adb install -r downloads/PIE-v0.3.1-debug.apk
+adb install -r downloads/PIE-v0.3.2-debug.apk
 ```
 
 ถ้ามีหลายอุปกรณ์ ให้เลือก serial จาก `adb devices` แล้วใส่ `-s SERIAL` ก่อน `install`
@@ -87,14 +89,14 @@ adb install -r downloads/PIE-v0.3.1-debug.apk
 ### ตรวจ SHA-256
 
 ```powershell
-Get-FileHash downloads/PIE-v0.3.1-debug.apk -Algorithm SHA256
+Get-FileHash downloads/PIE-v0.3.2-debug.apk -Algorithm SHA256
 Get-Content downloads/SHA256SUMS
 ```
 
 ค่า SHA-256 ของไฟล์ใน repo ชุดนี้:
 
 ```text
-d1ceb239bf35c5421e71f56ba3ef642ab3cb2e8c3eeb884101578a3a8a866ecd
+136ddb84a96db53824cb7f5ce9c0223cab95dc7af1f5ca2aad7a20ebd3631d41
 ```
 
 ## สารบัญสำหรับนักพัฒนา
@@ -363,12 +365,13 @@ adb devices
 | ชุด | ตรวจอะไร | ผลที่บันทึกไว้ |
 |---|---|---|
 | `DiaryWriterTest` | ลำดับเขียน วันที่ failure/retry ล้างข้อความ และ delete/backup barrier | 7 ผ่าน |
-| `BackupCipherTest` | เข้ารหัส/ถอดรหัส รหัสผิด และไฟล์ถูกแก้ไข | 5 ผ่าน |
+| `BackupCipherTest` | เข้ารหัส/ถอดรหัส รหัสผิด และไฟล์ถูกแก้ไข | 3 ผ่าน |
+| `ReminderMessagesTest` | 240 ประโยคไม่ซ้ำ รอบรายวัน ข้อความเอง fallback และขอบเขตวันที่ | 5 ผ่าน |
 | `SettingsWriterTest` | ลำดับแก้ข้อความแจ้งเตือนและการเขียนต่อหลังออกจากหน้า | 2 ผ่าน |
 | Android data tests | Persistence, migration 1→2, Backup round trip และสื่อหลังลบต้นฉบับ | 4 ผ่าน |
 | Android UI tests | เขียน/ย้อนอ่าน/recreate, หน้าตาม Pen, PIN และ loader | 5 ผ่าน |
 
-รอบ v0.3.1 ผ่าน **12 unit + 5 UI กรณี** และทดสอบ loader ซ้ำเมื่อปิด animation ระบบอีก 1 กรณี ส่วน Android data 4 กรณีเป็นผลตรวจจากรุ่นก่อน เนื่องจากไม่มีการเปลี่ยนชั้นข้อมูล ผลนี้มาจากการตรวจ UI Preview เมื่อ **2 พฤศจิกายน 2026** บน Android 17 emulator ไม่ได้หมายถึง CI ของ GitHub ผ่านแล้ว หรือทดสอบครบทุกอุปกรณ์ อ่านรายละเอียดและข้อจำกัดที่ [Verification](docs/LOADER_V0_3_1_VERIFICATION.md)
+รอบ v0.3.2 ผ่าน **17 unit + 5 UI กรณี** รวมคลังข้อความรายวันและการแสดงข้อความเดียวกันบนหน้าแรก/ตัวอย่างแจ้งเตือน ส่วน Android data 4 กรณีเป็นผลตรวจจากรุ่นก่อน เนื่องจากไม่มีการเปลี่ยนชั้นข้อมูล ผลนี้มาจากการตรวจ UI Preview เมื่อ **2 พฤศจิกายน 2026** บน Android 17 emulator ไม่ได้หมายถึง CI ของ GitHub ผ่านแล้ว หรือทดสอบครบทุกอุปกรณ์ อ่านรายละเอียดและข้อจำกัดที่ [Verification](docs/MESSAGES_V0_3_2_VERIFICATION.md)
 
 ### CI
 
@@ -384,7 +387,7 @@ Workflow ปัจจุบันยังไม่รัน emulator tests ไ�
 |---|---|---|
 | Debug | `app/build/outputs/apk/debug/app-debug.apk` | ติดตั้งทดสอบ เซ็นด้วย debug key |
 | Release | `app/build/outputs/apk/release/app-release-unsigned.apk` | เปิด R8/resource shrinking แต่ต้องเซ็นก่อนติดตั้งเผยแพร่ |
-| ไฟล์ดาวน์โหลดใน repo | `downloads/PIE-v0.3.1-debug.apk` | สำเนา Debug ที่ตรวจแล้วสำหรับชุดนี้ |
+| ไฟล์ดาวน์โหลดใน repo | `downloads/PIE-v0.3.2-debug.apk` | สำเนา Debug ที่ตรวจแล้วสำหรับชุดนี้ |
 
 Release UI Preview v0.2.0 ที่ตรวจไว้มีขนาด 3,044,651 bytes หรือประมาณ 3.0 MB **เป็นไฟล์ unsigned** ขนาดนี้ยังไม่รวมฟีเจอร์ V1 ที่เหลือ และไม่ใช่ผลวัด RAM หรือความลื่นบนโทรศัพท์จริง
 
@@ -393,9 +396,9 @@ Release UI Preview v0.2.0 ที่ตรวจไว้มีขนาด 3,044
 หลังรันทดสอบแล้ว ให้ใช้ชื่อไฟล์ให้ตรงกับเวอร์ชัน:
 
 ```powershell
-Copy-Item app/build/outputs/apk/debug/app-debug.apk downloads/PIE-v0.3.1-debug.apk
-$apkHash = (Get-FileHash downloads/PIE-v0.3.1-debug.apk -Algorithm SHA256).Hash.ToLowerInvariant()
-Add-Content downloads/SHA256SUMS "$apkHash  PIE-v0.3.1-debug.apk" -Encoding utf8NoBOM
+Copy-Item app/build/outputs/apk/debug/app-debug.apk downloads/PIE-v0.3.2-debug.apk
+$apkHash = (Get-FileHash downloads/PIE-v0.3.2-debug.apk -Algorithm SHA256).Hash.ToLowerInvariant()
+Add-Content downloads/SHA256SUMS "$apkHash  PIE-v0.3.2-debug.apk" -Encoding utf8NoBOM
 ```
 
 เมื่อเปลี่ยนเวอร์ชัน ให้อัปเดตชื่อไฟล์ ปุ่มดาวน์โหลด ขนาด และ checksum ใน README ด้วย การเซ็น Release ต้องเก็บ keystore นอก repo และใช้ signing key เดิมสำหรับการอัปเดตแอป

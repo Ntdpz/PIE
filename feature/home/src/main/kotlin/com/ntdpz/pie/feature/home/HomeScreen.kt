@@ -14,6 +14,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ntdpz.pie.core.designsystem.component.*
 import com.ntdpz.pie.core.designsystem.format.PieDates
+import com.ntdpz.pie.core.designsystem.motion.pieReveal
+import com.ntdpz.pie.core.designsystem.motion.pieSheen
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -28,7 +30,7 @@ fun HomeScreen(state: HomeUiState, onWrite: () -> Unit) {
             ),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().pieReveal(), verticalAlignment = Alignment.CenterVertically) {
                 PieBrand()
                 Spacer(Modifier.weight(1f))
                 Text(
@@ -39,7 +41,7 @@ fun HomeScreen(state: HomeUiState, onWrite: () -> Unit) {
                     modifier = Modifier.weight(1.5f),
                 )
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(Modifier.pieReveal(1), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("วันนี้เป็นยังไงบ้าง?", style = MaterialTheme.typography.headlineMedium)
                 Text(
                     "จะบ่น จะเล่า หรือแค่อยากพักใจ\nตรงนี้เขียนได้ทุกอย่างเลย",
@@ -56,7 +58,7 @@ fun HomeScreen(state: HomeUiState, onWrite: () -> Unit) {
 
 @Composable
 private fun TodayPreview(state: HomeUiState) {
-    Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(20.dp)) {
+    Surface(modifier = Modifier.pieReveal(2), color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 PieIcon(PieGlyph.Book, color = MaterialTheme.colorScheme.primary, size = 20.dp)
@@ -84,13 +86,13 @@ private fun WritingInvitation(
     onWrite: () -> Unit,
 ) {
     Surface(
-        Modifier.fillMaxWidth().heightIn(min = height),
+        Modifier.fillMaxWidth().heightIn(min = height).pieReveal(2),
         shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.onBackground,
     ) {
         Column(
-            Modifier.padding(24.dp),
+            Modifier.pieSheen().padding(24.dp),
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             PieIcon(PieGlyph.Invitation, color = MaterialTheme.colorScheme.primary, size = 32.dp)

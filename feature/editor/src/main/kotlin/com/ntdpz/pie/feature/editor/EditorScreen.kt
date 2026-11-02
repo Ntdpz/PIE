@@ -157,23 +157,3 @@ private fun ToolbarButton(glyph: PieGlyph, label: String, enabled: Boolean, onCl
         PieIcon(glyph, label, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
-
-@Composable
-private fun SaveStatus(state: SaveState, onRetry: () -> Unit) {
-    val color = if (state is SaveState.Failed) MaterialTheme.colorScheme.error else if (state is SaveState.Saved) Color(0xFF466D59) else MaterialTheme.colorScheme.onSurfaceVariant
-    Row(
-        Modifier.then(if (state is SaveState.Failed) Modifier.clickable(onClick = onRetry) else Modifier),
-        horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (state is SaveState.Saved) PieIcon(PieGlyph.Check, color = color, size = 14.dp)
-        Text(
-            when (state) {
-                SaveState.Idle -> "บันทึกอัตโนมัติ"
-                is SaveState.Saving -> "กำลังบันทึก…"
-                is SaveState.Saved -> "บันทึกแล้ว"
-                is SaveState.Failed -> "บันทึกไม่สำเร็จ · ลองอีกครั้ง"
-            },
-            style = MaterialTheme.typography.labelSmall, color = color,
-        )
-    }
-}

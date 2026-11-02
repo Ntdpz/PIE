@@ -8,6 +8,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.tween
+import com.ntdpz.pie.core.designsystem.motion.PieMotion
+import com.ntdpz.pie.core.designsystem.motion.pieReveal
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -43,14 +52,24 @@ fun HistoryScreen(
             Text(PieDates.month(state.month), Modifier.weight(1f), style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
             IconButton(onClick = { onChangeMonth(1) }) { PieIcon(PieGlyph.Next, "เดือนถัดไป", color = MaterialTheme.colorScheme.onSurfaceVariant, size = 20.dp) }
         }
-        MonthCalendar(state.month, state.selectedDate, state.entries.map { it.date }.toSet(), onSelectDate)
+        AnimatedContent(
+            targetState = state.month,
+            transitionSpec = {
+                val direction = if (targetState > initialState) 1 else -1
+                (fadeIn(tween(PieMotion.GentleMillis)) + slideInHorizontally(tween(PieMotion.GentleMillis, easing = PieMotion.Emphasized)) { it / 8 * direction }) togetherWith
+                    (fadeOut(tween(PieMotion.QuickMillis)) + slideOutHorizontally(tween(PieMotion.GentleMillis)) { -it / 8 * direction })
+            },
+            label = "Calendar month",
+        ) { month ->
+            MonthCalendar(month, state.selectedDate, state.entries.map { it.date }.toSet(), onSelectDate)
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(5.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
             Text("วันที่มีบันทึก", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (state.loading) LinearProgressIndicator(Modifier.fillMaxWidth())
         if (state.loadFailed) Text("เปิดรายการบันทึกไม่สำเร็จ")
-        Surface(shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface) {
+        Surface(modifier = Modifier.pieReveal(1), shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface) {
             Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(PieDates.shortEntry(state.selectedDate), Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)

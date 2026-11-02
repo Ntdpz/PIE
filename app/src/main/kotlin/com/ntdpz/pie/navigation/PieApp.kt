@@ -1,16 +1,14 @@
 package com.ntdpz.pie.navigation
 
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.scaleIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -66,8 +64,25 @@ fun PieApp(container: AppContainer) {
             navController = nav,
             startDestination = "home",
             modifier = Modifier.padding(padding).consumeWindowInsets(padding),
-            enterTransition = { fadeIn(tween(PieMotion.PageMillis)) },
-            exitTransition = { fadeOut(tween(PieMotion.QuickMillis)) },
+            enterTransition = {
+                val direction = navigationDirection(initialState.destination.route, targetState.destination.route)
+                fadeIn(tween(PieMotion.PageMillis)) +
+                    slideInHorizontally(tween(PieMotion.PageMillis, easing = PieMotion.Emphasized)) { it / 10 * direction } +
+                    scaleIn(tween(PieMotion.PageMillis, easing = PieMotion.Emphasized), initialScale = 0.985f)
+            },
+            exitTransition = {
+                val direction = navigationDirection(initialState.destination.route, targetState.destination.route)
+                fadeOut(tween(PieMotion.QuickMillis)) +
+                    slideOutHorizontally(tween(PieMotion.PageMillis, easing = PieMotion.Emphasized)) { -it / 16 * direction }
+            },
+            popEnterTransition = {
+                fadeIn(tween(PieMotion.PageMillis)) +
+                    slideInHorizontally(tween(PieMotion.PageMillis, easing = PieMotion.Emphasized)) { -it / 10 }
+            },
+            popExitTransition = {
+                fadeOut(tween(PieMotion.QuickMillis)) +
+                    slideOutHorizontally(tween(PieMotion.PageMillis, easing = PieMotion.Emphasized)) { it / 10 }
+            },
         ) {
             composable("home") {
                 val vm: HomeViewModel = viewModel(factory = viewModelFactory {

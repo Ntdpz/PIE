@@ -15,6 +15,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import com.ntdpz.pie.core.designsystem.motion.PieMotion
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
@@ -63,8 +67,8 @@ private fun CalendarDay(
 ) {
     val active = date != null && date == selectedDate
     val colors = MaterialTheme.colorScheme
-    val background = if (active) colors.primary else colors.background
-    val foreground = if (active) colors.onPrimary else colors.onBackground
+    val background by animateColorAsState(if (active) colors.primary else colors.background, tween(PieMotion.QuickMillis), label = "Selected day")
+    val foreground by animateColorAsState(if (active) colors.onPrimary else colors.onBackground, tween(PieMotion.QuickMillis), label = "Day ink")
     Box(
         modifier = modifier.heightIn(min = 44.dp)
             .background(background, RoundedCornerShape(12.dp))

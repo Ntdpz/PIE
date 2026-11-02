@@ -6,6 +6,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -46,7 +50,12 @@ fun PinScreen(state: PinUiState, onDigit: (Int) -> Unit, onDelete: () -> Unit, o
         )
         Spacer(Modifier.height(28.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-            repeat(6) { index -> Box(Modifier.size(12.dp).background(if (index < state.digits) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant, CircleShape)) }
+            repeat(6) { index ->
+                val filled = index < state.digits
+                val color by animateColorAsState(if (filled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant, label = "PIN dot color")
+                val scale = animateFloatAsState(if (filled) 1.2f else 1f, spring(dampingRatio = 0.55f, stiffness = 850f), label = "PIN dot pulse")
+                Box(Modifier.size(12.dp).graphicsLayer { scaleX = scale.value; scaleY = scale.value }.background(color, CircleShape))
+            }
         }
         Box(Modifier.height(40.dp), contentAlignment = Alignment.Center) {
             if (state.busy) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)

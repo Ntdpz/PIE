@@ -57,7 +57,7 @@ fun EditorScreen(
     }
     Column(
         Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.ime)
-            .backgroundWhite(),
+            .background(MaterialTheme.colorScheme.surface),
     ) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp).heightIn(min = 48.dp),
@@ -150,8 +150,6 @@ fun EditorScreen(
         Spacer(Modifier.height(24.dp))
     }
 }
-
-private fun Modifier.backgroundWhite() = this.then(Modifier.background(Color.White))
 
 @Composable
 private fun ToolbarButton(glyph: PieGlyph, label: String, enabled: Boolean, onClick: () -> Unit) {

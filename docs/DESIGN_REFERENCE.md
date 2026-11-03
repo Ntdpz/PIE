@@ -1,6 +1,6 @@
 # PIE R2 — design reference
 
-The approved source is the R2 set in [design/PIE.pen](../design/PIE.pen), committed with its referenced images. See [how to open the editable source](../design/README.md). These PNGs were exported through PEN MCP, not redrawn from memory.
+The current saved source is [design/PIE-v0.4.pen](../design/PIE-v0.4.pen), with uppercase PIE, a lower PIN keypad and light/dark theme variables. [design/PIE.pen](../design/PIE.pen) retains the previous R2 reference. See [how to open the editable source](../design/README.md). PNGs were exported through PEN MCP, not redrawn from memory; newer exports are in `design-reference/v0.4/`.
 
 | Screen / state | Pen node | Reference |
 |---|---|---|

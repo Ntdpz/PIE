@@ -43,17 +43,41 @@ class SettingsWriterTest {
         runCurrent()
         assertEquals("last edit", repository.settings.value.reminder.message)
     }
+
+    @Test
+    fun themeChoicesPersistInOrderAfterLeavingScreen() = runTest(dispatcher) {
+        val repository = TestSettingsRepository()
+        val vm = SettingsViewModel(repository, NoBackup(), backgroundScope)
+        val store = ViewModelStore().apply { put("settings", vm) }
+        runCurrent()
+        vm.saveTheme(ThemeMode.Dark)
+        vm.saveTheme(ThemeMode.Light)
+        vm.saveTheme(ThemeMode.Dark)
+        vm.saveReminder(ReminderSettings(message = "keep reminder"))
+        store.clear()
+        advanceTimeBy(100)
+        runCurrent()
+        assertEquals(listOf(ThemeMode.Dark, ThemeMode.Light, ThemeMode.Dark), repository.themes)
+        assertEquals(ThemeMode.Dark, repository.settings.value.themeMode)
+        assertEquals("keep reminder", repository.settings.value.reminder.message)
+    }
 }
 
 private class TestSettingsRepository : SettingsRepository {
     override val settings = MutableStateFlow(AppSettings(loaded = true))
     val saved = mutableListOf<String>()
+    val themes = mutableListOf<ThemeMode>()
     override suspend fun saveReminder(reminder: ReminderSettings) {
         delay(5)
         saved += reminder.message
         settings.value = settings.value.copy(reminder = reminder)
     }
     override suspend fun setPin(pin: CharArray, currentPin: CharArray?) = Unit
+    override suspend fun saveTheme(mode: ThemeMode) {
+        delay(5)
+        themes += mode
+        settings.value = settings.value.copy(themeMode = mode)
+    }
     override suspend fun verifyPin(pin: CharArray) = false
     override suspend fun disablePin(pin: CharArray) = false
 }

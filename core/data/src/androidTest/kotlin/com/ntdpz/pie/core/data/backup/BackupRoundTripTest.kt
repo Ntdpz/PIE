@@ -60,6 +60,7 @@ private class TestSettings : SettingsRepository {
     override val settings = MutableStateFlow(AppSettings(loaded = true, reminder = ReminderSettings(enabled = true)))
     override suspend fun saveReminder(reminder: ReminderSettings) { settings.value = settings.value.copy(reminder = reminder) }
     override suspend fun setPin(pin: CharArray, currentPin: CharArray?) = Unit
+    override suspend fun saveTheme(mode: com.ntdpz.pie.core.domain.settings.ThemeMode) { settings.value = settings.value.copy(themeMode = mode) }
     override suspend fun verifyPin(pin: CharArray) = false
     override suspend fun disablePin(pin: CharArray) = false
 }

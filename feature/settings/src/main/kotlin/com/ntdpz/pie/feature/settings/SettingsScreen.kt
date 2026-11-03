@@ -16,6 +16,7 @@ import com.ntdpz.pie.core.designsystem.component.*
 import com.ntdpz.pie.core.designsystem.motion.pieReveal
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import com.ntdpz.pie.core.domain.settings.ThemeMode
 
 @Composable
 fun SettingsRoute(viewModel: SettingsViewModel, versionName: String, onAction: (SettingsAction) -> Unit) {
@@ -24,11 +25,11 @@ fun SettingsRoute(viewModel: SettingsViewModel, versionName: String, onAction: (
         viewModel.refreshRestoreAvailability()
         onPauseOrDispose { }
     }
-    SettingsScreen(state, versionName, onAction)
+    SettingsScreen(state, versionName, onAction, viewModel::saveTheme)
 }
 
 @Composable
-fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (SettingsAction) -> Unit) {
+fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (SettingsAction) -> Unit, onThemeChange: (ThemeMode) -> Unit) {
     var pinOptions by remember { mutableStateOf(false) }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { pinOptions = false }
     val reminder = state.settings.reminder
@@ -39,6 +40,7 @@ fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (Setti
     ) {
         Text("ตั้งค่า", modifier = Modifier.pieReveal(), style = MaterialTheme.typography.headlineLarge)
         Text("ความเป็นส่วนตัว และบันทึกของคุณ", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        AppearancePicker(state.settings.themeMode, state.settings.loaded, onThemeChange)
         Column(Modifier.pieReveal(1)) {
             SectionLabel("ความเป็นส่วนตัว")
             SettingRow(PieGlyph.Lock, "ล็อกด้วย PIN", if (state.settings.pinEnabled) "เปิดอยู่ · เปลี่ยนหรือปิด PIN" else "ตั้ง PIN 6 หลักเพื่อเปิดแอป") {

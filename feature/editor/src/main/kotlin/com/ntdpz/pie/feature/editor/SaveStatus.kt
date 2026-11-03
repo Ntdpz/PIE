@@ -35,7 +35,7 @@ internal fun SaveStatus(state: SaveState, onRetry: () -> Unit) {
     ) { displayed ->
         val color = when (displayed) {
             SavePhase.Failed -> MaterialTheme.colorScheme.error
-            SavePhase.Saved -> Color(0xFF466D59)
+            SavePhase.Saved -> MaterialTheme.colorScheme.tertiary
             else -> MaterialTheme.colorScheme.onSurfaceVariant
         }
         Row(

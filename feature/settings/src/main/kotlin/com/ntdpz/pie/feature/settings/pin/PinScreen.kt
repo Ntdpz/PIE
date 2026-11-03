@@ -1,6 +1,8 @@
 package com.ntdpz.pie.feature.settings.pin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,62 +29,64 @@ fun PinRoute(viewModel: PinViewModel, onComplete: () -> Unit, onBack: (() -> Uni
 @Composable
 fun PinScreen(state: PinUiState, onDigit: (Int) -> Unit, onDelete: () -> Unit, onBack: (() -> Unit)?) {
     var forgot by remember { mutableStateOf(false) }
-    Column(
-        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Row(Modifier.fillMaxWidth().height(48.dp)) {
-            if (onBack != null) IconButton(onClick = onBack) { PieIcon(PieGlyph.Back, "กลับ") }
-        }
-        Spacer(Modifier.height(12.dp))
-        PieBrand()
-        Spacer(Modifier.height(28.dp))
-        val title = when (state.stage) {
-            PinStage.New -> "ตั้ง PIN ของคุณ"
-            PinStage.Confirm -> "ยืนยัน PIN อีกครั้ง"
-            PinStage.Verify -> if (state.purpose == PinPurpose.Unlock) "กลับมาแล้ว :)" else "ใส่ PIN เดิม"
-        }
-        Text(title, style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
-        Spacer(Modifier.height(8.dp))
-        Text(
-            if (state.stage == PinStage.Verify && state.purpose == PinPurpose.Unlock) "ใส่ PIN 6 หลัก เพื่อเปิดบันทึกของคุณ" else "ใช้ตัวเลข 6 หลัก",
-            style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(28.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
-            repeat(6) { index ->
-                val filled = index < state.digits
-                val color by animateColorAsState(if (filled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant, label = "PIN dot color")
-                val scale = animateFloatAsState(if (filled) 1.2f else 1f, spring(dampingRatio = 0.55f, stiffness = 850f), label = "PIN dot pulse")
-                Box(Modifier.size(12.dp).graphicsLayer { scaleX = scale.value; scaleY = scale.value }.background(color, CircleShape))
+    BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Column(
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = maxHeight).padding(horizontal = 32.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Row(Modifier.fillMaxWidth().height(48.dp)) {
+                if (onBack != null) IconButton(onClick = onBack) { PieIcon(PieGlyph.Back, "กลับ") }
             }
-        }
-        Box(Modifier.height(40.dp), contentAlignment = Alignment.Center) {
-            if (state.busy) PieLoader("กำลังตรวจสอบ…", compact = true)
-            else state.error?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center) }
-        }
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            listOf(listOf(1, 2, 3), listOf(4, 5, 6), listOf(7, 8, 9), listOf(-1, 0, -2)).forEach { keys ->
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    keys.forEach { key ->
-                        if (key == -1) Spacer(Modifier.weight(1f).height(68.dp))
-                        else Surface(
-                            onClick = { if (key == -2) onDelete() else onDigit(key) },
-                            enabled = !state.busy, modifier = Modifier.weight(1f).height(68.dp),
-                            shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface,
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                if (key == -2) PieIcon(PieGlyph.Delete, "ลบตัวเลข", color = MaterialTheme.colorScheme.onSurfaceVariant, size = 24.dp)
-                                else Text(key.toString(), style = MaterialTheme.typography.headlineSmall)
+            Spacer(Modifier.height(12.dp))
+            PieBrand()
+            Spacer(Modifier.height(20.dp))
+            val title = when (state.stage) {
+                PinStage.New -> "ตั้ง PIN ของคุณ"
+                PinStage.Confirm -> "ยืนยัน PIN อีกครั้ง"
+                PinStage.Verify -> if (state.purpose == PinPurpose.Unlock) "กลับมาแล้ว :)" else "ใส่ PIN เดิม"
+            }
+            Text(title, style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                if (state.stage == PinStage.Verify && state.purpose == PinPurpose.Unlock) "ใส่ PIN 6 หลัก เพื่อเปิดบันทึกของคุณ" else "ใช้ตัวเลข 6 หลัก",
+                style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.weight(1f).heightIn(min = 24.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+                repeat(6) { index ->
+                    val filled = index < state.digits
+                    val color by animateColorAsState(if (filled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant, label = "PIN dot color")
+                    val scale = animateFloatAsState(if (filled) 1.2f else 1f, spring(dampingRatio = 0.55f, stiffness = 850f), label = "PIN dot pulse")
+                    Box(Modifier.size(12.dp).graphicsLayer { scaleX = scale.value; scaleY = scale.value }.background(color, CircleShape))
+                }
+            }
+            Box(Modifier.height(40.dp), contentAlignment = Alignment.Center) {
+                if (state.busy) PieLoader("กำลังตรวจสอบ…", compact = true)
+                else state.error?.let { Text(it, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center) }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                listOf(listOf(1, 2, 3), listOf(4, 5, 6), listOf(7, 8, 9), listOf(-1, 0, -2)).forEach { keys ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        keys.forEach { key ->
+                            if (key == -1) Spacer(Modifier.weight(1f).height(68.dp))
+                            else Surface(
+                                onClick = { if (key == -2) onDelete() else onDigit(key) },
+                                enabled = !state.busy, modifier = Modifier.weight(1f).height(68.dp),
+                                shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface,
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    if (key == -2) PieIcon(PieGlyph.Delete, "ลบตัวเลข", color = MaterialTheme.colorScheme.onSurfaceVariant, size = 24.dp)
+                                    else Text(key.toString(), style = MaterialTheme.typography.headlineSmall)
+                                }
                             }
                         }
                     }
                 }
             }
+            Spacer(Modifier.height(12.dp))
+            if (state.purpose == PinPurpose.Unlock) TextButton(onClick = { forgot = true }) { Text("ลืม PIN?") }
+            else Text("PIE ไม่มีระบบกู้ PIN\nโปรดจดจำรหัสของคุณไว้", style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        Spacer(Modifier.height(28.dp))
-        if (state.purpose == PinPurpose.Unlock) TextButton(onClick = { forgot = true }) { Text("ลืม PIN?") }
-        else Text("PIE ไม่มีระบบกู้ PIN\nโปรดจดจำรหัสของคุณไว้", style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
     if (forgot) AlertDialog(
         onDismissRequest = { forgot = false }, title = { Text("ลืม PIN") },

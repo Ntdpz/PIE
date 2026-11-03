@@ -72,8 +72,8 @@ private fun TodayPreview(state: HomeUiState) {
             }
             Text(state.entry?.text?.takeIf { it.isNotBlank() } ?: "ภาพความทรงจำของวันนี้", maxLines = 2, overflow = TextOverflow.Ellipsis)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                PieIcon(PieGlyph.Check, color = Color(0xFF466D59), size = 16.dp)
-                Text("บันทึกแล้ว", style = MaterialTheme.typography.labelSmall, color = Color(0xFF466D59))
+                PieIcon(PieGlyph.Check, color = MaterialTheme.colorScheme.tertiary, size = 16.dp)
+                Text("บันทึกแล้ว", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.tertiary)
             }
         }
     }

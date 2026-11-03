@@ -26,6 +26,7 @@ class LocalSettingsRepository(context: Context) : SettingsRepository {
     private val times = stringSetPreferencesKey("reminder_times")
     private val custom = booleanPreferencesKey("reminder_custom")
     private val message = stringPreferencesKey("reminder_message")
+    private val theme = stringPreferencesKey("theme_mode")
     private val salt = stringPreferencesKey("pin_salt")
     private val hash = stringPreferencesKey("pin_hash")
     private val failures = intPreferencesKey("pin_failures")
@@ -35,6 +36,7 @@ class LocalSettingsRepository(context: Context) : SettingsRepository {
         AppSettings(
             loaded = true,
             pinEnabled = p[hash] != null,
+            themeMode = ThemeMode.entries.firstOrNull { it.name == p[theme] } ?: ThemeMode.System,
             reminder = ReminderSettings(
                 p[enabled] ?: false,
                 p[days]?.mapNotNull(String::toIntOrNull)?.toSet() ?: (1..7).toSet(),
@@ -55,6 +57,10 @@ class LocalSettingsRepository(context: Context) : SettingsRepository {
             it[custom] = reminder.customMode
             it[message] = reminder.message
         }
+    }
+
+    override suspend fun saveTheme(mode: ThemeMode) {
+        store.edit { it[theme] = mode.name }
     }
 
     override suspend fun setPin(pin: CharArray, currentPin: CharArray?) = withContext(Dispatchers.IO) {

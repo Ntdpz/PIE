@@ -25,8 +25,16 @@ class SettingsViewModel(
     val state = mutable.asStateFlow()
     private val pending = AtomicInteger()
     private val writes = Channel<ReminderSettings>(Channel.UNLIMITED)
+    private val themeWrites = Channel<ThemeMode>(Channel.UNLIMITED)
 
     init {
+        writeScope.launch {
+            for (mode in themeWrites) {
+                try { repository.saveTheme(mode) }
+                catch (cancelled: CancellationException) { throw cancelled }
+                catch (_: Exception) { mutable.update { it.copy(message = "เปลี่ยนรูปแบบแอปไม่สำเร็จ ลองอีกครั้ง") } }
+            }
+        }
         writeScope.launch {
             for (reminder in writes) {
                 try { repository.saveReminder(reminder) }
@@ -65,5 +73,9 @@ class SettingsViewModel(
 
     fun showMessage(message: String) { mutable.update { it.copy(message = message) } }
 
-    override fun onCleared() { writes.close() }
+    fun saveTheme(mode: ThemeMode) {
+        check(themeWrites.trySend(mode).isSuccess) { "Theme writer is closed" }
+    }
+
+    override fun onCleared() { writes.close(); themeWrites.close() }
 }

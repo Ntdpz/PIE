@@ -1,6 +1,6 @@
 # PIE · editable Pen source
 
-Open **[PIE.pen](PIE.pen)** in Pen to continue editing the approved R2 UI.
+Open **[PIE-v0.4.pen](PIE-v0.4.pen)** for the saved v0.4 design: uppercase PIE, lower PIN keypad and light/dark theme variables. The user saved this original document on 3 November 2026. The v0.4 mockup photos retain their original online URLs; local photo copies are available in `assets/`. [PIE.pen](PIE.pen) remains the earlier R2 reference with local image paths.
 
 This is the original active PIE document, including the earlier explorations and the R2 screens. Node IDs match [the design reference](../docs/DESIGN_REFERENCE.md). Keep the entire `design/` directory together when copying it.
 

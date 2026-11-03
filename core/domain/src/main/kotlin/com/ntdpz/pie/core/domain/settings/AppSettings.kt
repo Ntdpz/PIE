@@ -1,5 +1,7 @@
 package com.ntdpz.pie.core.domain.settings
 
+enum class ThemeMode { System, Light, Dark }
+
 data class ReminderSettings(
     val enabled: Boolean = false,
     val days: Set<Int> = (1..7).toSet(),
@@ -12,4 +14,5 @@ data class AppSettings(
     val loaded: Boolean = false,
     val pinEnabled: Boolean = false,
     val reminder: ReminderSettings = ReminderSettings(),
+    val themeMode: ThemeMode = ThemeMode.System,
 )

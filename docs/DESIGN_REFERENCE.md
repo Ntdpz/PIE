@@ -1,6 +1,8 @@
 # PIE R2 — design reference
 
-The current saved source is [design/PIE-v0.4.pen](../design/PIE-v0.4.pen), with uppercase PIE, a lower PIN keypad and light/dark theme variables. [design/PIE.pen](../design/PIE.pen) retains the previous R2 reference. See [how to open the editable source](../design/README.md). PNGs were exported through PEN MCP, not redrawn from memory; newer exports are in `design-reference/v0.4/`.
+The current editable source is [design/PIE-Kalka.fig](../design/PIE-Kalka.fig) in Kalka, including all 24 artboards and the proposed Merge flow. See [migration details](../design/KALKA.md). The table below keeps the original Pen IDs for traceability.
+
+The archived Pen source is [design/PIE-v0.4.pen](../design/PIE-v0.4.pen), with uppercase PIE, a lower PIN keypad and light/dark theme variables. [design/PIE.pen](../design/PIE.pen) retains the previous R2 reference. See [how to open the editable source](../design/README.md). PNGs were exported through PEN MCP, not redrawn from memory; newer exports are in `design-reference/v0.4/`.
 
 | Screen / state | Pen node | Reference |
 |---|---|---|
@@ -52,3 +54,4 @@ The full header wordmark was exported directly from the image node in Pen. Do no
 - [Lucide license](licenses/Lucide-LICENSE.txt)
 
 Copies of these licenses are included in APK assets.
+

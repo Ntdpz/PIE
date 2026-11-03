@@ -1,0 +1,110 @@
+{
+  "date": "2026-11-03",
+  "screens": 24,
+  "pages": [
+    {
+      "id": "1516790527:2501",
+      "name": "PIE · Merge · Light & Dark",
+      "roots": 8,
+      "expected": 8,
+      "fontFaithful": true,
+      "faces": [
+        {
+          "family": "Noto Sans Thai",
+          "style": "Regular",
+          "status": "available",
+          "source": "google",
+          "substitute": null
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "SemiBold",
+          "status": "available",
+          "source": "google",
+          "substitute": null
+        }
+      ],
+      "issues": []
+    },
+    {
+      "id": "1516790527:2500",
+      "name": "PIE · App UI",
+      "roots": 10,
+      "expected": 10,
+      "fontFaithful": true,
+      "faces": [
+        {
+          "family": "Noto Sans Thai",
+          "style": "ExtraBold",
+          "status": "available",
+          "source": "google",
+          "substitute": null
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Regular",
+          "status": "available",
+          "source": "google",
+          "substitute": null
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "SemiBold",
+          "status": "available",
+          "source": "google",
+          "substitute": null
+        }
+      ],
+      "issues": []
+    },
+    {
+      "id": "1516790527:3709",
+      "name": "PIE · Earlier explorations",
+      "roots": 6,
+      "expected": 6,
+      "fontFaithful": true,
+      "faces": [
+        {
+          "family": "Fahkwang",
+          "style": "Bold",
+          "status": "available",
+          "source": "google",
+          "substitute": null
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "ExtraBold",
+          "status": "available",
+          "source": "google",
+          "substitute": null
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Regular",
+          "status": "available",
+          "source": "google",
+          "substitute": null
+        }
+      ],
+      "issues": []
+    }
+  ],
+  "screenshots": [
+    {
+      "sourceId": "oMx7I",
+      "file": "work/Kalka-oMx7I.png"
+    },
+    {
+      "sourceId": "HEeUH",
+      "file": "work/Kalka-HEeUH.png"
+    },
+    {
+      "sourceId": "OXucF",
+      "file": "work/Kalka-OXucF.png"
+    },
+    {
+      "sourceId": "WVzQa",
+      "file": "work/Kalka-WVzQa.png"
+    }
+  ]
+}

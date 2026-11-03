@@ -1,8 +1,10 @@
-# PIE · editable Pen source
+# PIE · editable design source
+
+Use **[PIE-Kalka.fig](PIE-Kalka.fig)** in Kalka for current and future design work. See [migration details](KALKA.md). The Pen files below are archived references.
 
 Open **[PIE-v0.4.pen](PIE-v0.4.pen)** for the saved v0.4 design: uppercase PIE, lower PIN keypad and light/dark theme variables. The user saved this original document on 3 November 2026. The v0.4 mockup photos retain their original online URLs; local photo copies are available in `assets/`. [PIE.pen](PIE.pen) remains the earlier R2 reference with local image paths.
 
-This is the original active PIE document, including the earlier explorations and the R2 screens. Node IDs match [the design reference](../docs/DESIGN_REFERENCE.md). Keep the entire `design/` directory together when copying it.
+The archived Pen document includes the earlier explorations and the R2 screens. Node IDs match [the design reference](../docs/DESIGN_REFERENCE.md). Keep the entire `design/` directory together when copying it.
 
 | File | Purpose |
 |---|---|
@@ -18,3 +20,5 @@ The design uses Noto Sans Thai. The font and its license are already bundled in 
 The R2 PNG exports in `docs/design-reference/` remain the visual reference. Compose motion and real loading/error/security behavior live in the Android source; a `.pen` canvas is the editable visual design.
 
 Run `pwsh -File scripts/Verify-Design.ps1` from the repo root to check the JSON, all eight approved R2 frames and referenced local image files.
+
+

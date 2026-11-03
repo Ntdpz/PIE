@@ -24,4 +24,31 @@ class DiaryMigrationTest {
             close()
         }
     }
+
+    @Test
+    fun upgradeFrom2To3PreservesDiaryAndMediaAndCascadesReceipts() {
+        helper.createDatabase("merge-migration", 2).apply {
+            execSQL("INSERT INTO diary_entries VALUES ('2026-11-03', 'keep diary', 7)")
+            execSQL("INSERT INTO diary_media VALUES ('media-id', '2026-11-03', 'keep.png', 'image/png', 9)")
+            close()
+        }
+        helper.runMigrationsAndValidate("merge-migration", 3, true, DatabaseMigrations.From2To3).apply {
+            execSQL("PRAGMA foreign_keys=ON")
+            query("SELECT text FROM diary_entries").use { check(it.moveToFirst()); assertEquals("keep diary", it.getString(0)) }
+            query("SELECT fileName FROM diary_media").use { check(it.moveToFirst()); assertEquals("keep.png", it.getString(0)) }
+            execSQL("INSERT INTO import_receipts VALUES ('2026-11-03', 'source-hash')")
+            execSQL("DELETE FROM diary_entries WHERE date = '2026-11-03'")
+            query("SELECT COUNT(*) FROM import_receipts").use { check(it.moveToFirst()); assertEquals(0, it.getInt(0)) }
+            close()
+        }
+    }
+
+    @Test
+    fun upgradeFrom1To3PreservesText() {
+        helper.createDatabase("full-migration", 1).apply {
+            execSQL("INSERT INTO diary_entries VALUES ('2026-11-03', 'old note', 1)")
+            close()
+        }
+        helper.runMigrationsAndValidate("full-migration", 3, true, DatabaseMigrations.From1To2, DatabaseMigrations.From2To3).close()
+    }
 }

@@ -98,7 +98,7 @@ fun PieApp(container: AppContainer) {
             }
             composable("settings") {
                 val vm: SettingsViewModel = viewModel(factory = viewModelFactory {
-                    initializer { SettingsViewModel(container.settingsRepository, container.backupRepository, container.applicationScope) }
+                    initializer { SettingsViewModel(container.settingsRepository, container.backupRepository, container.applicationScope, container.mergeImportRepository) }
                 })
                 SettingsRoute(vm, BuildConfig.VERSION_NAME) { action ->
                     nav.navigate(when (action) {
@@ -113,7 +113,7 @@ fun PieApp(container: AppContainer) {
             }
             composable("reminders") {
                 val vm: SettingsViewModel = viewModel(factory = viewModelFactory {
-                    initializer { SettingsViewModel(container.settingsRepository, container.backupRepository, container.applicationScope) }
+                    initializer { SettingsViewModel(container.settingsRepository, container.backupRepository, container.applicationScope, container.mergeImportRepository) }
                 })
                 ReminderRoute(vm, LocalDate.now(container.clock), { nav.popBackStack() }, container.reminders::notifyNow)
             }
@@ -130,7 +130,7 @@ fun PieApp(container: AppContainer) {
             }
             composable("backup/{mode}") { entry ->
                 val vm: BackupViewModel = viewModel(factory = viewModelFactory {
-                    initializer { BackupViewModel(container.backupRepository, container.diaryWriter) }
+                    initializer { BackupViewModel(container.backupRepository, container.diaryWriter, container.mergeImportRepository, container.applicationScope) }
                 })
                 BackupRoute(vm, entry.arguments?.getString("mode") == "restore") { nav.popBackStack() }
             }

@@ -35,6 +35,14 @@ fun BackupRoute(viewModel: BackupViewModel, restoring: Boolean, onBack: () -> Un
         password = ""; confirmation = ""
     }
     BackHandler(state.busy) { }
+    if (state.preview != null) {
+        ImportReviewScreen(state, viewModel::choose, viewModel::confirmImport, viewModel::cancelPreview)
+        return
+    }
+    if (restoring && state.result != null) {
+        ImportSuccessScreen(requireNotNull(state.result), onBack)
+        return
+    }
     BackupScreen(
         state, restoring, password, confirmation,
         { password = it }, { confirmation = it }, onBack,
@@ -77,7 +85,7 @@ fun BackupScreen(
                 PieIcon(PieGlyph.Archive, color = colors.primary, size = 28.dp)
                 Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
                     Text("บันทึกทั้งหมดของคุณ")
-                    Text(if (restoring) "นำเข้าได้เมื่อแอปยังไม่มีข้อมูล" else "ใช้ย้ายข้อมูลเข้า PIE บนเครื่องใหม่ได้", style = MaterialTheme.typography.labelSmall, color = colors.primary)
+                    Text(if (restoring) "ตรวจรายการก่อนรวมกับบันทึกในเครื่อง" else "ใช้ย้ายข้อมูลเข้า PIE บนเครื่องใหม่ได้", style = MaterialTheme.typography.labelSmall, color = colors.primary)
                 }
             }
         }
@@ -94,10 +102,13 @@ fun BackupScreen(
             }
         }
         PiePrimaryButton(
-            if (state.busy) "กำลังทำรายการ…" else if (restoring) "เลือกไฟล์และนำเข้า" else "เลือกที่เก็บและส่งออก",
+            if (state.busy) "กำลังทำรายการ…" else if (restoring) "เลือกไฟล์เพื่อตรวจรายการ" else "เลือกที่เก็บและส่งออก",
             onChoose, enabled = valid && !state.busy, icon = PieGlyph.Download,
         )
-        if (state.busy) PieLoader(if (restoring) "กำลังนำเข้าบันทึก…" else "กำลังเข้ารหัสไฟล์สำรอง…", compact = true)
+        if (state.busy) PieLoader(if (restoring) "กำลังตรวจไฟล์สำรอง…" else "กำลังเข้ารหัสไฟล์สำรอง…", compact = true)
+        state.result?.let { result ->
+            Text("เพิ่ม ${result.addedDays} วัน · แก้ไข ${result.changedDays} วัน · ข้าม ${result.skippedDays} วัน\nเพิ่มสื่อ ${result.addedMedia} รายการ · ข้ามสื่อซ้ำ ${result.skippedMedia} รายการ")
+        }
         Text(
             state.message ?: if (restoring) "กรอกรหัสผ่านของไฟล์ที่ต้องการนำเข้า" else "กรอกรหัสผ่านอย่างน้อย 8 ตัวให้ตรงกันเพื่อส่งออก",
             style = MaterialTheme.typography.labelSmall,

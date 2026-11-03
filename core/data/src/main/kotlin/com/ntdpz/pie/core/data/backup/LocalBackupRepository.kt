@@ -25,12 +25,13 @@ internal class LocalBackupRepository(
     private val context: Context,
     private val database: PieDatabase,
     private val settings: SettingsRepository,
+    private val gate: DatabaseMutationGate = DatabaseMutationGate(database, context.filesDir),
 ) : BackupRepository {
     private val mediaRoot = File(context.filesDir, "diary-media").apply { mkdirs() }
 
     override suspend fun canRestore() = database.diaryDao().count() == 0
 
-    override suspend fun export(uri: String, password: CharArray) = withContext(Dispatchers.IO) {
+    override suspend fun export(uri: String, password: CharArray) = gate.exclusive {
         require(password.size >= 8)
         val zipFile = File.createTempFile("pie-export-", ".zip", context.cacheDir)
         try {
@@ -55,7 +56,7 @@ internal class LocalBackupRepository(
         } finally { zipFile.delete() }
     }
 
-    override suspend fun restore(uri: String, password: CharArray) = withContext(Dispatchers.IO) {
+    override suspend fun restore(uri: String, password: CharArray) = gate.exclusive {
         check(canRestore()) { "Restore requires an empty app" }
         val zipFile = File.createTempFile("pie-restore-", ".zip", context.cacheDir)
         val staging = File(context.filesDir, "restore-${UUID.randomUUID()}").apply { mkdirs() }

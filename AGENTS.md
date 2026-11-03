@@ -23,7 +23,7 @@ Work like a production line: each station accepts explicit input, does one job, 
 - Run `./gradlew testDebugUnitTest :core:domain:test lintDebug assembleDebug` and `pwsh -File scripts/Verify-Architecture.ps1`.
 - Report what was actually verified. Do not call the V1 finished while media, PIN, reminders or backup are missing.
 - Do not commit or push unless the user asks.
-- UI uses the approved R2 Pen references in docs/DESIGN_REFERENCE.md. Shared typography is bundled Noto Sans Thai; icons are Lucide assets.
+- UI uses the approved Kalka source in design/PIE-Kalka.fig and docs/DESIGN_REFERENCE.md; original Pen references remain archived. Shared typography is bundled Noto Sans Thai; icons are Lucide assets.
 - Close transient dialogs on stop before showing the session PIN gate.
 - New database migrations, archive authentication/restore and write ordering changes require their corresponding tests.
 - Version 0.2.0 is a UI preview; local usage metrics, broad device/IME/accessibility coverage and release acceptance remain.

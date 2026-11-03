@@ -8,21 +8,27 @@ import java.io.File
 import com.ntdpz.pie.core.data.media.MediaDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.onStart
+import com.ntdpz.pie.core.data.backup.DatabaseMutationGate
 
-internal class RoomDiaryRepository(private val dao: DiaryDao, private val media: MediaDao, private val mediaRoot: File) : DiaryRepository {
+internal class RoomDiaryRepository(private val dao: DiaryDao, private val media: MediaDao, private val mediaRoot: File, private val gate: DatabaseMutationGate? = null) : DiaryRepository {
     override fun observeEntry(date: LocalDate) =
-        dao.observeEntry(date.toString()).map { it?.toDomain() }
+        dao.observeEntry(date.toString()).onStart { gate?.exclusive { } }.map { it?.toDomain() }
 
     override fun observeSummaries() =
-        dao.observeSummaries().map { entries -> entries.map(DiarySummaryRow::toDomain) }
+        dao.observeSummaries().onStart { gate?.exclusive { } }.map { entries -> entries.map(DiarySummaryRow::toDomain) }
 
     override suspend fun readEntry(date: LocalDate) =
         dao.readEntry(date.toString())?.toDomain()
 
-    override suspend fun saveEntry(entry: DiaryEntry) = dao.upsert(entry.toEntity())
-    override suspend fun deleteEntry(date: LocalDate) = withContext(Dispatchers.IO) {
+    override suspend fun saveEntry(entry: DiaryEntry) = mutate { dao.upsert(entry.toEntity()) }
+    override suspend fun deleteEntry(date: LocalDate) = mutate {
         val owned = media.readForDate(date.toString())
         dao.delete(date.toString())
         owned.forEach { File(mediaRoot, it.fileName).delete() }
+    }
+
+    private suspend fun <T> mutate(block: suspend () -> T): T = withContext(Dispatchers.IO) {
+        if (gate == null) block() else gate.exclusive(block)
     }
 }

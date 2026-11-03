@@ -68,7 +68,7 @@ flowchart TD
 - SessionViewModel/PieSessionGate ดูแล lifecycle lock และ FLAG_SECURE แยกจาก feature UI
 - AndroidReminders/ReminderReceiver เป็น adapter สำหรับ notification, alarm, reboot และ timezone changes
 - BackupManifestIO ดูแล schema archive; BackupCipher ดูแล PBKDF2 + AES-256-GCM; LocalBackupRepository ประกอบงานไฟล์และฐานข้อมูล
-- Restore decrypt/authenticate จบก่อนอ่าน ZIP ตรวจชื่อไฟล์/ข้อมูลลง staging และ commit เฉพาะเมื่อ database ยังว่าง การเตือนที่นำเข้ามาปิดอยู่ และไม่สำรอง PIN
+- Merge import decrypt/authenticate จบก่อนอ่าน ZIP ตรวจข้อมูลลง staging แล้วให้ตรวจรายการและเลือกข้อความรายวันก่อน commit; PIN ธีม และแจ้งเตือนคงค่าของเครื่องนี้ ดู [Merge v0.5.0](MERGE_IMPORT_V0_5_0.md)
 - ฐานข้อมูลในเครื่องยังไม่มีการเข้ารหัสระดับแอป; PIN เป็น access gate ไม่ใช่ encryption
 
 ## ขอบเขตและ lifetime

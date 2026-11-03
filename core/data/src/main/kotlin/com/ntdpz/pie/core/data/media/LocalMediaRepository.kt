@@ -12,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import com.ntdpz.pie.core.data.backup.DatabaseMutationGate
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.NonCancellable
 import java.io.File
@@ -22,17 +24,18 @@ import java.util.UUID
 internal class LocalMediaRepository(
     private val context: Context,
     private val database: PieDatabase,
+    private val gate: DatabaseMutationGate = DatabaseMutationGate(database, context.filesDir),
 ) : DiaryMediaRepository {
     private val root = File(context.filesDir, "diary-media").apply { mkdirs() }
     private val dao = database.mediaDao()
 
-    override fun observeMedia(date: LocalDate) = dao.observe(date.toString()).map { rows ->
+    override fun observeMedia(date: LocalDate) = dao.observe(date.toString()).onStart { gate.exclusive { } }.map { rows ->
         rows.map { row ->
             DiaryMedia(row.id, Uri.fromFile(File(root, row.fileName)).toString(), row.mimeType.startsWith("video/"))
         }
     }
 
-    override suspend fun importMedia(date: LocalDate, uri: String) = withContext(Dispatchers.IO) {
+    override suspend fun importMedia(date: LocalDate, uri: String) = gate.exclusive {
         val source = Uri.parse(uri)
         val mime = context.contentResolver.getType(source).orEmpty()
         require(mime.startsWith("image/") || mime.startsWith("video/")) { "Unsupported media" }
@@ -74,8 +77,8 @@ internal class LocalMediaRepository(
         }
     }
 
-    override suspend fun deleteMedia(id: String) = withContext(Dispatchers.IO) {
-        val media = dao.read(id) ?: return@withContext
+    override suspend fun deleteMedia(id: String) = gate.exclusive {
+        val media = dao.read(id) ?: return@exclusive
         dao.delete(id)
         File(root, media.fileName).delete()
         Unit

@@ -31,8 +31,7 @@ fun SettingsRoute(viewModel: SettingsViewModel, versionName: String, onAction: (
 @Composable
 fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (SettingsAction) -> Unit, onThemeChange: (ThemeMode) -> Unit) {
     var pinOptions by remember { mutableStateOf(false) }
-    var importInfo by remember { mutableStateOf(false) }
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { pinOptions = false; importInfo = false }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { pinOptions = false }
     val reminder = state.settings.reminder
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState())
@@ -60,8 +59,13 @@ fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (Setti
                     .format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy · HH:mm", java.util.Locale.forLanguageTag("th-TH")))
             }
             SettingRow(PieGlyph.Download, "ส่งออกไฟล์สำรอง", backupTime?.let { "ส่งออกสำเร็จล่าสุด $it" } ?: "ยังไม่มีประวัติส่งออกสำเร็จบนเครื่องนี้") { onAction(SettingsAction.ExportBackup) }
-            SettingRow(PieGlyph.Archive, "นำเข้าไฟล์สำรอง", if (state.canRestore) "เลือกไฟล์ .pie และใส่รหัสผ่านไฟล์สำรอง" else "มีบันทึกอยู่แล้ว · ดูเงื่อนไขการนำเข้า") {
-                if (state.canRestore) onAction(SettingsAction.RestoreBackup) else importInfo = true
+            SettingRow(PieGlyph.Archive, "นำเข้าไฟล์สำรอง", "รวมกับบันทึกในเครื่อง · ตรวจรายการก่อนนำเข้า") {
+                onAction(SettingsAction.RestoreBackup)
+            }
+            state.lastImportAtMillis?.let { timestamp ->
+                val label = java.time.Instant.ofEpochMilli(timestamp).atZone(java.time.ZoneId.systemDefault())
+                    .format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy · HH:mm", java.util.Locale.forLanguageTag("th-TH")))
+                Text("นำเข้าสำเร็จล่าสุด $label", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         Surface(modifier = Modifier.pieReveal(3), color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onBackground, shape = RoundedCornerShape(16.dp)) {
@@ -74,12 +78,6 @@ fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (Setti
         state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
         Text("PIE · V$versionName", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-    if (importInfo) AlertDialog(
-        onDismissRequest = { importInfo = false },
-        title = { Text("นำเข้าไฟล์สำรอง") },
-        text = { Text("รุ่นนี้นำเข้าได้เมื่อแอปยังไม่มีบันทึก เพื่อป้องกันข้อมูลเดิมถูกเขียนทับ และยังไม่รองรับการรวมบันทึก\n\nหากต้องการกู้คืนบนเครื่องใหม่ ให้ติดตั้ง PIE แล้วเลือก ตั้งค่า → นำเข้าไฟล์สำรอง เลือกไฟล์ .pie และใส่รหัสผ่านที่ตั้งตอนส่งออก\n\nควรส่งออกบันทึกปัจจุบันให้เรียบร้อยก่อนจัดการข้อมูลเดิม") },
-        confirmButton = { TextButton(onClick = { importInfo = false }) { Text("เข้าใจแล้ว") } },
-    )
     if (pinOptions) AlertDialog(
         onDismissRequest = { pinOptions = false },
         title = { Text("ล็อกด้วย PIN") },

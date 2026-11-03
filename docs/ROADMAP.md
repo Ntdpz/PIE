@@ -50,7 +50,7 @@
 5. **Backup / Restore**
    - Archive versioning, password encryption, streaming media
    - ส่งออก consistent snapshot พร้อมสื่อที่เสร็จแล้ว
-   - นำเข้าใน staging ตรวจครบแล้ว commit เฉพาะเมื่อแอปว่าง
+   - นำเข้าใน staging ตรวจรายการและเลือก Merge รายวันก่อนยืนยัน (v0.5.0)
 6. **Local usage + release**
    - event definition, no content collection, no upload
    - Baseline Profile, release APK size/startup/frame measurements

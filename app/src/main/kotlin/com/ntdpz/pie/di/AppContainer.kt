@@ -22,6 +22,7 @@ class AppContainer(context: Context) {
     val diaryRepository = data.repository
     val mediaRepository = data.media
     val backupRepository = data.backup
+    val mergeImportRepository = data.merge
     val diaryWriter = DiaryWriter(diaryRepository, applicationScope, clock)
 
     init {

@@ -3,6 +3,7 @@ package com.ntdpz.pie.feature.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ntdpz.pie.core.domain.backup.BackupRepository
+import com.ntdpz.pie.core.domain.backup.MergeImportRepository
 import com.ntdpz.pie.core.domain.settings.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -14,12 +15,14 @@ data class SettingsUiState(
     val canRestore: Boolean = false,
     val saved: Boolean = true,
     val message: String? = null,
+    val lastImportAtMillis: Long? = null,
 )
 
 class SettingsViewModel(
     private val repository: SettingsRepository,
     private val backups: BackupRepository,
     private val writeScope: CoroutineScope,
+    private val imports: MergeImportRepository? = null,
 ) : ViewModel() {
     private val mutable = MutableStateFlow(SettingsUiState())
     val state = mutable.asStateFlow()
@@ -28,6 +31,13 @@ class SettingsViewModel(
     private val themeWrites = Channel<ThemeMode>(Channel.UNLIMITED)
 
     init {
+        imports?.let { source ->
+            viewModelScope.launch {
+                source.lastImportAtMillis.catch { emit(null) }.collect { timestamp ->
+                    mutable.update { it.copy(lastImportAtMillis = timestamp) }
+                }
+            }
+        }
         writeScope.launch {
             for (mode in themeWrites) {
                 try { repository.saveTheme(mode) }

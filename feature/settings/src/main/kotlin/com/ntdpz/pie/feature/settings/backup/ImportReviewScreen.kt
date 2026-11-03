@@ -1,7 +1,9 @@
 package com.ntdpz.pie.feature.settings.backup
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import com.ntdpz.pie.core.designsystem.motion.PieMotion
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -40,7 +42,9 @@ internal fun ImportReviewScreen(
                     Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    if (state.busy) PieLoader("กำลังรวมบันทึก…", compact = true)
+                    AnimatedVisibility(state.busy, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+                        PieLoader("กำลังรวมบันทึก…", compact = true)
+                    }
                     PiePrimaryButton(
                         label = when (step) {
                             0 -> if (conflicts.isEmpty()) "ตรวจสรุปก่อนนำเข้า" else "เลือกข้อความ ${conflicts.size} วัน"
@@ -77,7 +81,19 @@ internal fun ImportReviewScreen(
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
-            AnimatedContent(targetState = step to conflictIndex, label = "Import step") { (page, index) ->
+            AnimatedContent(
+                targetState = step to conflictIndex,
+                transitionSpec = {
+                    val forward = targetState.first > initialState.first ||
+                        (targetState.first == initialState.first && targetState.second > initialState.second)
+                    val direction = if (forward) 1 else -1
+                    (fadeIn(tween(PieMotion.GentleMillis)) +
+                        slideInHorizontally(tween(PieMotion.PageMillis, easing = PieMotion.Emphasized)) { it / 8 * direction })
+                        .togetherWith(fadeOut(tween(PieMotion.QuickMillis)) +
+                            slideOutHorizontally(tween(PieMotion.PageMillis, easing = PieMotion.Emphasized)) { -it / 12 * direction })
+                },
+                label = "Import step",
+            ) { (page, index) ->
                 Column(
                     Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp),

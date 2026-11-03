@@ -1,10 +1,18 @@
 package com.ntdpz.pie.feature.settings.backup
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.graphics.graphicsLayer
+import com.ntdpz.pie.core.designsystem.motion.piePressScale
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -29,14 +37,19 @@ internal fun ImportConflictContent(
     ImportTextCard("จากไฟล์สำรอง", conflict.backup.text)
     Text("เลือกข้อความที่จะใช้ในวันนี้", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
     MergeChoice.entries.forEach { choice ->
+        val interactions = remember { MutableInteractionSource() }
+        val background by animateColorAsState(if (selected == choice) colors.primaryContainer else colors.surface, label = "Choice color")
+        val selectedScale by animateFloatAsState(if (selected == choice) 1f else 0.985f, spring(dampingRatio = 0.75f), label = "Choice emphasis")
         Surface(
-            color = if (selected == choice) colors.primaryContainer else colors.surface,
+            modifier = Modifier.piePressScale(interactions).graphicsLayer { scaleX = selectedScale; scaleY = selectedScale },
+            color = background,
             shape = RoundedCornerShape(16.dp),
         ) {
             Row(
                 Modifier.fillMaxWidth().selectable(
                     selected = selected == choice, enabled = enabled,
                     role = Role.RadioButton, onClick = { onChoice(choice) },
+                    interactionSource = interactions, indication = LocalIndication.current,
                 ).padding(horizontal = 12.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -51,6 +64,7 @@ internal fun ImportConflictContent(
             MergeChoice.UseBackup -> "ใช้ข้อความจากไฟล์สำรองแทนข้อความเดิม รูปและวิดีโอเดิมยังอยู่"
             MergeChoice.KeepBoth -> "ต่อข้อความจากไฟล์สำรองท้ายข้อความเดิม\nมีตัวแบ่งชัดเจน และยังอยู่ในวันเดียวกัน"
         },
+        modifier = Modifier.animateContentSize(),
         style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant,
     )
 }

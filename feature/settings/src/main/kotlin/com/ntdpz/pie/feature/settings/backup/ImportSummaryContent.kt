@@ -13,6 +13,7 @@ import com.ntdpz.pie.core.domain.backup.ImportPreview
 import com.ntdpz.pie.core.domain.backup.ImportResult
 import com.ntdpz.pie.core.domain.backup.MergeChoice
 import java.time.LocalDate
+import com.ntdpz.pie.core.designsystem.motion.pieReveal
 
 @Composable
 internal fun ImportOverview(preview: ImportPreview) {
@@ -54,8 +55,8 @@ internal fun ImportSuccessScreen(result: ImportResult, onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             Spacer(Modifier.height(24.dp))
-            PieIcon(PieGlyph.Check, color = MaterialTheme.colorScheme.primary, size = 56.dp)
-            Text("เรื่องเล่ากลับมาอยู่ด้วยกันแล้ว", style = MaterialTheme.typography.headlineLarge)
+            PieSuccessMark()
+            Text("เรื่องเล่ากลับมาอยู่ด้วยกันแล้ว", modifier = Modifier.pieReveal(1), style = MaterialTheme.typography.headlineLarge)
             Text("นำเข้าบันทึกเรียบร้อย\nกลับไปเปิดดูวันเก่า ๆ ได้เลย", color = MaterialTheme.colorScheme.onSurfaceVariant)
             ImportSummaryCard(listOf(
                 "เพิ่มวันใหม่" to "${result.addedDays} วัน",
@@ -75,8 +76,8 @@ internal fun ImportSuccessScreen(result: ImportResult, onBack: () -> Unit) {
 private fun ImportSummaryCard(rows: List<Pair<String, String>>) {
     Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(20.dp)) {
         Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            rows.forEach { (label, value) ->
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            rows.forEachIndexed { index, (label, value) ->
+                Row(Modifier.fillMaxWidth().pieReveal(index), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(label, Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
                     Text(value, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
                 }

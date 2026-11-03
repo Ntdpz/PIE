@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="downloads/PIE-v0.6.0-debug.apk"><strong>⬇ ดาวน์โหลด APK ทดลอง · v0.6.0</strong></a>
+  <a href="downloads/PIE-v0.7.0-debug.apk"><strong>⬇ ดาวน์โหลด APK ทดลอง · v0.7.0</strong></a>
   &nbsp; · &nbsp;
   <a href="#getting-started">เริ่มพัฒนา</a>
   &nbsp; · &nbsp;
@@ -25,7 +25,7 @@
 
 PIE เป็นแอปไดอารี่ส่วนตัวสำหรับ Android แต่ละวันมีกระดาษหนึ่งหน้า กลับมาเขียนต่อได้กี่รอบก็ได้ รองรับข้อความ Emoji และ `#` แบบข้อความธรรมดา ข้อมูลหลักอยู่บนเครื่องและเริ่มใช้งานได้โดยไม่ต้องสร้างบัญชี
 
-**สถานะ: UI Preview `0.6.0`** — UI R3 โทนสมุดส่วนตัว พร้อม Gallery ความทรงจำ: ปัดรูปในวันเดียวกัน ปัดเปลี่ยนวัน เปิดอ่านเรื่องเล่ายาว และเรียกปฏิทินจากปุ่ม · [รายละเอียดและผลทดสอบ](docs/R3_GALLERY_V0_6_0.md) · PIN, แจ้งเตือน และสำรองข้อมูลยังทำงานตามเดิม งานสถิติในเครื่องและการตรวจรับ V1 หลายอุปกรณ์ยังอยู่ในแผน
+**สถานะ: UI Preview `0.7.0`** — UI R3 โทนสมุดส่วนตัว พร้อม Gallery ความทรงจำ: รูปสูงตามสัดส่วนจริง ปัดรูปในวันเดียวกัน ข้อความต่อใต้รูป และเลื่อนอ่านวันถัดไปแบบ Feed · [รายละเอียดและผลทดสอบ](docs/GALLERY_FEED_V0_7_0.md) · PIN, แจ้งเตือน และสำรองข้อมูลยังทำงานตามเดิม งานสถิติในเครื่องและการตรวจรับ V1 หลายอุปกรณ์ยังอยู่ในแผน
 
 ## สิ่งที่ทำได้ตอนนี้
 
@@ -57,14 +57,14 @@ PIE เป็นแอปไดอารี่ส่วนตัวสำหร�
 
 ## ดาวน์โหลดและติดตั้ง
 
-**[ดาวน์โหลด PIE v0.6.0 — Debug APK](downloads/PIE-v0.6.0-debug.apk)**
+**[ดาวน์โหลด PIE v0.7.0 — Debug APK](downloads/PIE-v0.7.0-debug.apk)**
 
 | รายการ | รายละเอียด |
 |---|---|
-| ชื่อไฟล์ | `PIE-v0.6.0-debug.apk` |
-| เวอร์ชัน / Build | `0.6.0` / `11` |
+| ชื่อไฟล์ | `PIE-v0.7.0-debug.apk` |
+| เวอร์ชัน / Build | `0.7.0` / `13` |
 | Android ขั้นต่ำ | Android 8.0 · API 26 |
-| ขนาดไฟล์ | 19,456,970 bytes · ประมาณ 19.5 MB |
+| ขนาดไฟล์ | 19,286,565 bytes · ประมาณ 19.3 MB |
 | Package | `com.ntdpz.pie` |
 | การเซ็น | Android debug key ของเครื่องที่ build |
 | ตรวจความถูกต้อง | [SHA256SUMS](downloads/SHA256SUMS) |
@@ -79,7 +79,7 @@ PIE เป็นแอปไดอารี่ส่วนตัวสำหร�
 
 ```powershell
 adb devices
-adb install -r downloads/PIE-v0.6.0-debug.apk
+adb install -r downloads/PIE-v0.7.0-debug.apk
 ```
 
 ถ้ามีหลายอุปกรณ์ ให้เลือก serial จาก `adb devices` แล้วใส่ `-s SERIAL` ก่อน `install`
@@ -89,7 +89,7 @@ adb install -r downloads/PIE-v0.6.0-debug.apk
 ### ตรวจ SHA-256
 
 ```powershell
-Get-FileHash downloads/PIE-v0.6.0-debug.apk -Algorithm SHA256
+Get-FileHash downloads/PIE-v0.7.0-debug.apk -Algorithm SHA256
 Get-Content downloads/SHA256SUMS
 ```
 
@@ -371,7 +371,7 @@ adb devices
 | Android data tests | Persistence, migration 1→2, Backup round trip และสื่อหลังลบต้นฉบับ | 4 ผ่าน |
 | Android UI tests | เขียน/ย้อนอ่าน/recreate, หน้าตาม Pen, PIN และ loader | 5 ผ่าน |
 
-รอบ v0.6.0 ผ่าน 34 unit cases, Android data 20 กรณี และ Android UI 12 กรณีบน emulator ดู [R3 / Gallery verification](docs/R3_GALLERY_V0_6_0.md) ผลนี้เป็นการตรวจในเครื่อง ไม่ใช่การยืนยัน CI หรือทุกอุปกรณ์
+รอบ v0.7.0 ผ่าน 36 unit cases และ Android UI 12 กรณีบน emulator; ชุด Android data 20 กรณีผ่านในรอบ 0.6.0 ดู [R3 / Gallery verification](docs/GALLERY_FEED_V0_7_0.md) ผลนี้เป็นการตรวจในเครื่อง ไม่ใช่การยืนยัน CI หรือทุกอุปกรณ์
 
 ### CI
 
@@ -387,7 +387,7 @@ Workflow ปัจจุบันยังไม่รัน emulator tests ไ�
 |---|---|---|
 | Debug | `app/build/outputs/apk/debug/app-debug.apk` | ติดตั้งทดสอบ เซ็นด้วย debug key |
 | Release | `app/build/outputs/apk/release/app-release-unsigned.apk` | เปิด R8/resource shrinking แต่ต้องเซ็นก่อนติดตั้งเผยแพร่ |
-| ไฟล์ดาวน์โหลดใน repo | `downloads/PIE-v0.6.0-debug.apk` | สำเนา Debug ที่ตรวจแล้วสำหรับชุดนี้ |
+| ไฟล์ดาวน์โหลดใน repo | `downloads/PIE-v0.7.0-debug.apk` | สำเนา Debug ที่ตรวจแล้วสำหรับชุดนี้ |
 
 Release UI Preview v0.2.0 ที่ตรวจไว้มีขนาด 3,044,651 bytes หรือประมาณ 3.0 MB **เป็นไฟล์ unsigned** ขนาดนี้ยังไม่รวมฟีเจอร์ V1 ที่เหลือ และไม่ใช่ผลวัด RAM หรือความลื่นบนโทรศัพท์จริง
 
@@ -396,9 +396,9 @@ Release UI Preview v0.2.0 ที่ตรวจไว้มีขนาด 3,044
 หลังรันทดสอบแล้ว ให้ใช้ชื่อไฟล์ให้ตรงกับเวอร์ชัน:
 
 ```powershell
-Copy-Item app/build/outputs/apk/debug/app-debug.apk downloads/PIE-v0.6.0-debug.apk
-$apkHash = (Get-FileHash downloads/PIE-v0.6.0-debug.apk -Algorithm SHA256).Hash.ToLowerInvariant()
-Add-Content downloads/SHA256SUMS "$apkHash  PIE-v0.6.0-debug.apk" -Encoding utf8NoBOM
+Copy-Item app/build/outputs/apk/debug/app-debug.apk downloads/PIE-v0.7.0-debug.apk
+$apkHash = (Get-FileHash downloads/PIE-v0.7.0-debug.apk -Algorithm SHA256).Hash.ToLowerInvariant()
+Add-Content downloads/SHA256SUMS "$apkHash  PIE-v0.7.0-debug.apk" -Encoding utf8NoBOM
 ```
 
 เมื่อเปลี่ยนเวอร์ชัน ให้อัปเดตชื่อไฟล์ ปุ่มดาวน์โหลด ขนาด และ checksum ใน README ด้วย การเซ็น Release ต้องเก็บ keystore นอก repo และใช้ signing key เดิมสำหรับการอัปเดตแอป

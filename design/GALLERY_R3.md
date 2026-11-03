@@ -1,5 +1,7 @@
 # Gallery memories — R3 proposal
 
+**Approved revision:** [Gallery Feed R3](GALLERY_FEED_R3.md) replaces the popup story reader with an inline feed and natural-height media in 0.7.0. Review the updated `R3 · Gallery · เริ่มดูที่นี่` overview in Kalka. The interaction below is retained as the historical 0.6.x viewer reference.
+
 The memory tab opens a date-based gallery. The calendar moves behind the calendar button in its header. Every day stays reachable, including days containing text only.
 
 ## Proposed interaction

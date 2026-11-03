@@ -38,6 +38,7 @@ private fun MemoryPhoto(uri: String, loader: ImageLoader, active: Boolean, onZoo
     var failed by remember(uri) { mutableStateOf(false) }
     var retry by remember(uri) { mutableIntStateOf(0) }
     LaunchedEffect(active) { if (!active) { scale = 1f; offset = Offset.Zero } }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { scale = 1f; offset = Offset.Zero; onZoom(false) }
     LaunchedEffect(scale, active) { if (active) onZoom(scale > 1.01f) }
     val transform = rememberTransformableState { zoom, pan, _ ->
         scale = (scale * zoom).coerceIn(1f, 4f)
@@ -52,7 +53,7 @@ private fun MemoryPhoto(uri: String, loader: ImageLoader, active: Boolean, onZoo
                 .transformable(transform, canPan = { scale > 1.01f })
                 .pointerInput(uri) { detectTapGestures(onDoubleTap = { scale = if (scale > 1f) 1f else 2f; offset = Offset.Zero }) },
         )
-        if (scale > 1.01f) TextButton(onClick = { scale = 1f; offset = Offset.Zero }, Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 56.dp)) { Text("คืนขนาดภาพ") }
+        if (scale > 1.01f) TextButton(onClick = { scale = 1f; offset = Offset.Zero }, Modifier.align(Alignment.BottomEnd).padding(12.dp)) { Text("คืนขนาดภาพ") }
         if (failed) TextButton(onClick = { retry++; failed = false }, Modifier.align(Alignment.Center)) { Text("เปิดภาพไม่สำเร็จ · ลองอีกครั้ง") }
     }
 }
@@ -74,7 +75,7 @@ private fun MemoryVideo(uri: String, loader: ImageLoader, active: Boolean, modif
             DisposableEffect(player) { onDispose { player.release() } }
             LaunchedEffect(sound) { player.volume = if (sound) 1f else 0f }
             AndroidView(factory = { PlayerView(it).apply { this.player = player } }, modifier = Modifier.fillMaxSize())
-            FilledTonalButton(onClick = { sound = !sound }, Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 56.dp)) { Text(if (sound) "ปิดเสียง" else "เปิดเสียง") }
+            FilledTonalButton(onClick = { sound = !sound }, Modifier.align(Alignment.BottomEnd).padding(12.dp)) { Text(if (sound) "ปิดเสียง" else "เปิดเสียง") }
         }
     }
 }

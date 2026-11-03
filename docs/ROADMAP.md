@@ -1,3 +1,7 @@
+## 0.7.0 · Gallery Feed
+
+The approved Gallery Feed replaces day snapping and the story popup with natural-height media and complete inline prose. Full text is observed for visible and adjacent dates, videos stop when media leaves the viewport, and the calendar remains secondary. See [0.7.0 verification](GALLERY_FEED_V0_7_0.md).
+
 ## 0.6.0 · R3 and Gallery
 
 R3 UI and Gallery memories are implemented, with a hidden calendar, attachment/day paging, full story reading and explicit video playback. See [0.6.0 verification](R3_GALLERY_V0_6_0.md). Usage metrics, V2 Drive sync and broad release acceptance remain pending.

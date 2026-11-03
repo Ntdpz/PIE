@@ -1,4 +1,12 @@
-# PIE R2 — design reference
+# PIE — design reference
+
+## Current runtime: R3
+
+The approved Gallery Feed revision is implemented in 0.7.0: natural-height media and full inline prose replace the earlier memory pager/story popup. See [current Feed verification](GALLERY_FEED_V0_7_0.md).
+
+The approved visual system is [DESIGN.md](../DESIGN.md), with editable R3 pages in `design/PIE-Kalka.fig`. Runtime coverage is tracked in [R3 / Gallery](R3_GALLERY_V0_6_0.md). Version 0.6.1 also aligns calendar sheets, PIN options/help, deletion dialogs, reminder time input and Material surface roles with this system. The R2 tokens and Pen IDs below are historical references, not current implementation tokens.
+
+## Archived R2
 
 The current editable source is [design/PIE-Kalka.fig](../design/PIE-Kalka.fig) in Kalka, including all 24 artboards and the proposed Merge flow. See [migration details](../design/KALKA.md). The table below keeps the original Pen IDs for traceability.
 

@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import org.junit.Rule
 import org.junit.Test
 
@@ -30,16 +31,19 @@ class DiaryFlowTest {
             compose.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().isNotEmpty()
         }
         compose.onNode(hasSetTextAction()).performTextReplacement(text)
+        compose.onNodeWithContentDescription("เพิ่ม Emoji").performClick()
+        compose.onNodeWithText("🫶").assertIsDisplayed().performClick()
+        val savedText = "$text🫶"
         compose.waitUntil(15_000) {
             compose.onAllNodesWithText("บันทึกแล้ว").fetchSemanticsNodes().isNotEmpty()
         }
         compose.onNodeWithContentDescription("กลับ").performClick()
         compose.onNodeWithText("เขียนต่อ").performClick()
-        compose.onNode(hasSetTextAction()).assertTextEquals(text)
+        compose.onNode(hasSetTextAction()).assertTextEquals(savedText)
         compose.activityRule.scenario.recreate()
         compose.waitUntil(15_000) {
             compose.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNode(hasSetTextAction()).assertTextEquals(text)
+        compose.onNode(hasSetTextAction()).assertTextEquals(savedText)
     }
 }

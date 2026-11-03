@@ -70,17 +70,30 @@ fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (Setti
         state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
         Text("PIE · V$versionName", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
-    if (pinOptions) AlertDialog(
+    if (pinOptions) PieDialog(
         onDismissRequest = { pinOptions = false },
-        title = { Text("ล็อกด้วย PIN") },
+        title = "ล็อกด้วย PIN",
         text = {
             Column {
-                TextButton(onClick = { pinOptions = false; onAction(SettingsAction.ChangePin) }) { Text("เปลี่ยน PIN") }
-                TextButton(onClick = { pinOptions = false; onAction(SettingsAction.DisablePin) }) { Text("ปิด PIN") }
+                PinOption(PieGlyph.Lock, "เปลี่ยน PIN") { pinOptions = false; onAction(SettingsAction.ChangePin) }
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                PinOption(PieGlyph.Close, "ปิด PIN") { pinOptions = false; onAction(SettingsAction.DisablePin) }
             }
         },
         confirmButton = { TextButton(onClick = { pinOptions = false }) { Text("ยกเลิก") } },
     )
+}
+
+@Composable
+private fun PinOption(glyph: PieGlyph, label: String, onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = 56.dp).clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        PieIcon(glyph, color = MaterialTheme.colorScheme.onSurfaceVariant, size = 20.dp)
+        Text(label, style = MaterialTheme.typography.bodyMedium)
+    }
 }
 
 @Composable

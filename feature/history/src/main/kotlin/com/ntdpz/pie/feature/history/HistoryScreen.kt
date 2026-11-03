@@ -42,7 +42,7 @@ fun HistoryScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("ย้อนวัน", Modifier.weight(1f), style = MaterialTheme.typography.headlineMedium)
+            Text("เลือกวัน", Modifier.weight(1f), style = MaterialTheme.typography.headlineMedium)
             FilledTonalButton(onClick = onToday, shape = RoundedCornerShape(12.dp), contentPadding = PaddingValues(horizontal = 18.dp)) {
                 Text("วันนี้", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
             }
@@ -83,7 +83,7 @@ fun HistoryScreen(
                     overflow = TextOverflow.Ellipsis,
                 )
                 PiePrimaryButton(
-                    if (entry == null) "เขียนบันทึกวันนี้" else if (today) "เปิดบันทึกวันนี้" else "เปิดบันทึก",
+                    if (entry == null && today) "เขียนบันทึกวันนี้" else if (entry == null) "เขียนบันทึก" else if (today) "เปิดบันทึกวันนี้" else "เปิดบันทึก",
                     onOpenDiary, enabled = !state.loading && !state.loadFailed, icon = PieGlyph.Book,
                 )
             }

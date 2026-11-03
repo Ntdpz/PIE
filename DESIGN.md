@@ -2,7 +2,7 @@
 
 <!-- Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 -->
 
-Direction chosen by the user: **สงบ เหมือนสมุดส่วนตัว**. The R3 visual layer and Gallery extension are implemented in the 0.6.0 debug preview. See docs/R3_GALLERY_V0_6_0.md for runtime behavior and validation.
+Direction chosen by the user: **สงบ เหมือนสมุดส่วนตัว**. The R3 visual layer is implemented, with the approved inline Gallery Feed revision in 0.7.0. See docs/GALLERY_FEED_V0_7_0.md for current runtime behavior and validation; docs/R3_GALLERY_V0_6_0.md retains the earlier viewer record.
 
 ## Intent
 
@@ -43,7 +43,7 @@ Small text on selection tints uses the ink token, rather than accent text with i
 - No streak penalties, guilt, required mood logging or invented engagement statistics.
 - Preview before Merge remains. Keep replacement counts explicit at confirmation; details are available in a sheet instead of always filling the screen.
 - Keep meaningful safety text at the decision: separate backup password from PIN, show replacement count, state what deletion removes.
-- A long entry expands to full reading text. The two-line example in a mockup is not permission to truncate real content permanently.
+- Gallery Feed shows complete prose directly beneath natural-height media; scrolling continues into older days. No separate story popup or reader expansion. Gallery thumbnails may crop, while feed media preserves the source aspect ratio.
 
 ## Interaction handoff
 

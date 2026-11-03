@@ -25,6 +25,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -67,10 +69,11 @@ private fun CalendarDay(
 ) {
     val active = date != null && date == selectedDate
     val colors = MaterialTheme.colorScheme
-    val background by animateColorAsState(if (active) colors.primary else colors.background, tween(PieMotion.QuickMillis), label = "Selected day")
+    val background by animateColorAsState(if (active) colors.primary else Color.Transparent, tween(PieMotion.QuickMillis), label = "Selected day")
     val foreground by animateColorAsState(if (active) colors.onPrimary else colors.onBackground, tween(PieMotion.QuickMillis), label = "Day ink")
     Box(
-        modifier = modifier.heightIn(min = 44.dp)
+        modifier = modifier.heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(12.dp))
             .background(background, RoundedCornerShape(12.dp))
             .then(
                 if (date == null) Modifier else Modifier

@@ -74,11 +74,11 @@ private fun MediaViewer(item: DiaryMedia, onClose: () -> Unit, onDelete: () -> U
             }
         }
     }
-    if (confirmDelete) AlertDialog(
+    if (confirmDelete) PieDialog(
         onDismissRequest = { confirmDelete = false },
-        title = { Text("ลบสื่อนี้?") },
+        title = "ลบสื่อนี้?",
         text = { Text("ลบเฉพาะสำเนาใน PIE ไฟล์ต้นฉบับในแกลเลอรีจะยังอยู่") },
-        confirmButton = { TextButton(onClick = onDelete) { Text("ลบ") } },
+        confirmButton = { TextButton(onClick = onDelete) { Text("ลบ", color = MaterialTheme.colorScheme.error) } },
         dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("ยกเลิก") } },
     )
 }

@@ -33,13 +33,11 @@ class MemoryViewModelTest {
         val vm = MemoryViewModel(diary, FixtureMedia(), date)
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.state.collect() }
         runCurrent()
-        vm.selectDate(old); runCurrent()
-        assertEquals(old, vm.state.value.date)
-        assertEquals(longText, vm.state.value.text)
+        vm.showDates(setOf(old)); runCurrent()
+        assertEquals(longText, vm.state.value.entries[old]?.text)
         diary.entries.value = listOf(entry(date, "today"), entry(old, "edited old day"))
         runCurrent()
-        assertEquals(old, vm.state.value.date)
-        assertEquals("edited old day", vm.state.value.text)
+        assertEquals("edited old day", vm.state.value.entries[old]?.text)
         assertEquals(date, vm.initialDate)
     }
 
@@ -54,7 +52,26 @@ class MemoryViewModelTest {
         assertEquals(1, vm.state.value.days.size)
         diary.entries.value = emptyList(); runCurrent()
         assertTrue(vm.state.value.days.isEmpty())
-        assertEquals("", vm.state.value.text)
+        assertTrue(vm.state.value.entries.isEmpty())
+    }
+
+    @Test fun feedLoadsFullProseForVisibleAndAdjacentDatesOnly() = runTest(dispatcher) {
+        val diary = FixtureDiary((0..9).map { entry(date.minusDays(it.toLong()), "full prose ".repeat(80)) })
+        val vm = MemoryViewModel(diary, FixtureMedia(), date.minusDays(4))
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.state.collect() }
+        runCurrent()
+        assertEquals(setOf(date.minusDays(3), date.minusDays(4), date.minusDays(5)), vm.state.value.entries.keys)
+        vm.showDates(setOf(date.minusDays(6), date.minusDays(7))); runCurrent()
+        assertEquals((5..8).map { date.minusDays(it.toLong()) }.toSet(), vm.state.value.entries.keys)
+        assertTrue(vm.state.value.entries.values.all { it.text.length > 160 })
+    }
+
+    @Test fun aspectRatioPreservesLandscapePortraitAndRotatedMedia() {
+        assertEquals(16f / 9, memoryAspectRatio(1920, 1080, 0)!!, .0001f)
+        assertEquals(4f / 3, memoryAspectRatio(4000, 3000, 0)!!, .0001f)
+        assertEquals(3f / 4, memoryAspectRatio(4000, 3000, 90)!!, .0001f)
+        assertEquals(9f / 16, memoryAspectRatio(1920, 1080, 270)!!, .0001f)
+        assertNull(memoryAspectRatio(0, 1080, 0))
     }
 
     private fun entry(date: LocalDate, text: String) = DiaryEntry(date, text, Instant.EPOCH)

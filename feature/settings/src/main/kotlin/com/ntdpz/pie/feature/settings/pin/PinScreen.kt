@@ -89,9 +89,9 @@ fun PinScreen(state: PinUiState, onDigit: (Int) -> Unit, onDelete: () -> Unit, o
             else Text("PIE ไม่มีระบบกู้ PIN\nโปรดจดจำรหัสของคุณไว้", style = MaterialTheme.typography.labelSmall, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
-    if (forgot) AlertDialog(
-        onDismissRequest = { forgot = false }, title = { Text("ลืม PIN") },
-        text = { Text("PIE ไม่มีระบบกู้ PIN หากต้องเริ่มใหม่ ต้องล้างข้อมูลแอปจากการตั้งค่า Android ซึ่งจะลบบันทึกทั้งหมดบนเครื่อง\n\nหากมีไฟล์สำรอง สามารถนำเข้าหลังเริ่มใหม่ด้วยรหัสผ่านไฟล์สำรองได้") },
+    if (forgot) PieDialog(
+        onDismissRequest = { forgot = false }, title = "ลืม PIN?",
+        text = { Text("PIE กู้ PIN ไม่ได้\n\nการเริ่มใหม่ด้วยการล้างข้อมูลแอปในการตั้งค่า Android จะลบบันทึกทั้งหมดบนเครื่อง\n\nถ้ามีไฟล์สำรอง นำเข้าหลังเริ่มใหม่ได้ด้วยรหัสผ่านของไฟล์นั้น") },
         confirmButton = { TextButton(onClick = { forgot = false }) { Text("เข้าใจแล้ว") } },
     )
 }

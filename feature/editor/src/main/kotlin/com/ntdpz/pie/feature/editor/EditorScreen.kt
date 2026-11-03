@@ -72,10 +72,10 @@ fun EditorScreen(
                 IconButton(onClick = { menu = true }, Modifier.size(48.dp)) { PieIcon(PieGlyph.More, "ตัวเลือกบันทึก") }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                     DropdownMenuItem(
-                        text = { Text("ลบบันทึกวันนี้") },
+                        text = { Text("ลบบันทึกนี้", color = MaterialTheme.colorScheme.error) },
                         onClick = { menu = false; confirmDelete = true },
                         enabled = !state.importing && !state.deleting,
-                        leadingIcon = { PieIcon(PieGlyph.Trash) },
+                        leadingIcon = { PieIcon(PieGlyph.Trash, color = MaterialTheme.colorScheme.error) },
                     )
                 }
             }
@@ -133,18 +133,29 @@ fun EditorScreen(
             ToolbarButton(PieGlyph.Hash, "เพิ่ม #", !state.loading) { insert("#") }
         }
     }
-    if (confirmDelete) AlertDialog(
+    if (confirmDelete) PieDialog(
         onDismissRequest = { confirmDelete = false },
-        title = { Text("ลบบันทึกนี้?") },
+        title = "ลบบันทึกนี้?",
         text = { Text("ลบข้อความและสื่อของวันที่ ${PieDates.entry(state.date)}\nเมื่อลบแล้วจะกู้คืนไม่ได้") },
         confirmButton = { TextButton(onClick = { confirmDelete = false; onDeleteEntry() }) { Text("ลบบันทึก", color = MaterialTheme.colorScheme.error) } },
         dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("ยกเลิก") } },
     )
     if (emojiPicker) ModalBottomSheet(onDismissRequest = { emojiPicker = false }, containerColor = MaterialTheme.colorScheme.surface) {
         Text("เติมความรู้สึก", Modifier.padding(horizontal = 24.dp), style = MaterialTheme.typography.titleLarge)
-        listOf(listOf("🙂", "🥹", "🥰", "😂", "😌", "😢"), listOf("😭", "😤", "🤍", "✨", "🌷", "🫶")).forEach { emojis ->
-            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                emojis.forEach { emoji -> TextButton(onClick = { insert(emoji); emojiPicker = false }) { Text(emoji, style = MaterialTheme.typography.headlineSmall) } }
+        FlowRow(
+            Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            maxItemsInEachRow = 6,
+        ) {
+            listOf("🙂", "🥹", "🥰", "😂", "😌", "😢", "😭", "😤", "🤍", "✨", "🌷", "🫶").forEach { emoji ->
+                Surface(
+                    onClick = { insert(emoji); emojiPicker = false },
+                    modifier = Modifier.size(48.dp), shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                ) {
+                    Box(contentAlignment = Alignment.Center) { Text(emoji, style = MaterialTheme.typography.headlineSmall) }
+                }
             }
         }
         Spacer(Modifier.height(24.dp))

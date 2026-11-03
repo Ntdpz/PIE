@@ -1,5 +1,1 @@
-{
-  "collections": 2,
-  "variables": 18,
-  "bound": 725
-}
+{"collections":2,"variables":18,"bound":0,"reason":"Keep explicit artboard colors: variable binding changed layout during visual verification."}

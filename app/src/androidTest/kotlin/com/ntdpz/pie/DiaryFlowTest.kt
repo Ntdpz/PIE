@@ -19,12 +19,12 @@ class DiaryFlowTest {
     fun savedTextSurvivesNavigationAndActivityRecreation() {
         val text = "PIE integration test 🙂 #test"
         compose.waitUntil(15_000) {
-            compose.onAllNodesWithText("เริ่มเขียนวันนี้").fetchSemanticsNodes().isNotEmpty() ||
-                compose.onAllNodesWithText("เขียนต่อวันนี้").fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText("เริ่มเขียน").fetchSemanticsNodes().isNotEmpty() ||
+                compose.onAllNodesWithText("เขียนต่อ").fetchSemanticsNodes().isNotEmpty()
         }
         val label = if (
-            compose.onAllNodesWithText("เขียนต่อวันนี้").fetchSemanticsNodes().isNotEmpty()
-        ) "เขียนต่อวันนี้" else "เริ่มเขียนวันนี้"
+            compose.onAllNodesWithText("เขียนต่อ").fetchSemanticsNodes().isNotEmpty()
+        ) "เขียนต่อ" else "เริ่มเขียน"
         compose.onNodeWithText(label).performClick()
         compose.waitUntil(15_000) {
             compose.onAllNodes(hasSetTextAction()).fetchSemanticsNodes().isNotEmpty()
@@ -34,8 +34,7 @@ class DiaryFlowTest {
             compose.onAllNodesWithText("บันทึกแล้ว").fetchSemanticsNodes().isNotEmpty()
         }
         compose.onNodeWithContentDescription("กลับ").performClick()
-        compose.onNodeWithText("ย้อนวัน").performClick()
-        compose.onNodeWithText("เปิดบันทึกวันนี้").performClick()
+        compose.onNodeWithText("เขียนต่อ").performClick()
         compose.onNode(hasSetTextAction()).assertTextEquals(text)
         compose.activityRule.scenario.recreate()
         compose.waitUntil(15_000) {

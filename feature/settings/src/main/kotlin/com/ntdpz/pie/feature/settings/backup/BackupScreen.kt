@@ -71,56 +71,42 @@ fun BackupScreen(
 ) {
     val colors = MaterialTheme.colorScheme
     val valid = password.length >= 8 && (restoring || password == confirmation)
-    Column(
-        Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState())
-            .padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            IconButton(onClick = onBack, enabled = !state.busy) { PieIcon(PieGlyph.Back, "กลับ") }
-            Text("ตั้งค่า", style = MaterialTheme.typography.titleSmall, color = colors.onSurfaceVariant)
-        }
-        Text(if (restoring) "กลับมาหาเรื่องเล่าเดิม" else "เก็บบันทึกไว้อีกที่", style = MaterialTheme.typography.headlineLarge, fontSize = 28.sp)
-        Text(
-            if (restoring) "นำเข้าข้อความ รูป และวิดีโอ\nจากไฟล์สำรองของคุณ" else "ส่งออกข้อความ รูป และวิดีโอทั้งหมด\nเป็นไฟล์สำรองหนึ่งไฟล์",
-            color = colors.onSurfaceVariant,
-        )
-        Surface(color = colors.primaryContainer, contentColor = colors.onBackground, shape = RoundedCornerShape(16.dp)) {
-            Row(Modifier.fillMaxWidth().padding(18.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                PieIcon(PieGlyph.Archive, color = colors.primary, size = 28.dp)
-                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text("บันทึกทั้งหมดของคุณ")
-                    Text(if (restoring) "ตรวจรายการก่อนรวมกับบันทึกในเครื่อง" else "ใช้ย้ายข้อมูลเข้า PIE บนเครื่องใหม่ได้", style = MaterialTheme.typography.labelSmall, color = colors.primary)
+    Scaffold(
+        modifier = Modifier.imePadding(), contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            Surface {
+                Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    AnimatedVisibility(state.busy, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+                        PieLoader(if (restoring) "กำลังตรวจไฟล์สำรอง…" else "กำลังเข้ารหัสและตรวจไฟล์สำรอง…", compact = true)
+                    }
+                    PiePrimaryButton(if (restoring) "เลือกไฟล์ .pie" else "ส่งออกไฟล์", onChoose, enabled = valid && !state.busy, icon = if (restoring) PieGlyph.Archive else PieGlyph.Download)
                 }
             }
-        }
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(if (restoring) "รหัสผ่านของไฟล์สำรอง" else "ตั้งรหัสผ่านให้ไฟล์สำรอง", style = MaterialTheme.typography.bodySmall)
-            PasswordField(password, onPassword, "รหัสผ่านไฟล์สำรอง", !state.busy)
-            if (!restoring) PasswordField(confirmation, onConfirmation, "ยืนยันรหัสผ่านอีกครั้ง", !state.busy)
-            Text("ตั้งแยกจาก PIN ที่ใช้เปิดแอป\nคุณต้องใช้รหัสผ่านนี้เมื่อนำเข้าไฟล์", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
-        }
-        Surface(color = colors.surface, shape = RoundedCornerShape(12.dp)) {
-            Row(Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PieIcon(PieGlyph.Info, color = colors.primary, size = 20.dp)
-                Text("PIE กู้รหัสผ่านไฟล์สำรองให้ไม่ได้\nโปรดเก็บรหัสผ่านไว้ในที่ที่คุณจำได้", style = MaterialTheme.typography.labelMedium)
+        },
+    ) { padding ->
+        Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            TextButton(onClick = onBack, enabled = !state.busy) { PieIcon(PieGlyph.Previous, size = 18.dp); Text("สำรองข้อมูล") }
+            Text(if (restoring) "พาเรื่องเล่ากลับมา" else "เก็บไว้อีกที่", style = MaterialTheme.typography.headlineLarge)
+            Surface(color = colors.surface, shape = RoundedCornerShape(18.dp)) {
+                Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    PieIcon(PieGlyph.Archive, color = colors.primary, size = 40.dp)
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(if (restoring) ".pie" else "ทุกเรื่องในไฟล์เดียว", style = MaterialTheme.typography.titleMedium)
+                        Text(if (restoring) "รวมกับบันทึกเดิม" else "ข้อความ · รูป · วิดีโอ", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+                    }
+                }
             }
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(if (restoring) "รหัสผ่านของไฟล์" else "ตั้งรหัสผ่านของไฟล์", style = MaterialTheme.typography.bodySmall)
+                PasswordField(password, onPassword, "รหัสผ่านไฟล์สำรอง", !state.busy)
+                if (!restoring) {
+                    Text("ยืนยันรหัสผ่าน", style = MaterialTheme.typography.bodySmall)
+                    PasswordField(confirmation, onConfirmation, "ยืนยันรหัสผ่านอีกครั้ง", !state.busy)
+                }
+                Text(if (restoring) "รหัสที่ตั้งไว้ตอนส่งออก" else "อย่างน้อย 8 ตัวอักษร · ใช้รหัสแยกจาก PIN", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
+            }
+            state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = if (state.completed) colors.tertiary else colors.error) }
         }
-        PiePrimaryButton(
-            if (state.busy) "กำลังทำรายการ…" else if (restoring) "เลือกไฟล์เพื่อตรวจรายการ" else "เลือกที่เก็บและส่งออก",
-            onChoose, enabled = valid && !state.busy, icon = PieGlyph.Download,
-        )
-        AnimatedVisibility(state.busy, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
-            PieLoader(if (restoring) "กำลังตรวจไฟล์สำรอง…" else "กำลังเข้ารหัสและตรวจไฟล์สำรอง…", compact = true)
-        }
-        state.result?.let { result ->
-            Text("เพิ่ม ${result.addedDays} วัน · แก้ไข ${result.changedDays} วัน · ข้าม ${result.skippedDays} วัน\nเพิ่มสื่อ ${result.addedMedia} รายการ · ข้ามสื่อซ้ำ ${result.skippedMedia} รายการ")
-        }
-        Text(
-            state.message ?: if (restoring) "กรอกรหัสผ่านของไฟล์ที่ต้องการนำเข้า" else "กรอกรหัสผ่านอย่างน้อย 8 ตัวให้ตรงกันเพื่อส่งออก",
-            style = MaterialTheme.typography.labelSmall,
-            color = if (state.message != null && !state.completed) colors.error else colors.onSurfaceVariant,
-        )
     }
 }
 

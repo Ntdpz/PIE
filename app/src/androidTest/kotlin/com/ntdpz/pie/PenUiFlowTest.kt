@@ -31,57 +31,57 @@ class PenUiFlowTest {
 
     @Test
     fun settingsReminderAndBackupScreensAreUsable() {
-        waitText("วันนี้เป็นยังไงบ้าง?")
+        waitText("วันนี้เป็นยังไงบ้าง")
         val dailyMessage = ReminderMessages.defaultForDay(LocalDate.now())
-        compose.onNodeWithText(dailyMessage).assertIsDisplayed()
         saveScreen("home")
-        compose.onNode(hasText("ย้อนวัน") and hasClickAction()).performClick()
-        waitText("วันที่มีบันทึก")
+        compose.onNode(hasText("ความทรงจำ") and hasClickAction()).performClick()
+        compose.onNodeWithContentDescription("เลือกวันจากปฏิทิน").performClick()
+        waitText("เลือกวัน")
         saveScreen("calendar")
+        compose.onNodeWithContentDescription("ปิดปฏิทิน").performClick()
         compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
-        waitText("ความเป็นส่วนตัว และบันทึกของคุณ")
+        waitText("หน้าตาแอป")
         saveScreen("settings")
-        compose.onNodeWithText("นำเข้าไฟล์สำรอง").assertExists()
-        compose.onNodeWithText("แจ้งเตือนให้เขียน").performClick()
-        waitText("ข้อความที่จะได้รับ")
+        compose.onNodeWithText("นำเข้าไฟล์").assertExists()
+        compose.onNodeWithText("แจ้งเตือน").performClick()
+        waitText("คำชวนของวันนี้")
         compose.onNodeWithText(dailyMessage).assertIsDisplayed()
-        compose.onNodeWithText("หมุนเวียน 240 ประโยคตามวัน\nหากตั้งหลายเวลา จะใช้ข้อความเดียวกันในวันนั้น").assertIsDisplayed()
         saveScreen("reminders")
-        compose.onNodeWithText("เขียนข้อความเอง").performClick()
+        compose.onNodeWithText("เขียนเอง").performClick()
         compose.onNode(hasSetTextAction()).performTextReplacement("ทดสอบการบันทึกข้อความแจ้งเตือน")
         compose.waitUntil(15_000) {
             compose.onAllNodesWithText("บันทึกการตั้งค่าแล้ว").fetchSemanticsNodes().isNotEmpty()
         }
         compose.onNodeWithContentDescription("กลับ").performClick()
-        compose.onNodeWithText("ส่งออกไฟล์สำรอง").performClick()
-        waitText("เก็บบันทึกไว้อีกที่")
-        compose.onNodeWithText("เลือกที่เก็บและส่งออก").assertIsNotEnabled()
+        compose.onNodeWithText("ส่งออกไฟล์").performClick()
+        waitText("เก็บไว้อีกที่")
+        compose.onNodeWithText("ส่งออกไฟล์").assertIsNotEnabled()
         saveScreen("backup")
         val fields = compose.onAllNodes(hasSetTextAction())
         fields[0].performTextReplacement("a-test-backup-password")
         fields[1].performTextReplacement("a-test-backup-password")
-        compose.onNodeWithText("เลือกที่เก็บและส่งออก").assertIsEnabled()
+        compose.onNodeWithText("ส่งออกไฟล์").assertIsEnabled()
     }
 
     @Test
     fun pinLocksAfterBackgroundAndRejectsWrongCode() {
-        waitText("วันนี้เป็นยังไงบ้าง?")
+        waitText("วันนี้เป็นยังไงบ้าง")
         compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
-        compose.onNodeWithText("ล็อกด้วย PIN").performClick()
+        compose.onNodeWithText("รหัส PIN").performClick()
         waitText("ตั้ง PIN ของคุณ")
         typePin(pin)
         waitText("ยืนยัน PIN อีกครั้ง")
         typePin(pin)
-        waitText("เปิดอยู่ · เปลี่ยนหรือปิด PIN")
-        compose.onNodeWithText("ล็อกด้วย PIN").performClick()
+        waitText("เปิดอยู่")
+        compose.onNodeWithText("รหัส PIN").performClick()
         waitText("เปลี่ยน PIN")
         compose.activityRule.scenario.moveToState(Lifecycle.State.CREATED)
         compose.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
-        waitText("กลับมาแล้ว :)")
+        waitText("พื้นที่ของคุณ")
         typePin("999999")
         waitText("PIN ไม่ถูกต้อง ลองอีกครั้ง")
         typePin(pin)
-        waitText("ความเป็นส่วนตัว และบันทึกของคุณ")
+        waitText("หน้าตาแอป")
         compose.onNodeWithText("เปลี่ยน PIN").assertDoesNotExist()
     }
 
@@ -90,7 +90,7 @@ class PenUiFlowTest {
     }
 
     private fun waitText(text: String) {
-        compose.waitUntil(20_000) { compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(20_000) { (compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty() || (text == "วันนี้เป็นยังไงบ้าง" && compose.onAllNodesWithText("กลับมาเล่าต่อได้นะ").fetchSemanticsNodes().isNotEmpty())) }
     }
 
     private fun saveScreen(name: String) {

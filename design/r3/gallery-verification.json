@@ -1,0 +1,16 @@
+{
+  "screens": 8,
+  "pages": [
+    {
+      "name": "R3 · Gallery · Light",
+      "artboards": 4,
+      "fontFaithful": true
+    },
+    {
+      "name": "R3 · Gallery · Dark",
+      "artboards": 4,
+      "fontFaithful": true
+    }
+  ],
+  "overflow": []
+}

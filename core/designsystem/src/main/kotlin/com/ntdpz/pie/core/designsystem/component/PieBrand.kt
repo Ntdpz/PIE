@@ -25,14 +25,14 @@ import com.ntdpz.pie.core.designsystem.R
 fun PieBrand(modifier: Modifier = Modifier) {
     val fontScale = LocalDensity.current.fontScale
     Row(
-        modifier.width(120.dp).height(52.dp).semantics(mergeDescendants = true) { contentDescription = "PIE" },
+        modifier.width(84.dp).height(36.dp).semantics(mergeDescendants = true) { contentDescription = "PIE" },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Image(painterResource(R.drawable.pie_symbol), contentDescription = null, modifier = Modifier.size(42.dp, 49.dp))
+        Image(painterResource(R.drawable.pie_symbol), contentDescription = null, modifier = Modifier.size(26.dp, 30.dp))
         Text(
             "PIE", modifier = Modifier.clearAndSetSemantics { },
-            style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.ExtraBold, fontSize = (36 / fontScale).sp, lineHeight = (40 / fontScale).sp),
+            style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.ExtraBold, fontSize = (26 / fontScale).sp, lineHeight = (32 / fontScale).sp),
             color = MaterialTheme.colorScheme.onBackground,
             maxLines = 1, softWrap = false,
         )

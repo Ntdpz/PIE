@@ -48,24 +48,24 @@ class MergeImportFlowTest {
             }
             vm.run(Uri.fromFile(archive).toString(), "test-backup-password".toCharArray(), true)
             compose.waitUntil(30_000) { vm.state.value.preview != null }
-            compose.onNodeWithText("ตรวจรายการก่อนนำเข้า").assertIsDisplayed()
+            compose.onNodeWithText("พบเรื่องเล่าของคุณ").assertIsDisplayed()
             saveReview(context, if (dark) "overview-dark" else "overview")
             compose.onNodeWithText("เลือกข้อความ 1 วัน").performClick()
-            compose.onNodeWithText("วันนี้อยากเก็บแบบไหน?").assertIsDisplayed()
-            compose.onNodeWithText("เก็บทั้งสองข้อความ").performScrollTo().performClick()
+            compose.onNodeWithText("เก็บแบบไหนดี?").assertIsDisplayed()
+            compose.onNodeWithText("เก็บทั้งคู่").performScrollTo().performClick()
             if (dark) {
                 compose.onNodeWithText("กลับไปภาพรวม").performClick()
                 compose.onNodeWithText("เลือกข้อความ 1 วัน").performClick()
-                compose.onNodeWithText("เก็บทั้งสองข้อความ").assertIsSelected()
+                compose.onNodeWithText("เก็บทั้งคู่").assertIsSelected()
             }
             saveReview(context, if (dark) "choice-dark" else "choice")
             assertEquals("ข้อความในเครื่องทดสอบ", runBlocking { container.diaryRepository.readEntry(date)!!.text })
-            compose.onNodeWithText("ใช้ตัวเลือกนี้ · ตรวจสรุป").performClick()
-            compose.onNodeWithText("รวมเรื่องเล่าเข้าด้วยกัน").assertIsDisplayed()
+            compose.onNodeWithText("ตรวจสรุป").performClick()
+            compose.onNodeWithText("พร้อมรวมบันทึกแล้ว").assertIsDisplayed()
             saveReview(context, if (dark) "confirm-dark" else "confirm")
             compose.onNodeWithText("ยืนยันนำเข้า").performClick()
             compose.waitUntil(30_000) { vm.state.value.completed }
-            compose.onNodeWithText("เรื่องเล่ากลับมาอยู่ด้วยกันแล้ว").assertIsDisplayed()
+            compose.onNodeWithText("อยู่ด้วยกันแล้ว").assertIsDisplayed()
             saveReview(context, if (dark) "success-dark" else "success")
             val merged = runBlocking { container.diaryRepository.readEntry(date)!!.text }
             assertTrue(merged.startsWith("ข้อความในเครื่องทดสอบ"))

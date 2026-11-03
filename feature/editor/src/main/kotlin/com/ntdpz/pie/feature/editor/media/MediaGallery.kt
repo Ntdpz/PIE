@@ -36,7 +36,6 @@ internal fun MediaGallery(media: List<DiaryMedia>, onDelete: (String) -> Unit) {
     val imageLoader = remember(context) { ImageLoader.Builder(context).components { add(VideoFrameDecoder.Factory()) }.build() }
     DisposableEffect(imageLoader) { onDispose { imageLoader.shutdown() } }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("รูปและวิดีโอของวันนี้", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(media, key = { it.id }) { item ->
                 Surface(

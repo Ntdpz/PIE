@@ -33,7 +33,7 @@ internal fun PieBottomBar(route: String?, onSelect: (PieDestination) -> Unit) {
     val position = animateFloatAsState(selectedIndex.toFloat(), spring(dampingRatio = 0.85f, stiffness = 500f), label = "Tab indicator")
     val pillColor = MaterialTheme.colorScheme.primaryContainer
     val haptic = LocalHapticFeedback.current
-    Surface(color = MaterialTheme.colorScheme.surface) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column(Modifier.windowInsetsPadding(WindowInsets.navigationBars)) {
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             Row(
@@ -41,7 +41,7 @@ internal fun PieBottomBar(route: String?, onSelect: (PieDestination) -> Unit) {
                     .drawBehind {
                         val gap = 8.dp.toPx()
                         val width = (size.width - gap * 2) / 3
-                        drawRoundRect(pillColor, Offset((width + gap) * position.value, 0f), Size(width, size.height), CornerRadius(16.dp.toPx()))
+                        drawRoundRect(pillColor, Offset((width + gap) * position.value + (width - 52.dp.toPx()) / 2f, 0f), Size(52.dp.toPx(), 36.dp.toPx()), CornerRadius(18.dp.toPx()))
                     },
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {

@@ -22,8 +22,8 @@ private fun text(size: Int, weight: FontWeight = FontWeight.Normal) = TextStyle(
 
 val PieTypography = Typography(
     displayLarge = text(40), displayMedium = text(34), displaySmall = text(30),
-    headlineLarge = text(30), headlineMedium = text(29), headlineSmall = text(25),
+    headlineLarge = text(28, FontWeight.Medium), headlineMedium = text(28, FontWeight.Medium), headlineSmall = text(24, FontWeight.Medium),
     titleLarge = text(20), titleMedium = text(17), titleSmall = text(15),
-    bodyLarge = text(18), bodyMedium = text(16), bodySmall = text(14),
+    bodyLarge = text(20), bodyMedium = text(16), bodySmall = text(14),
     labelLarge = text(15, FontWeight.SemiBold), labelMedium = text(13), labelSmall = text(12),
 )

@@ -8,6 +8,7 @@ data class HistoryUiState(
     val month: YearMonth,
     val selectedDate: LocalDate,
     val today: LocalDate = selectedDate,
+    val memories: List<MemoryDay> = emptyList(),
     val entries: List<DiarySummary> = emptyList(),
     val loading: Boolean = true,
     val loadFailed: Boolean = false,

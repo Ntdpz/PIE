@@ -57,7 +57,7 @@ fun EditorScreen(
     }
     Column(
         Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.ime)
-            .background(MaterialTheme.colorScheme.surface),
+            .background(MaterialTheme.colorScheme.background),
     ) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp).heightIn(min = 48.dp),
@@ -119,14 +119,14 @@ fun EditorScreen(
             Surface(
                 onClick = onAddMedia,
                 enabled = !state.loading && !state.importing && !state.deleting,
-                modifier = Modifier.weight(1f).height(52.dp),
+                modifier = Modifier.size(52.dp),
                 color = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(14.dp),
             ) {
                 Row(Modifier.padding(horizontal = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    PieIcon(PieGlyph.Media, color = MaterialTheme.colorScheme.primary)
-                    Text("รูป / วิดีโอ", style = MaterialTheme.typography.bodySmall)
+                    PieIcon(PieGlyph.Media, "เพิ่มรูปหรือวิดีโอ", color = MaterialTheme.colorScheme.primary)
+
                 }
             }
             ToolbarButton(PieGlyph.Emoji, "เพิ่ม Emoji", !state.loading) { emojiPicker = true }

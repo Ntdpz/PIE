@@ -10,6 +10,9 @@ internal interface MediaDao {
     @Query("SELECT * FROM diary_media WHERE date = :date ORDER BY createdAtEpochMillis, id")
     fun observe(date: String): Flow<List<MediaEntity>>
 
+    @Query("SELECT * FROM diary_media ORDER BY date DESC, createdAtEpochMillis, id")
+    fun observeAll(): Flow<List<MediaEntity>>
+
     @Insert
     suspend fun insert(media: MediaEntity)
 

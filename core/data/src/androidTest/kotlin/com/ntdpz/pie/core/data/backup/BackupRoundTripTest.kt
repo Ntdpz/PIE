@@ -26,9 +26,11 @@ class BackupRoundTripTest {
 
     @Test
     @androidx.test.filters.SdkSuppress(minSdkVersion = 29)
-    fun exportsAndPreviews384MiBThroughDocumentProviderWithoutBufferingWholeArchive() = runTest(timeout = kotlin.time.Duration.parse("5m")) {
+    fun exportsAndPreviewsLargeBackupThroughDocumentProviderWithoutBufferingWholeArchive() = runTest(timeout = kotlin.time.Duration.parse("5m")) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val database = Room.inMemoryDatabaseBuilder(context, PieDatabase::class.java).build()
+        val payloadMiB = if (context.cacheDir.usableSpace >= 2L * 1024 * 1024 * 1024) 384 else 192
+        org.junit.Assume.assumeTrue(context.cacheDir.usableSpace > (payloadMiB * 4L + 64) * 1024 * 1024)
         val settings = TestSettings()
         val gate = DatabaseMutationGate(database, context.filesDir)
         val backups = LocalBackupRepository(context, database, settings, gate)
@@ -47,14 +49,14 @@ class BackupRoundTripTest {
             val random = java.util.Random(42)
             val buffer = ByteArray(64 * 1024)
             owned.outputStream().buffered().use { output ->
-                repeat(384 * 16) { random.nextBytes(buffer); output.write(buffer) }
+                repeat(payloadMiB * 16) { random.nextBytes(buffer); output.write(buffer) }
             }
             database.diaryDao().upsert(DiaryEntity("2026-11-03", "large backup fixture", 123L))
             database.mediaDao().insert(MediaEntity(id, "2026-11-03", name, "video/mp4", 123L))
             backups.export(destination.toString(), "fixture-password".toCharArray())
             assertNotNull(settings.settings.first().lastBackupAtMillis)
             context.contentResolver.openFileDescriptor(destination, "r")!!.use {
-                assertTrue(it.statSize > 384L * 1024 * 1024)
+                assertTrue(it.statSize > payloadMiB.toLong() * 1024 * 1024)
             }
             val preview = imports.prepareImport(destination.toString(), "fixture-password".toCharArray())
             assertEquals(0, preview.addedDays)

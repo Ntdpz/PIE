@@ -1,3 +1,7 @@
+## 0.6.0 · R3 and Gallery
+
+R3 UI and Gallery memories are implemented, with a hidden calendar, attachment/day paging, full story reading and explicit video playback. See [0.6.0 verification](R3_GALLERY_V0_6_0.md). Usage metrics, V2 Drive sync and broad release acceptance remain pending.
+
 # Roadmap
 
 ## UI Preview 0.2.0

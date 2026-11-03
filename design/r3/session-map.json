@@ -1,0 +1,284 @@
+{
+  "document": "tab-1",
+  "light": "0:6",
+  "nodes": {
+    "light-home": {
+      "id": "1285399498:26",
+      "page": "0:6",
+      "name": "01 · วันนี้",
+      "complete": true
+    },
+    "light-continue": {
+      "id": "1285399498:70",
+      "page": "0:6",
+      "name": "02 · เขียนต่อ",
+      "complete": true
+    },
+    "light-editor": {
+      "id": "1285399498:111",
+      "page": "0:6",
+      "name": "03 · หน้าเขียน",
+      "complete": true
+    },
+    "light-history": {
+      "id": "1285399498:194",
+      "page": "0:6",
+      "name": "04 · ย้อนวัน",
+      "complete": true
+    },
+    "light-settings": {
+      "id": "1285399498:302",
+      "page": "0:6",
+      "name": "05 · ตั้งค่า",
+      "complete": true
+    },
+    "light-reminder": {
+      "id": "1285399498:379",
+      "page": "0:6",
+      "name": "06 · แจ้งเตือน",
+      "complete": true
+    },
+    "light-pin": {
+      "id": "1285399498:438",
+      "page": "0:6",
+      "name": "07 · PIN มือเดียว",
+      "complete": true
+    },
+    "light-export": {
+      "id": "1285399498:485",
+      "page": "0:6",
+      "name": "08 · ส่งออก",
+      "complete": true
+    },
+    "light-import": {
+      "id": "1285399498:528",
+      "page": "0:6",
+      "name": "09 · นำเข้า",
+      "complete": true
+    },
+    "light-review": {
+      "id": "1285399498:573",
+      "page": "0:6",
+      "name": "10 · ภาพรวมไฟล์",
+      "complete": true
+    },
+    "light-conflict": {
+      "id": "1285399498:622",
+      "page": "0:6",
+      "name": "11 · เลือกข้อความ",
+      "complete": true
+    },
+    "light-confirm": {
+      "id": "1285399498:671",
+      "page": "0:6",
+      "name": "12 · ยืนยัน",
+      "complete": true
+    },
+    "light-success": {
+      "id": "1285399498:712",
+      "page": "0:6",
+      "name": "13 · สำเร็จ",
+      "complete": true
+    },
+    "light-delete": {
+      "id": "1285399498:1433",
+      "page": "0:6",
+      "name": "14 · ยืนยันลบ",
+      "complete": true
+    },
+    "light-details": {
+      "id": "1285399498:1447",
+      "page": "0:6",
+      "name": "15 · รายละเอียด",
+      "complete": true
+    },
+    "dark-home": {
+      "id": "1285399498:779",
+      "page": "1285399498:727",
+      "name": "01 · วันนี้",
+      "complete": true
+    },
+    "dark-continue": {
+      "id": "1285399498:823",
+      "page": "1285399498:727",
+      "name": "02 · เขียนต่อ",
+      "complete": true
+    },
+    "dark-editor": {
+      "id": "1285399498:864",
+      "page": "1285399498:727",
+      "name": "03 · หน้าเขียน",
+      "complete": true
+    },
+    "dark-history": {
+      "id": "1285399498:947",
+      "page": "1285399498:727",
+      "name": "04 · ย้อนวัน",
+      "complete": true
+    },
+    "dark-settings": {
+      "id": "1285399498:1055",
+      "page": "1285399498:727",
+      "name": "05 · ตั้งค่า",
+      "complete": true
+    },
+    "dark-reminder": {
+      "id": "1285399498:1132",
+      "page": "1285399498:727",
+      "name": "06 · แจ้งเตือน",
+      "complete": true
+    },
+    "dark-pin": {
+      "id": "1285399498:1191",
+      "page": "1285399498:727",
+      "name": "07 · PIN มือเดียว",
+      "complete": true
+    },
+    "dark-export": {
+      "id": "1285399498:1260",
+      "page": "1285399498:727",
+      "name": "08 · ส่งออก",
+      "complete": true
+    },
+    "dark-import": {
+      "id": "1285399498:1284",
+      "page": "1285399498:727",
+      "name": "09 · นำเข้า",
+      "complete": true
+    },
+    "dark-review": {
+      "id": "1285399498:1303",
+      "page": "1285399498:727",
+      "name": "10 · ภาพรวมไฟล์",
+      "complete": true
+    },
+    "dark-conflict": {
+      "id": "1285399498:1327",
+      "page": "1285399498:727",
+      "name": "11 · เลือกข้อความ",
+      "complete": true
+    },
+    "dark-confirm": {
+      "id": "1285399498:1350",
+      "page": "1285399498:727",
+      "name": "12 · ยืนยัน",
+      "complete": true
+    },
+    "dark-success": {
+      "id": "1285399498:1374",
+      "page": "1285399498:727",
+      "name": "13 · สำเร็จ",
+      "complete": true
+    },
+    "dark-delete": {
+      "id": "1285399498:1389",
+      "page": "1285399498:727",
+      "name": "14 · ยืนยันลบ",
+      "complete": true
+    },
+    "dark-details": {
+      "id": "1285399498:1403",
+      "page": "1285399498:727",
+      "name": "15 · รายละเอียด",
+      "complete": true
+    },
+    "light-home-qa-320": {
+      "id": "1285399498:1480",
+      "page": "1285399498:1477",
+      "name": "01 · วันนี้",
+      "complete": true
+    },
+    "light-conflict-qa-320": {
+      "id": "1285399498:1499",
+      "page": "1285399498:1477",
+      "name": "11 · เลือกข้อความ",
+      "complete": true
+    },
+    "light-home-qa-375": {
+      "id": "1285399498:1524",
+      "page": "1285399498:1477",
+      "name": "01 · วันนี้",
+      "complete": true
+    },
+    "light-conflict-qa-375": {
+      "id": "1285399498:1543",
+      "page": "1285399498:1477",
+      "name": "11 · เลือกข้อความ",
+      "complete": true
+    },
+    "light-home-qa-414": {
+      "id": "1285399498:1568",
+      "page": "1285399498:1477",
+      "name": "01 · วันนี้",
+      "complete": true
+    },
+    "light-conflict-qa-414": {
+      "id": "1285399498:1587",
+      "page": "1285399498:1477",
+      "name": "11 · เลือกข้อความ",
+      "complete": true
+    },
+    "light-gallery": {
+      "id": "1285399498:1841",
+      "page": "1285399498:1839",
+      "name": "16 · Gallery ความทรงจำ",
+      "complete": true
+    },
+    "light-memory": {
+      "id": "1285399498:1868",
+      "page": "1285399498:1839",
+      "name": "17 · ภาพและเรื่องเล่า",
+      "complete": true
+    },
+    "light-memory-read": {
+      "id": "1285399498:1885",
+      "page": "1285399498:1839",
+      "name": "18 · อ่านความทรงจำ",
+      "complete": true
+    },
+    "light-gallery-calendar": {
+      "id": "1285399498:1901",
+      "page": "1285399498:1839",
+      "name": "19 · ปฏิทินที่ซ่อนไว้",
+      "complete": true
+    },
+    "dark-gallery": {
+      "id": "1285399498:1976",
+      "page": "1285399498:1840",
+      "name": "16 · Gallery ความทรงจำ",
+      "complete": true
+    },
+    "dark-memory": {
+      "id": "1285399498:2003",
+      "page": "1285399498:1840",
+      "name": "17 · ภาพและเรื่องเล่า",
+      "complete": true
+    },
+    "dark-memory-read": {
+      "id": "1285399498:2020",
+      "page": "1285399498:1840",
+      "name": "18 · อ่านความทรงจำ",
+      "complete": true
+    },
+    "dark-gallery-calendar": {
+      "id": "1285399498:2036",
+      "page": "1285399498:1840",
+      "name": "19 · ปฏิทินที่ซ่อนไว้",
+      "complete": true
+    }
+  },
+  "dark": "1285399498:727",
+  "qa": "1285399498:1477",
+  "review": "1285399498:1614",
+  "covers": {
+    "light": "1285399498:1615",
+    "dark": "1285399498:1721"
+  },
+  "galleryLight": "1285399498:1839",
+  "galleryDark": "1285399498:1840",
+  "galleryReview": "1285399498:2113",
+  "galleryCovers": {
+    "light": "1285399498:2114",
+    "dark": "1285399498:2179"
+  }
+}

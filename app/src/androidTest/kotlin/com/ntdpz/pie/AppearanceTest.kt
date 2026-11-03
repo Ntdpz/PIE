@@ -35,27 +35,27 @@ class AppearanceTest {
 
     @Test
     fun explicitThemeSurvivesRecreationAndCanReturnToLight() {
-        compose.waitUntil(20_000) { compose.onAllNodesWithText("วันนี้เป็นยังไงบ้าง?").fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(20_000) { (compose.onAllNodesWithText("วันนี้เป็นยังไงบ้าง").fetchSemanticsNodes().isNotEmpty() || compose.onAllNodesWithText("กลับมาเล่าต่อได้นะ").fetchSemanticsNodes().isNotEmpty()) }
         compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
         compose.onNodeWithText("มืด").performClick()
         waitTheme(ThemeMode.Dark)
         compose.waitForIdle()
-        assertEquals(0xFF171518.toInt(), compose.onRoot().captureToImage().asAndroidBitmap().getPixel(2, 200))
+        assertEquals(0xFF1D1B19.toInt(), compose.onRoot().captureToImage().asAndroidBitmap().getPixel(2, 200))
         saveScreen("settings-dark")
         compose.activityRule.scenario.recreate()
-        compose.waitUntil(20_000) { compose.onAllNodesWithText("รูปแบบแอป").fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(20_000) { compose.onAllNodesWithText("หน้าตาแอป").fetchSemanticsNodes().isNotEmpty() }
         assertEquals(ThemeMode.Dark, runBlocking { LocalSettingsRepository(context).settings.first().themeMode })
-        compose.onNode(hasText("หน้าแรก") and hasClickAction()).performClick()
+        compose.onNode(hasText("วันนี้") and hasClickAction()).performClick()
         saveScreen("home-dark")
-        compose.onNode(hasText("ย้อนวัน") and hasClickAction()).performClick()
+        compose.onNode(hasText("ความทรงจำ") and hasClickAction()).performClick()
         saveScreen("calendar-dark")
         compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
         compose.onNodeWithText("สว่าง").performClick()
         waitTheme(ThemeMode.Light)
         compose.waitForIdle()
-        assertEquals(0xFFF7F8FA.toInt(), compose.onRoot().captureToImage().asAndroidBitmap().getPixel(2, 200))
+        assertEquals(0xFFF7F3EC.toInt(), compose.onRoot().captureToImage().asAndroidBitmap().getPixel(2, 200))
         saveScreen("settings-light")
-        compose.onNode(hasText("หน้าแรก") and hasClickAction()).performClick()
+        compose.onNode(hasText("วันนี้") and hasClickAction()).performClick()
         saveScreen("home-light")
     }
 

@@ -92,9 +92,16 @@ fun PieApp(container: AppContainer) {
             }
             composable("history") {
                 val vm: HistoryViewModel = viewModel(factory = viewModelFactory {
-                    initializer { HistoryViewModel(container.diaryRepository, container.clock) }
+                    initializer { HistoryViewModel(container.diaryRepository, container.clock, container.mediaRepository) }
                 })
-                HistoryRoute(vm, openDiary)
+                HistoryRoute(vm, openDiary) { date -> nav.navigate("memory/$date") }
+            }
+            composable("memory/{date}", arguments = listOf(navArgument("date") { type = NavType.StringType })) { entry ->
+                val date = LocalDate.parse(requireNotNull(entry.arguments?.getString("date")))
+                val vm: com.ntdpz.pie.feature.history.MemoryViewModel = viewModel(factory = viewModelFactory {
+                    initializer { com.ntdpz.pie.feature.history.MemoryViewModel(container.diaryRepository, container.mediaRepository, date) }
+                })
+                com.ntdpz.pie.feature.history.MemoryRoute(vm, { nav.popBackStack() }, openDiary)
             }
             composable("settings") {
                 val vm: SettingsViewModel = viewModel(factory = viewModelFactory {

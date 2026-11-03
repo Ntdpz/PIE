@@ -38,41 +38,33 @@ fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (Setti
             .padding(start = 24.dp, end = 24.dp, top = 12.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        Text("ตั้งค่า", modifier = Modifier.pieReveal(), style = MaterialTheme.typography.headlineLarge)
-        Text("ความเป็นส่วนตัว และบันทึกของคุณ", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text("พื้นที่ของคุณ", modifier = Modifier.pieReveal(), style = MaterialTheme.typography.headlineLarge)
         AppearancePicker(state.settings.themeMode, state.settings.loaded, onThemeChange)
         Column(Modifier.pieReveal(1)) {
-            SectionLabel("ความเป็นส่วนตัว")
-            SettingRow(PieGlyph.Lock, "ล็อกด้วย PIN", if (state.settings.pinEnabled) "เปิดอยู่ · เปลี่ยนหรือปิด PIN" else "ตั้ง PIN 6 หลักเพื่อเปิดแอป") {
+            SectionLabel("ของคุณ")
+            SettingRow(PieGlyph.Lock, "รหัส PIN", if (state.settings.pinEnabled) "เปิดอยู่" else "ปิดอยู่") {
                 if (state.settings.pinEnabled) pinOptions = true else onAction(SettingsAction.SetupPin)
             }
             val summary = if (reminder.enabled) {
                 (if (reminder.days.size == 7) "ทุกวัน" else "${reminder.days.size} วัน/สัปดาห์") +
                     " · " + reminder.times.sorted().joinToString(", ") { "%02d:%02d".format(it / 60, it % 60) }
-            } else "ปิดอยู่ · ตั้งวันและเวลาได้"
-            SettingRow(PieGlyph.Bell, "แจ้งเตือนให้เขียน", summary) { onAction(SettingsAction.Reminders) }
+            } else "ปิดอยู่"
+            SettingRow(PieGlyph.Bell, "แจ้งเตือน", summary) { onAction(SettingsAction.Reminders) }
         }
         Column(Modifier.pieReveal(2)) {
-            SectionLabel("บันทึกของคุณ")
+            SectionLabel("เก็บเรื่องเล่า")
             val backupTime = state.settings.lastBackupAtMillis?.let {
                 java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault())
                     .format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy · HH:mm", java.util.Locale.forLanguageTag("th-TH")))
             }
-            SettingRow(PieGlyph.Download, "ส่งออกไฟล์สำรอง", backupTime?.let { "ส่งออกสำเร็จล่าสุด $it" } ?: "ยังไม่มีประวัติส่งออกสำเร็จบนเครื่องนี้") { onAction(SettingsAction.ExportBackup) }
-            SettingRow(PieGlyph.Archive, "นำเข้าไฟล์สำรอง", "รวมกับบันทึกในเครื่อง · ตรวจรายการก่อนนำเข้า") {
+            SettingRow(PieGlyph.Download, "ส่งออกไฟล์", backupTime?.let { "ล่าสุด $it" } ?: "ยังไม่ได้ส่งออก") { onAction(SettingsAction.ExportBackup) }
+            SettingRow(PieGlyph.Archive, "นำเข้าไฟล์", "ตรวจรายการก่อนรวม") {
                 onAction(SettingsAction.RestoreBackup)
             }
             state.lastImportAtMillis?.let { timestamp ->
                 val label = java.time.Instant.ofEpochMilli(timestamp).atZone(java.time.ZoneId.systemDefault())
                     .format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy · HH:mm", java.util.Locale.forLanguageTag("th-TH")))
                 Text("นำเข้าสำเร็จล่าสุด $label", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
-        Surface(modifier = Modifier.pieReveal(3), color = MaterialTheme.colorScheme.primaryContainer, contentColor = MaterialTheme.colorScheme.onBackground, shape = RoundedCornerShape(16.dp)) {
-            Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PieIcon(PieGlyph.Storage, color = MaterialTheme.colorScheme.primary)
-                Text("เรื่องของคุณ อยู่กับคุณ", style = MaterialTheme.typography.titleMedium)
-                Text("เก็บไว้บนเครื่องนี้ ยังไม่ซิงก์ข้ามเครื่อง\nส่งออกไฟล์สำรองเพื่อเก็บหรือย้ายข้อมูล", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }

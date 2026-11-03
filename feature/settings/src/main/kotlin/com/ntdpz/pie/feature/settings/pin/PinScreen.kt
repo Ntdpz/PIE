@@ -29,6 +29,7 @@ fun PinRoute(viewModel: PinViewModel, onComplete: () -> Unit, onBack: (() -> Uni
 @Composable
 fun PinScreen(state: PinUiState, onDigit: (Int) -> Unit, onDelete: () -> Unit, onBack: (() -> Unit)?) {
     var forgot by remember { mutableStateOf(false) }
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_STOP) { forgot = false }
     BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Column(
             Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).heightIn(min = maxHeight).padding(horizontal = 32.dp, vertical = 12.dp),
@@ -43,12 +44,12 @@ fun PinScreen(state: PinUiState, onDigit: (Int) -> Unit, onDelete: () -> Unit, o
             val title = when (state.stage) {
                 PinStage.New -> "ตั้ง PIN ของคุณ"
                 PinStage.Confirm -> "ยืนยัน PIN อีกครั้ง"
-                PinStage.Verify -> if (state.purpose == PinPurpose.Unlock) "กลับมาแล้ว :)" else "ใส่ PIN เดิม"
+                PinStage.Verify -> if (state.purpose == PinPurpose.Unlock) "พื้นที่ของคุณ" else "ใส่ PIN เดิม"
             }
             Text(title, style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.onBackground, textAlign = TextAlign.Center)
             Spacer(Modifier.height(8.dp))
             Text(
-                if (state.stage == PinStage.Verify && state.purpose == PinPurpose.Unlock) "ใส่ PIN 6 หลัก เพื่อเปิดบันทึกของคุณ" else "ใช้ตัวเลข 6 หลัก",
+                if (state.stage == PinStage.Verify && state.purpose == PinPurpose.Unlock) "ใส่ PIN 6 หลัก" else "ใช้ตัวเลข 6 หลัก",
                 style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
             )
             Spacer(Modifier.weight(1f).heightIn(min = 24.dp))

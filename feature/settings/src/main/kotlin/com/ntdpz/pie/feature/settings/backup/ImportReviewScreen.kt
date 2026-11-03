@@ -48,7 +48,7 @@ internal fun ImportReviewScreen(
                     PiePrimaryButton(
                         label = when (step) {
                             0 -> if (conflicts.isEmpty()) "ตรวจสรุปก่อนนำเข้า" else "เลือกข้อความ ${conflicts.size} วัน"
-                            1 -> if (conflictIndex < conflicts.lastIndex) "ใช้ตัวเลือกนี้ · วันถัดไป" else "ใช้ตัวเลือกนี้ · ตรวจสรุป"
+                            1 -> if (conflictIndex < conflicts.lastIndex) "ถัดไป" else "ตรวจสรุป"
                             else -> "ยืนยันนำเข้า"
                         },
                         onClick = {

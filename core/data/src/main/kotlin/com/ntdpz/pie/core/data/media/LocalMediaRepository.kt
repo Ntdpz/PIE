@@ -29,6 +29,12 @@ internal class LocalMediaRepository(
     private val root = File(context.filesDir, "diary-media").apply { mkdirs() }
     private val dao = database.mediaDao()
 
+    override fun observeAllMedia() = dao.observeAll().onStart { gate.exclusive { } }.map { rows ->
+        rows.groupBy { LocalDate.parse(it.date) }.mapValues { (_, items) ->
+            items.map { row -> DiaryMedia(row.id, Uri.fromFile(File(root, row.fileName)).toString(), row.mimeType.startsWith("video/")) }
+        }
+    }
+
     override fun observeMedia(date: LocalDate) = dao.observe(date.toString()).onStart { gate.exclusive { } }.map { rows ->
         rows.map { row ->
             DiaryMedia(row.id, Uri.fromFile(File(root, row.fileName)).toString(), row.mimeType.startsWith("video/"))

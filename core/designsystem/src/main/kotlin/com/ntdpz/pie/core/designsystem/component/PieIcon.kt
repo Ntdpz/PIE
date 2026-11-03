@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.ntdpz.pie.core.designsystem.R
 
 enum class PieGlyph(@param:DrawableRes val resource: Int) {
+    Sun(R.drawable.ic_theme_sun), Moon(R.drawable.ic_theme_moon), Device(R.drawable.ic_theme_device),
     Home(R.drawable.ic_house), Calendar(R.drawable.ic_calendar_days),
     Settings(R.drawable.ic_settings_2), Invitation(R.drawable.ic_message_circle_heart),
     Write(R.drawable.ic_pen_line), Book(R.drawable.ic_book_open), Check(R.drawable.ic_check),

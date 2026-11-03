@@ -1,0 +1,427 @@
+{
+  "date": "2026-11-03",
+  "proposal": "R3 · สมุดส่วนตัว",
+  "mainScreens": 30,
+  "smallPhoneReferences": 6,
+  "pages": [
+    {
+      "kind": "light",
+      "id": "0:6",
+      "name": "R3 · สมุดส่วนตัว · Light",
+      "roots": 15,
+      "artboards": 15,
+      "expected": 15,
+      "fontFaithful": true,
+      "faces": [
+        {
+          "family": "Noto Sans Thai",
+          "style": "ExtraBold",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Medium",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Regular",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "SemiBold",
+          "status": "available"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "kind": "dark",
+      "id": "1285399498:727",
+      "name": "R3 · สมุดส่วนตัว · Dark",
+      "roots": 15,
+      "artboards": 15,
+      "expected": 15,
+      "fontFaithful": true,
+      "faces": [
+        {
+          "family": "Noto Sans Thai",
+          "style": "ExtraBold",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Medium",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Regular",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "SemiBold",
+          "status": "available"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "kind": "qa",
+      "id": "1285399498:1477",
+      "name": "R3 · จอเล็ก · 320–414",
+      "roots": 6,
+      "artboards": 6,
+      "expected": 6,
+      "fontFaithful": true,
+      "faces": [
+        {
+          "family": "Noto Sans Thai",
+          "style": "ExtraBold",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Medium",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Regular",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "SemiBold",
+          "status": "available"
+        }
+      ],
+      "issues": []
+    },
+    {
+      "kind": "review",
+      "id": "1285399498:1614",
+      "name": "R3 · เริ่มดูที่นี่",
+      "roots": 3,
+      "artboards": 2,
+      "expected": 2,
+      "fontFaithful": true,
+      "faces": [
+        {
+          "family": "Noto Sans Thai",
+          "style": "ExtraBold",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Medium",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "Regular",
+          "status": "available"
+        },
+        {
+          "family": "Noto Sans Thai",
+          "style": "SemiBold",
+          "status": "available"
+        }
+      ],
+      "issues": []
+    }
+  ],
+  "overflow": [],
+  "screens": [
+    {
+      "key": "light-home",
+      "name": "01 · วันนี้",
+      "width": 390,
+      "height": 844,
+      "textElements": 9,
+      "characters": 105
+    },
+    {
+      "key": "light-continue",
+      "name": "02 · เขียนต่อ",
+      "width": 390,
+      "height": 844,
+      "textElements": 10,
+      "characters": 182
+    },
+    {
+      "key": "light-editor",
+      "name": "03 · หน้าเขียน",
+      "width": 390,
+      "height": 844,
+      "textElements": 4,
+      "characters": 115
+    },
+    {
+      "key": "light-history",
+      "name": "04 · ย้อนวัน",
+      "width": 390,
+      "height": 844,
+      "textElements": 45,
+      "characters": 163
+    },
+    {
+      "key": "light-settings",
+      "name": "05 · ตั้งค่า",
+      "width": 390,
+      "height": 844,
+      "textElements": 17,
+      "characters": 154
+    },
+    {
+      "key": "light-reminder",
+      "name": "06 · แจ้งเตือน",
+      "width": 390,
+      "height": 844,
+      "textElements": 15,
+      "characters": 116
+    },
+    {
+      "key": "light-pin",
+      "name": "07 · PIN มือเดียว",
+      "width": 390,
+      "height": 844,
+      "textElements": 13,
+      "characters": 40
+    },
+    {
+      "key": "light-export",
+      "name": "08 · ส่งออก",
+      "width": 390,
+      "height": 844,
+      "textElements": 11,
+      "characters": 170
+    },
+    {
+      "key": "light-import",
+      "name": "09 · นำเข้า",
+      "width": 390,
+      "height": 844,
+      "textElements": 9,
+      "characters": 124
+    },
+    {
+      "key": "light-review",
+      "name": "10 · ภาพรวมไฟล์",
+      "width": 390,
+      "height": 844,
+      "textElements": 12,
+      "characters": 129
+    },
+    {
+      "key": "light-conflict",
+      "name": "11 · เลือกข้อความ",
+      "width": 390,
+      "height": 844,
+      "textElements": 14,
+      "characters": 239
+    },
+    {
+      "key": "light-confirm",
+      "name": "12 · ยืนยัน",
+      "width": 390,
+      "height": 844,
+      "textElements": 12,
+      "characters": 142
+    },
+    {
+      "key": "light-success",
+      "name": "13 · สำเร็จ",
+      "width": 390,
+      "height": 844,
+      "textElements": 8,
+      "characters": 76
+    },
+    {
+      "key": "light-delete",
+      "name": "14 · ยืนยันลบ",
+      "width": 390,
+      "height": 844,
+      "textElements": 6,
+      "characters": 139
+    },
+    {
+      "key": "light-details",
+      "name": "15 · รายละเอียด",
+      "width": 390,
+      "height": 844,
+      "textElements": 16,
+      "characters": 203
+    },
+    {
+      "key": "dark-home",
+      "name": "01 · วันนี้",
+      "width": 390,
+      "height": 844,
+      "textElements": 9,
+      "characters": 105
+    },
+    {
+      "key": "dark-continue",
+      "name": "02 · เขียนต่อ",
+      "width": 390,
+      "height": 844,
+      "textElements": 10,
+      "characters": 182
+    },
+    {
+      "key": "dark-editor",
+      "name": "03 · หน้าเขียน",
+      "width": 390,
+      "height": 844,
+      "textElements": 4,
+      "characters": 115
+    },
+    {
+      "key": "dark-history",
+      "name": "04 · ย้อนวัน",
+      "width": 390,
+      "height": 844,
+      "textElements": 45,
+      "characters": 163
+    },
+    {
+      "key": "dark-settings",
+      "name": "05 · ตั้งค่า",
+      "width": 390,
+      "height": 844,
+      "textElements": 17,
+      "characters": 154
+    },
+    {
+      "key": "dark-reminder",
+      "name": "06 · แจ้งเตือน",
+      "width": 390,
+      "height": 844,
+      "textElements": 15,
+      "characters": 116
+    },
+    {
+      "key": "dark-pin",
+      "name": "07 · PIN มือเดียว",
+      "width": 390,
+      "height": 844,
+      "textElements": 13,
+      "characters": 40
+    },
+    {
+      "key": "dark-export",
+      "name": "08 · ส่งออก",
+      "width": 390,
+      "height": 844,
+      "textElements": 11,
+      "characters": 170
+    },
+    {
+      "key": "dark-import",
+      "name": "09 · นำเข้า",
+      "width": 390,
+      "height": 844,
+      "textElements": 9,
+      "characters": 124
+    },
+    {
+      "key": "dark-review",
+      "name": "10 · ภาพรวมไฟล์",
+      "width": 390,
+      "height": 844,
+      "textElements": 12,
+      "characters": 129
+    },
+    {
+      "key": "dark-conflict",
+      "name": "11 · เลือกข้อความ",
+      "width": 390,
+      "height": 844,
+      "textElements": 14,
+      "characters": 239
+    },
+    {
+      "key": "dark-confirm",
+      "name": "12 · ยืนยัน",
+      "width": 390,
+      "height": 844,
+      "textElements": 12,
+      "characters": 142
+    },
+    {
+      "key": "dark-success",
+      "name": "13 · สำเร็จ",
+      "width": 390,
+      "height": 844,
+      "textElements": 8,
+      "characters": 76
+    },
+    {
+      "key": "dark-delete",
+      "name": "14 · ยืนยันลบ",
+      "width": 390,
+      "height": 844,
+      "textElements": 6,
+      "characters": 139
+    },
+    {
+      "key": "dark-details",
+      "name": "15 · รายละเอียด",
+      "width": 390,
+      "height": 844,
+      "textElements": 16,
+      "characters": 203
+    },
+    {
+      "key": "light-home-qa-320",
+      "name": "01 · วันนี้",
+      "width": 320,
+      "height": 844,
+      "textElements": 9,
+      "characters": 105
+    },
+    {
+      "key": "light-conflict-qa-320",
+      "name": "11 · เลือกข้อความ",
+      "width": 320,
+      "height": 844,
+      "textElements": 14,
+      "characters": 239
+    },
+    {
+      "key": "light-home-qa-375",
+      "name": "01 · วันนี้",
+      "width": 375,
+      "height": 844,
+      "textElements": 9,
+      "characters": 105
+    },
+    {
+      "key": "light-conflict-qa-375",
+      "name": "11 · เลือกข้อความ",
+      "width": 375,
+      "height": 844,
+      "textElements": 14,
+      "characters": 239
+    },
+    {
+      "key": "light-home-qa-414",
+      "name": "01 · วันนี้",
+      "width": 414,
+      "height": 844,
+      "textElements": 9,
+      "characters": 105
+    },
+    {
+      "key": "light-conflict-qa-414",
+      "name": "11 · เลือกข้อความ",
+      "width": 414,
+      "height": 844,
+      "textElements": 14,
+      "characters": 239
+    }
+  ]
+}

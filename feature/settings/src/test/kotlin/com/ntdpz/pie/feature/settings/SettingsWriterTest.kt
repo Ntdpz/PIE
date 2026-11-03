@@ -67,6 +67,7 @@ private class TestSettingsRepository : SettingsRepository {
     override val settings = MutableStateFlow(AppSettings(loaded = true))
     val saved = mutableListOf<String>()
     val themes = mutableListOf<ThemeMode>()
+    override suspend fun recordBackupSuccess(atMillis: Long) { settings.value = settings.value.copy(lastBackupAtMillis = atMillis) }
     override suspend fun saveReminder(reminder: ReminderSettings) {
         delay(5)
         saved += reminder.message

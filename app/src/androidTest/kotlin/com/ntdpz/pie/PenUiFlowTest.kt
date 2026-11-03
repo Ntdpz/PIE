@@ -41,6 +41,7 @@ class PenUiFlowTest {
         compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
         waitText("ความเป็นส่วนตัว และบันทึกของคุณ")
         saveScreen("settings")
+        compose.onNodeWithText("นำเข้าไฟล์สำรอง").assertExists()
         compose.onNodeWithText("แจ้งเตือนให้เขียน").performClick()
         waitText("ข้อความที่จะได้รับ")
         compose.onNodeWithText(dailyMessage).assertIsDisplayed()

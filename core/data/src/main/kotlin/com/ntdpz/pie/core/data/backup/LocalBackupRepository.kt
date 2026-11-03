@@ -51,6 +51,7 @@ internal class LocalBackupRepository(
             output.buffered().use { target ->
                 zipFile.inputStream().buffered().use { BackupCipher.encrypt(it, target, password) }
             }
+            settings.recordBackupSuccess(System.currentTimeMillis())
         } finally { zipFile.delete() }
     }
 

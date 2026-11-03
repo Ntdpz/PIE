@@ -10,8 +10,8 @@ android {
         applicationId = "com.ntdpz.pie"
         minSdk = 26
         targetSdk = 37
-        versionCode = 6
-        versionName = "0.4.0"
+        versionCode = 7
+        versionName = "0.4.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {

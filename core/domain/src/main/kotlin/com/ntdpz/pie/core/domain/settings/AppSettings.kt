@@ -15,4 +15,5 @@ data class AppSettings(
     val pinEnabled: Boolean = false,
     val reminder: ReminderSettings = ReminderSettings(),
     val themeMode: ThemeMode = ThemeMode.System,
+    val lastBackupAtMillis: Long? = null,
 )

@@ -33,6 +33,10 @@ class BackupRoundTripTest {
             database.mediaDao().insert(MediaEntity(id, "2026-11-02", name, "image/png", 123L))
             val uri = Uri.fromFile(archive).toString()
             backups.export(uri, password)
+            val exportedAt = settings.settings.first().lastBackupAtMillis
+            assertNotNull(exportedAt)
+            assertTrue(runCatching { backups.export(Uri.fromFile(context.cacheDir).toString(), password) }.isFailure)
+            assertEquals(exportedAt, settings.settings.first().lastBackupAtMillis)
             assertFalse(archive.readBytes().contentEquals(bytes))
             assertFalse(backups.canRestore())
             assertTrue(runCatching { backups.restore(uri, password) }.isFailure)
@@ -47,6 +51,7 @@ class BackupRoundTripTest {
             assertEquals(id, database.mediaDao().readAll().single().id)
             assertArrayEquals(bytes, ownedFile.readBytes())
             assertFalse(settings.settings.first().reminder.enabled)
+            assertEquals(exportedAt, settings.settings.first().lastBackupAtMillis)
         } finally {
             password.fill('\u0000')
             archive.delete()
@@ -57,6 +62,7 @@ class BackupRoundTripTest {
 }
 
 private class TestSettings : SettingsRepository {
+    override suspend fun recordBackupSuccess(atMillis: Long) { settings.value = settings.value.copy(lastBackupAtMillis = atMillis) }
     override val settings = MutableStateFlow(AppSettings(loaded = true, reminder = ReminderSettings(enabled = true)))
     override suspend fun saveReminder(reminder: ReminderSettings) { settings.value = settings.value.copy(reminder = reminder) }
     override suspend fun setPin(pin: CharArray, currentPin: CharArray?) = Unit

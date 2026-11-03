@@ -105,7 +105,7 @@ fun BackupScreen(
             if (state.busy) "กำลังทำรายการ…" else if (restoring) "เลือกไฟล์เพื่อตรวจรายการ" else "เลือกที่เก็บและส่งออก",
             onChoose, enabled = valid && !state.busy, icon = PieGlyph.Download,
         )
-        if (state.busy) PieLoader(if (restoring) "กำลังตรวจไฟล์สำรอง…" else "กำลังเข้ารหัสไฟล์สำรอง…", compact = true)
+        if (state.busy) PieLoader(if (restoring) "กำลังตรวจไฟล์สำรอง…" else "กำลังเข้ารหัสและตรวจไฟล์สำรอง…", compact = true)
         state.result?.let { result ->
             Text("เพิ่ม ${result.addedDays} วัน · แก้ไข ${result.changedDays} วัน · ข้าม ${result.skippedDays} วัน\nเพิ่มสื่อ ${result.addedMedia} รายการ · ข้ามสื่อซ้ำ ${result.skippedMedia} รายการ")
         }

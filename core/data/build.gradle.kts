@@ -32,6 +32,7 @@ tasks.matching { it.name == "mergeDebugAndroidTestAssets" }.configureEach {
 }
 
 dependencies {
+    implementation(libs.tink.android)
     implementation(libs.datastore.preferences)
     implementation(libs.coroutines.android)
     testImplementation(libs.junit)

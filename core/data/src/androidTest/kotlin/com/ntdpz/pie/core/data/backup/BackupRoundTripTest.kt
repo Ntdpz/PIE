@@ -14,6 +14,59 @@ import java.io.File
 import java.util.UUID
 
 class BackupRoundTripTest {
+    @Test fun encryptionAcceptsThaiAndEmojiPasswords() {
+        for (value in listOf("รหัสผ่านของฉัน", "backup🙂🔐password", "12345678")) {
+            val encrypted = java.io.ByteArrayOutputStream()
+            BackupCipher.encrypt("fixture".byteInputStream(), encrypted, value.toCharArray())
+            val restored = java.io.ByteArrayOutputStream()
+            BackupCipher.decrypt(encrypted.toByteArray().inputStream(), restored, value.toCharArray())
+            assertEquals("fixture", restored.toString("UTF-8"))
+        }
+    }
+
+    @Test
+    @androidx.test.filters.SdkSuppress(minSdkVersion = 29)
+    fun exportsAndPreviews384MiBThroughDocumentProviderWithoutBufferingWholeArchive() = runTest(timeout = kotlin.time.Duration.parse("5m")) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val database = Room.inMemoryDatabaseBuilder(context, PieDatabase::class.java).build()
+        val settings = TestSettings()
+        val gate = DatabaseMutationGate(database, context.filesDir)
+        val backups = LocalBackupRepository(context, database, settings, gate)
+        val imports = LocalMergeImportRepository(context, database, gate)
+        val id = UUID.randomUUID().toString()
+        val root = File(context.filesDir, "diary-media").apply { mkdirs() }
+        val name = MediaFileNames.forId(id, "video/mp4")
+        val owned = File(root, name)
+        val values = android.content.ContentValues().apply {
+            put(android.provider.MediaStore.Downloads.DISPLAY_NAME, "PIE-streaming-test-$id.pie")
+            put(android.provider.MediaStore.Downloads.MIME_TYPE, "application/octet-stream")
+            put(android.provider.MediaStore.Downloads.IS_PENDING, 1)
+        }
+        val destination = requireNotNull(context.contentResolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values))
+        try {
+            val random = java.util.Random(42)
+            val buffer = ByteArray(64 * 1024)
+            owned.outputStream().buffered().use { output ->
+                repeat(384 * 16) { random.nextBytes(buffer); output.write(buffer) }
+            }
+            database.diaryDao().upsert(DiaryEntity("2026-11-03", "large backup fixture", 123L))
+            database.mediaDao().insert(MediaEntity(id, "2026-11-03", name, "video/mp4", 123L))
+            backups.export(destination.toString(), "fixture-password".toCharArray())
+            assertNotNull(settings.settings.first().lastBackupAtMillis)
+            context.contentResolver.openFileDescriptor(destination, "r")!!.use {
+                assertTrue(it.statSize > 384L * 1024 * 1024)
+            }
+            val preview = imports.prepareImport(destination.toString(), "fixture-password".toCharArray())
+            assertEquals(0, preview.addedDays)
+            assertEquals(0, preview.addedMedia)
+            assertEquals(1, preview.skippedMedia)
+            imports.discardImport(preview.token)
+        } finally {
+            context.contentResolver.delete(destination, null, null)
+            owned.delete()
+            database.close()
+        }
+    }
     @Test
     fun encryptedBackupRestoresTextMediaAndDisabledReminders() = runTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext

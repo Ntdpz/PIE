@@ -48,11 +48,8 @@ internal class LocalBackupRepository(
                     zip.closeEntry()
                 }
             }
-            val output = context.contentResolver.openOutputStream(Uri.parse(uri), "wt") ?: throw IOException("Cannot open backup destination")
-            output.buffered().use { target ->
-                zipFile.inputStream().buffered().use { BackupCipher.encrypt(it, target, password) }
-            }
-            settings.recordBackupSuccess(System.currentTimeMillis())
+                        BackupDestinationWriter(context).write(zipFile, uri, password)
+settings.recordBackupSuccess(System.currentTimeMillis())
         } finally { zipFile.delete() }
     }
 

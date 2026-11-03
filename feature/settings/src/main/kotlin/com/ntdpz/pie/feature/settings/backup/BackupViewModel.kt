@@ -44,6 +44,9 @@ class BackupViewModel(
                     mutable.value = BackupUiState(completed = true, message = "ส่งออกไฟล์สำรองแล้ว")
                 }
             } catch (cancelled: CancellationException) { throw cancelled }
+            catch (error: BackupReadException) {
+                mutable.value = BackupUiState(message = error.reason.userMessage())
+            }
             catch (_: Exception) {
                 mutable.value = BackupUiState(message = if (restore) "ตรวจไฟล์ไม่สำเร็จ โปรดตรวจไฟล์ รหัสผ่าน และพื้นที่ว่าง ข้อมูลเดิมยังอยู่" else "ส่งออกไม่สำเร็จ โปรดตรวจพื้นที่ว่างและสถานะการบันทึก")
             } finally { password.fill('\u0000') }
@@ -87,4 +90,11 @@ class BackupViewModel(
     override fun onCleared() {
         preparedToken?.let { token -> cleanupScope.launch { imports.discardImport(token) } }
     }
+}
+
+private fun BackupReadFailure.userMessage(): String = when (this) {
+    BackupReadFailure.Incomplete -> "ไฟล์สำรองบันทึกไม่ครบ กรุณาส่งออกไฟล์ใหม่จากเครื่องที่มีบันทึกเดิม ข้อมูลในแอปยังอยู่"
+    BackupReadFailure.AuthenticationOrDamage -> "รหัสผ่านไม่ตรงหรือไฟล์สำรองเสียหาย โปรดลองรหัสผ่านของไฟล์นี้ หรือส่งออกไฟล์ใหม่ ข้อมูลเดิมยังอยู่"
+    BackupReadFailure.Unsupported -> "ไฟล์นี้ไม่ใช่ไฟล์สำรอง PIE ที่รองรับ กรุณาเลือกไฟล์ .pie ที่ส่งออกจาก PIE"
+    BackupReadFailure.LegacyTooLarge -> "ไฟล์สำรองรุ่นเก่ามีขนาดใหญ่ กรุณาอัปเดต PIE บนเครื่องเดิมแล้วส่งออกไฟล์ใหม่"
 }

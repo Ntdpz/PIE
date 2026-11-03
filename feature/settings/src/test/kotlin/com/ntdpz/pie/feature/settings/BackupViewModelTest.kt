@@ -69,6 +69,21 @@ class BackupViewModelTest {
         assertNull(imports.committed)
     }
 
+    @Test fun incompleteBackupExplainsReExportWithoutChangingExistingData() = runTest(dispatcher) {
+        val imports = FakeImports(date).apply { readFailure = BackupReadFailure.Incomplete }
+        val vm = BackupViewModel(NoArchives(), DiaryWriter(EmptyDiary(), backgroundScope, Clock.systemUTC()), imports, backgroundScope)
+        val store = ViewModelStore().apply { put("backup", vm) }
+        val password = "fixture-password".toCharArray()
+        vm.run("fixture", password, true)
+        runCurrent()
+        assertTrue(vm.state.value.message!!.contains("บันทึกไม่ครบ"))
+        assertTrue(vm.state.value.message!!.contains("ส่งออกไฟล์ใหม่"))
+        assertFalse(vm.state.value.completed)
+        assertNull(vm.state.value.preview)
+        assertNull(imports.committed)
+        assertTrue(password.all { it == '\u0000' })
+        store.clear()
+    }
     @Test fun failedValidationClearsPasswordAndDoesNotExposePreview() = runTest(dispatcher) {
         val imports = FakeImports(date).apply { failPrepare = true }
         val vm = BackupViewModel(NoArchives(), DiaryWriter(EmptyDiary(), backgroundScope, Clock.systemUTC()), imports, backgroundScope)
@@ -91,8 +106,10 @@ private class FakeImports(date: LocalDate) : MergeImportRepository {
     var commits = 0
     var stale = false
     var failPrepare = false
+    var readFailure: BackupReadFailure? = null
     val discarded = mutableListOf<String>()
     override suspend fun prepareImport(uri: String, password: CharArray): ImportPreview {
+        readFailure?.let { throw BackupReadException(it) }
         if (failPrepare) error("Invalid fixture")
         return preview
     }

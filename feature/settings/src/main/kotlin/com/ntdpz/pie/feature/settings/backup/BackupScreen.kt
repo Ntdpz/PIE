@@ -1,6 +1,10 @@
 package com.ntdpz.pie.feature.settings.backup
 
+import android.net.Uri
+import android.provider.OpenableColumns
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.expandVertically
@@ -21,14 +25,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ntdpz.pie.core.designsystem.component.*
 import java.time.LocalDate
 
 @Composable
-fun BackupRoute(viewModel: BackupViewModel, restoring: Boolean, onBack: () -> Unit) {
+fun BackupRoute(viewModel: BackupViewModel, restoring: Boolean, driveDestination: Boolean = false, onBack: () -> Unit) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val focus = LocalFocusManager.current
+    var source by remember { mutableStateOf<Uri?>(null) }
+    var sourceName by remember { mutableStateOf<String?>(null) }
     var password by remember { mutableStateOf("") }
     var confirmation by remember { mutableStateOf("") }
     val create = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
@@ -36,10 +45,26 @@ fun BackupRoute(viewModel: BackupViewModel, restoring: Boolean, onBack: () -> Un
         password = ""; confirmation = ""
     }
     val open = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) viewModel.run(uri.toString(), password.toCharArray(), true)
-        password = ""; confirmation = ""
+        if (uri != null) {
+            source = uri
+            sourceName = runCatching {
+                context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+                    ?.use { if (it.moveToFirst()) it.getString(0) else null }
+            }.getOrNull() ?: "ไฟล์สำรองที่เลือก"
+            password = ""
+        }
     }
-    BackHandler(state.busy) { }
+    val goBack: () -> Unit = {
+        if (restoring && source != null) {
+            focus.clearFocus()
+            source = null
+            sourceName = null
+            password = ""
+        } else onBack()
+    }
+    BackHandler(state.busy || (restoring && source != null && state.preview == null && state.result == null)) {
+        if (!state.busy) goBack()
+    }
     if (state.preview != null) {
         ImportReviewScreen(state, viewModel::choose, viewModel::confirmImport, viewModel::cancelPreview)
         return
@@ -49,63 +74,146 @@ fun BackupRoute(viewModel: BackupViewModel, restoring: Boolean, onBack: () -> Un
         return
     }
     BackupScreen(
-        state, restoring, password, confirmation,
-        { password = it }, { confirmation = it }, onBack,
-        onChoose = {
-            if (restoring) open.launch(arrayOf("*/*"))
-            else create.launch("PIE-${LocalDate.now()}.pie")
+        state, restoring, driveDestination, sourceName, password, confirmation,
+        { password = it }, { confirmation = it }, goBack,
+        onPickFile = { open.launch(arrayOf("*/*")) },
+        onContinue = {
+            focus.clearFocus()
+            if (restoring) {
+                source?.let { viewModel.run(it.toString(), password.toCharArray(), true) }
+                password = ""
+            } else {
+                create.launch("PIE-${LocalDate.now()}.pie")
+            }
         },
     )
 }
 
 @Composable
-fun BackupScreen(
+private fun BackupScreen(
     state: BackupUiState,
     restoring: Boolean,
+    driveDestination: Boolean,
+    sourceName: String?,
     password: String,
     confirmation: String,
     onPassword: (String) -> Unit,
     onConfirmation: (String) -> Unit,
     onBack: () -> Unit,
-    onChoose: () -> Unit,
+    onPickFile: () -> Unit,
+    onContinue: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
-    val valid = password.length >= 8 && (restoring || password == confirmation)
+    val picking = restoring && sourceName == null
+    val valid = picking || (password.length >= 8 && (restoring || password == confirmation))
     Scaffold(
-        modifier = Modifier.imePadding(), contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = Modifier.imePadding(),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        topBar = {
+            Column {
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    IconButton(onClick = onBack, enabled = !state.busy) {
+                        PieIcon(PieGlyph.Previous, "กลับ", size = 20.dp)
+                    }
+                    Text(
+                        if (restoring) "นำเข้าไฟล์สำรอง" else if (driveDestination) "สำรองไป Google Drive" else "ส่งออกไฟล์สำรอง",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+                HorizontalDivider(Modifier.padding(horizontal = 24.dp))
+            }
+        },
         bottomBar = {
             Surface {
-                Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(
+                    Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     AnimatedVisibility(state.busy, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
                         PieLoader(if (restoring) "กำลังตรวจไฟล์สำรอง…" else "กำลังเข้ารหัสและตรวจไฟล์สำรอง…", compact = true)
                     }
-                    PiePrimaryButton(if (restoring) "เลือกไฟล์ .pie" else "ส่งออกไฟล์", onChoose, enabled = valid && !state.busy, icon = if (restoring) PieGlyph.Archive else PieGlyph.Download)
+                    Text(
+                        when {
+                            restoring -> "คุณจะได้ตรวจรายการก่อนยืนยันการรวม"
+                            driveDestination -> "ในหน้าถัดไป เลือก Drive แล้วเลือกโฟลเดอร์ที่ต้องการ"
+                            else -> "กรอกและยืนยันรหัสผ่านเพื่อเลือกที่บันทึก"
+                        },
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colors.onSurfaceVariant,
+                    )
+                    PiePrimaryButton(
+                        when {
+                            picking -> "เลือกไฟล์ .pie"
+                            restoring -> "เปิดไฟล์เพื่อตรวจรายการ"
+                            driveDestination -> "เลือกที่เก็บบน Google Drive"
+                            else -> "เลือกที่บันทึกไฟล์"
+                        },
+                        if (picking) onPickFile else onContinue,
+                        enabled = valid && !state.busy,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
             }
         },
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
-            TextButton(onClick = onBack, enabled = !state.busy) { PieIcon(PieGlyph.Previous, size = 18.dp); Text("สำรองข้อมูล") }
-            Text(if (restoring) "พาเรื่องเล่ากลับมา" else "เก็บไว้อีกที่", style = MaterialTheme.typography.headlineLarge)
-            Surface(color = colors.surface, shape = RoundedCornerShape(18.dp)) {
-                Row(Modifier.fillMaxWidth().padding(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                    PieIcon(PieGlyph.Archive, color = colors.primary, size = 40.dp)
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(if (restoring) ".pie" else "ทุกเรื่องในไฟล์เดียว", style = MaterialTheme.typography.titleMedium)
-                        Text(if (restoring) "รวมกับบันทึกเดิม" else "ข้อความ · รูป · วิดีโอ", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+        AnimatedContent(
+            targetState = picking,
+            modifier = Modifier.fillMaxSize().padding(padding),
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            label = "backup step",
+        ) { chooseFile ->
+            Column(
+                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                if (restoring) {
+                    Text(
+                        if (chooseFile) "1 จาก 2 · เลือกไฟล์" else "2 จาก 2 · เปิดไฟล์",
+                        color = colors.primary,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+                Text(
+                    when {
+                        chooseFile -> "เลือกไฟล์ .pie"
+                        restoring -> "ใส่รหัสผ่านของไฟล์"
+                        else -> "สร้างไฟล์สำรอง .pie"
+                    },
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+                if (chooseFile) {
+                    Text("เลือกไฟล์สำรองจากเครื่อง แล้วใส่รหัสผ่านที่ตั้งไว้ตอนส่งออก")
+                } else {
+                    if (restoring) {
+                        Surface(color = colors.surface, shape = RoundedCornerShape(14.dp)) {
+                            Column(Modifier.fillMaxWidth().padding(16.dp)) {
+                                Text("ไฟล์ที่เลือก", style = MaterialTheme.typography.labelMedium)
+                                Text(sourceName.orEmpty(), style = MaterialTheme.typography.titleMedium)
+                            }
+                        }
+                    } else {
+                        Text("เก็บข้อความ รูป และวิดีโอไว้ในไฟล์เข้ารหัส")
+                    }
+                    PasswordField(password, onPassword, "รหัสผ่านไฟล์", !state.busy)
+                    if (restoring) {
+                        TextButton(onClick = onPickFile, enabled = !state.busy) { Text("เลือกไฟล์อื่น") }
+                    } else {
+                        Text("อย่างน้อย 8 ตัวอักษร · ใช้รหัสแยกจาก PIN เปิดแอป", style = MaterialTheme.typography.bodySmall)
+                        PasswordField(confirmation, onConfirmation, "ยืนยันรหัสผ่าน", !state.busy)
+                        Text("เก็บรหัสนี้ไว้สำหรับเปิดไฟล์เมื่อนำเข้าบันทึก", style = MaterialTheme.typography.bodySmall)
                     }
                 }
-            }
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(if (restoring) "รหัสผ่านของไฟล์" else "ตั้งรหัสผ่านของไฟล์", style = MaterialTheme.typography.bodySmall)
-                PasswordField(password, onPassword, "รหัสผ่านไฟล์สำรอง", !state.busy)
-                if (!restoring) {
-                    Text("ยืนยันรหัสผ่าน", style = MaterialTheme.typography.bodySmall)
-                    PasswordField(confirmation, onConfirmation, "ยืนยันรหัสผ่านอีกครั้ง", !state.busy)
+                state.message?.let {
+                    val message = if (driveDestination && state.completed) {
+                        "สร้างไฟล์สำรองแล้ว · ตรวจสถานะอัปโหลดในแอป Drive"
+                    } else it
+                    Text(message, style = MaterialTheme.typography.bodySmall, color = if (state.completed) colors.tertiary else colors.error)
                 }
-                Text(if (restoring) "รหัสที่ตั้งไว้ตอนส่งออก" else "อย่างน้อย 8 ตัวอักษร · ใช้รหัสแยกจาก PIN", style = MaterialTheme.typography.labelMedium, color = colors.onSurfaceVariant)
             }
-            state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = if (state.completed) colors.tertiary else colors.error) }
         }
     }
 }
@@ -115,7 +223,7 @@ private fun PasswordField(value: String, onChange: (String) -> Unit, placeholder
     var visible by remember { mutableStateOf(false) }
     OutlinedTextField(
         value, onChange, modifier = Modifier.fillMaxWidth(), enabled = enabled,
-        singleLine = true, placeholder = { Text(placeholder, style = MaterialTheme.typography.bodySmall) },
+        singleLine = true, label = { Text(placeholder) },
         shape = RoundedCornerShape(12.dp),
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="th">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIE · ร่างหน้าเขียน</title>
+<style>
+/* Hallmark · pre-emit critique: P4 H4 E4 S5 R5 V4 */
+:root{--paper:#f7f3ec;--surface:#fffcf7;--ink:#302b28;--muted:#746b62;--line:#e4dcd1;--soft:#efe5da;--accent:#a64e3c;--white:#fff;--font:"Noto Sans Thai",Tahoma,sans-serif}
+*{box-sizing:border-box}html,body{overflow-x:clip}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 var(--font)}
+main{max-width:440px;min-height:100svh;margin:auto;display:flex;flex-direction:column}
+header{display:flex;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+header span{display:grid;place-items:center;width:48px;height:48px;font-size:26px}small{display:block;color:var(--muted)}
+article{padding:24px;flex:1;outline-offset:-4px}h1{font-size:24px;line-height:1.35;margin:0 0 16px}p{margin:0 0 16px}
+nav,.actions{display:flex;gap:8px;align-items:center}nav{position:sticky;bottom:0;padding:14px 12px;border-top:1px solid var(--line);background:var(--surface)}
+button{font:600 14px var(--font);white-space:nowrap;min-height:48px;border:0;border-radius:24px;padding:0 12px;color:var(--ink);background:var(--soft);cursor:pointer}
+.primary{background:var(--accent);color:var(--white)}dialog{width:min(100%,440px);max-width:none;margin:auto auto 0;border:0;border-radius:24px 24px 0 0;padding:24px;color:var(--ink);background:var(--surface)}
+dialog::backdrop{background:color-mix(in srgb,var(--ink) 35%,transparent)}h2{font-size:21px;margin:0 0 16px}
+textarea{width:100%;min-height:104px;resize:vertical;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);font:inherit}
+.actions{justify-content:flex-end;margin-top:16px}.note{margin-top:12px}
+</style>
+<main>
+  <header><span aria-hidden="true">‹</span><div><strong>5 พฤศจิกายน 2569</strong><small>ตัวอย่างหน้าเขียน</small></div></header>
+  <article contenteditable="true" aria-label="ข้อความบันทึก"><h1>เย็นนี้ที่ริมแม่น้ำ</h1><p>วันนี้ได้เดินช้าลงนิดหนึ่ง ลมเย็นจนอยากนั่งอยู่ตรงนั้นอีกพัก</p><p><strong>ก่อนกลับบ้าน</strong></p><ul><li>แวะซื้อขนมปัง</li><li>เก็บรูปท้องฟ้าไว้</li></ul></article>
+  <nav aria-label="เครื่องมือเขียน"><button type="button" disabled>＋ แนบไฟล์</button><button id="formatOpen">Aa จัดรูปแบบ</button><button class="primary" id="voiceOpen">พิมพ์ด้วยเสียง</button></nav>
+</main>
+<dialog id="voice"><h2>ตรวจข้อความจากเสียง</h2><textarea aria-label="ข้อความจากเสียง">ตอนเดินกลับบ้าน ท้องฟ้าเริ่มเปลี่ยนสี เลยหยุดดูอยู่พักหนึ่ง</textarea><small class="note">ข้อความตัวอย่างสำหรับลองแก้ก่อนแทรก</small><div class="actions"><button id="voiceClose">ยกเลิก</button><button class="primary" id="insert">แทรกข้อความ</button></div></dialog>
+<dialog id="format"><h2>จัดรูปแบบ</h2><div class="actions"><button data-format="heading">หัวข้อ</button><button data-format="bold">ตัวหนา</button><button data-format="list">รายการ</button></div><small class="note">เลือกข้อความหรือวางเคอร์เซอร์ในย่อหน้าก่อนจัดรูปแบบ</small><div class="actions"><button id="formatClose">เสร็จแล้ว</button></div></dialog>
+<script>
+const byId = id => document.getElementById(id);
+const editor = document.querySelector("article");
+let range;
+document.addEventListener("selectionchange", () => {
+  const selection = getSelection();
+  if (selection.rangeCount && editor.contains(selection.anchorNode)) range = selection.getRangeAt(0).cloneRange();
+});
+function restore() {
+  editor.focus();
+  const selection = getSelection();
+  if (range && editor.contains(range.commonAncestorContainer)) {
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+}
+byId("voiceOpen").onclick = () => byId("voice").showModal();
+byId("voiceClose").onclick = () => byId("voice").close();
+byId("insert").onclick = () => {
+  const text = byId("voice").querySelector("textarea").value;
+  byId("voice").close();
+  restore();
+  document.execCommand("insertText", false, text);
+};
+byId("formatOpen").onclick = () => byId("format").showModal();
+byId("formatClose").onclick = () => byId("format").close();
+document.querySelectorAll("[data-format]").forEach(button => button.onclick = () => {
+  byId("format").close();
+  restore();
+  const commands = { heading: ["formatBlock", "h2"], bold: ["bold", null], list: ["insertUnorderedList", null] };
+  const [command, value] = commands[button.dataset.format];
+  document.execCommand(command, false, value);
+});
+</script>
+</html>

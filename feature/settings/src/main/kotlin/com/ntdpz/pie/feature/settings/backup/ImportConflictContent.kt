@@ -13,19 +13,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ntdpz.pie.core.designsystem.format.PieDates
 import com.ntdpz.pie.core.designsystem.motion.piePressScale
 import com.ntdpz.pie.core.domain.backup.DiaryConflict
 import com.ntdpz.pie.core.domain.backup.MergeChoice
+import com.ntdpz.pie.core.domain.diary.DiaryEntry
+import com.ntdpz.pie.core.domain.diary.TextFormat
 
 @Composable
 internal fun ImportConflictContent(conflict: DiaryConflict, index: Int, total: Int, selected: MergeChoice, enabled: Boolean, onChoice: (MergeChoice) -> Unit) {
     val colors = MaterialTheme.colorScheme
     Text("เก็บแบบไหนดี?", style = MaterialTheme.typography.headlineLarge)
     Text("${PieDates.entry(conflict.date)} · ${index + 1} / $total", style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
-    ImportTextCard("ในเครื่อง", conflict.device.text)
-    ImportTextCard("จากไฟล์", conflict.backup.text)
+    if (conflict.device.text == conflict.backup.text) {
+        Text("ข้อความเหมือนกัน แต่จัดรูปแบบต่างกัน", style = MaterialTheme.typography.bodySmall)
+    }
+    ImportTextCard("ในเครื่อง", conflict.device)
+    ImportTextCard("จากไฟล์", conflict.backup)
     if (LocalDensity.current.fontScale > 1.3f) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         MergeChoice.entries.forEach { choice -> ChoiceTile(choice, selected, enabled, Modifier.fillMaxWidth(), onChoice) }
     } else Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -50,12 +59,25 @@ private fun ChoiceTile(choice: MergeChoice, selected: MergeChoice, enabled: Bool
 }
 
 @Composable
-private fun ImportTextCard(label: String, text: String) {
+private fun ImportTextCard(label: String, entry: DiaryEntry) {
+    val text = entry.text
+    val styled = remember(text, entry.formatting) {
+        AnnotatedString.Builder(text).apply {
+            entry.formatting.forEach { range ->
+                val style = when (range.format) {
+                    TextFormat.Bold -> SpanStyle(fontWeight = FontWeight.Bold)
+                    TextFormat.Heading -> SpanStyle(fontSize = 26.sp, fontWeight = FontWeight.Bold)
+                    TextFormat.Subheading -> SpanStyle(fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+                }
+                addStyle(style, range.start, range.end)
+            }
+        }.toAnnotatedString()
+    }
     var expanded by remember(label, text) { mutableStateOf(false) }
     Surface(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(16.dp)) {
         Column(Modifier.fillMaxWidth().animateContentSize().padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(text, maxLines = if (expanded) Int.MAX_VALUE else 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(styled, maxLines = if (expanded) Int.MAX_VALUE else 3, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             if (text.length > 120 || text.count { it == '\n' } > 2) TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "ย่อ" else "อ่านทั้งหมด") }
         }
     }

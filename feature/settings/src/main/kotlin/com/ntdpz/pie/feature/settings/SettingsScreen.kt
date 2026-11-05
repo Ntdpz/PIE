@@ -39,20 +39,11 @@ fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (Setti
         verticalArrangement = Arrangement.spacedBy(24.dp),
     ) {
         Text("พื้นที่ของคุณ", modifier = Modifier.pieReveal(), style = MaterialTheme.typography.headlineLarge)
-        AppearancePicker(state.settings.themeMode, state.settings.loaded, onThemeChange)
-        Column(Modifier.pieReveal(1)) {
-            SectionLabel("ของคุณ")
-            SettingRow(PieGlyph.Lock, "รหัส PIN", if (state.settings.pinEnabled) "เปิดอยู่" else "ปิดอยู่") {
-                if (state.settings.pinEnabled) pinOptions = true else onAction(SettingsAction.SetupPin)
-            }
-            val summary = if (reminder.enabled) {
-                (if (reminder.days.size == 7) "ทุกวัน" else "${reminder.days.size} วัน/สัปดาห์") +
-                    " · " + reminder.times.sorted().joinToString(", ") { "%02d:%02d".format(it / 60, it % 60) }
-            } else "ปิดอยู่"
-            SettingRow(PieGlyph.Bell, "แจ้งเตือน", summary) { onAction(SettingsAction.Reminders) }
-        }
-        Column(Modifier.pieReveal(2)) {
+        Column(Modifier.pieReveal(1), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SectionLabel("เก็บเรื่องเล่า")
+            Spacer(Modifier.height(8.dp))
+            DriveBackupCard { onAction(SettingsAction.GoogleDrive) }
+            Spacer(Modifier.height(8.dp))
             val backupTime = state.settings.lastBackupAtMillis?.let {
                 java.time.Instant.ofEpochMilli(it).atZone(java.time.ZoneId.systemDefault())
                     .format(java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy · HH:mm", java.util.Locale.forLanguageTag("th-TH")))
@@ -67,6 +58,19 @@ fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (Setti
                 Text("นำเข้าสำเร็จล่าสุด $label", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
+        Column(Modifier.pieReveal(2), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            SectionLabel("ส่วนตัวและการใช้งาน")
+            Spacer(Modifier.height(8.dp))
+            SettingRow(PieGlyph.Lock, "รหัส PIN", if (state.settings.pinEnabled) "เปิดอยู่" else "ปิดอยู่") {
+                if (state.settings.pinEnabled) pinOptions = true else onAction(SettingsAction.SetupPin)
+            }
+            val summary = if (reminder.enabled) {
+                (if (reminder.days.size == 7) "ทุกวัน" else "${reminder.days.size} วัน/สัปดาห์") +
+                    " · " + reminder.times.sorted().joinToString(", ") { "%02d:%02d".format(it / 60, it % 60) }
+            } else "ปิดอยู่"
+            SettingRow(PieGlyph.Bell, "แจ้งเตือน", summary) { onAction(SettingsAction.Reminders) }
+        }
+        AppearancePicker(state.settings.themeMode, state.settings.loaded, onThemeChange)
         state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
         Text("PIE · V$versionName", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
@@ -103,9 +107,9 @@ private fun SectionLabel(text: String) {
 
 @Composable
 private fun SettingRow(glyph: PieGlyph, title: String, detail: String, onClick: () -> Unit) {
-    Column {
+    Surface(onClick = onClick, shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface) {
         Row(
-            Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = 16.dp),
+            Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(horizontal = 20.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically,
         ) {
             PieIcon(glyph, color = MaterialTheme.colorScheme.primary)
@@ -115,6 +119,34 @@ private fun SettingRow(glyph: PieGlyph, title: String, detail: String, onClick: 
             }
             PieIcon(PieGlyph.Next, color = MaterialTheme.colorScheme.onSurfaceVariant, size = 18.dp)
         }
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+    }
+}
+
+@Composable
+private fun DriveBackupCard(onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Surface(onClick = onClick, shape = RoundedCornerShape(28.dp), color = colors.primaryContainer) {
+        Column(
+            Modifier.fillMaxWidth().padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Surface(shape = RoundedCornerShape(24.dp), color = colors.surface) {
+                Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                    PieIcon(PieGlyph.CloudBackup, color = colors.primary)
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("Google Drive", style = MaterialTheme.typography.headlineSmall, color = colors.onSurface)
+                    Text("สำรองข้อมูลไว้กับบัญชีของคุณ", style = MaterialTheme.typography.bodySmall, color = colors.onSurface)
+                    Text("เลือกที่เก็บเมื่อสำรอง", style = MaterialTheme.typography.labelSmall, color = colors.onSurfaceVariant)
+                }
+                Surface(shape = RoundedCornerShape(24.dp), color = colors.primary) {
+                    Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+                        PieIcon(PieGlyph.ArrowUpRight, color = colors.onPrimary)
+                    }
+                }
+            }
+        }
     }
 }

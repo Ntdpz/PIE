@@ -33,6 +33,7 @@ import com.ntdpz.pie.feature.home.HomeViewModel
 import com.ntdpz.pie.feature.settings.SettingsRoute
 import com.ntdpz.pie.feature.settings.SettingsViewModel
 import com.ntdpz.pie.feature.settings.SettingsAction
+import com.ntdpz.pie.feature.settings.drive.DriveScreen
 import com.ntdpz.pie.feature.settings.reminder.ReminderRoute
 import com.ntdpz.pie.feature.settings.pin.PinRoute
 import com.ntdpz.pie.feature.settings.pin.PinPurpose
@@ -115,14 +116,22 @@ fun PieApp(container: AppContainer) {
                         SettingsAction.Reminders -> "reminders"
                         SettingsAction.ExportBackup -> "backup/export"
                         SettingsAction.RestoreBackup -> "backup/restore"
+                        SettingsAction.GoogleDrive -> "drive"
                     })
                 }
+            }
+            composable("drive") {
+                DriveScreen(
+                    onBack = { nav.popBackStack() },
+                    onExport = { nav.navigate("backup/drive") },
+                    onImport = { nav.navigate("backup/restore") },
+                )
             }
             composable("reminders") {
                 val vm: SettingsViewModel = viewModel(factory = viewModelFactory {
                     initializer { SettingsViewModel(container.settingsRepository, container.backupRepository, container.applicationScope, container.mergeImportRepository) }
                 })
-                ReminderRoute(vm, LocalDate.now(container.clock), { nav.popBackStack() }, container.reminders::notifyNow)
+                ReminderRoute(vm, LocalDate.now(container.clock), { nav.popBackStack() })
             }
             composable("pin/{purpose}") { entry ->
                 val purpose = when (entry.arguments?.getString("purpose")) {
@@ -139,7 +148,12 @@ fun PieApp(container: AppContainer) {
                 val vm: BackupViewModel = viewModel(factory = viewModelFactory {
                     initializer { BackupViewModel(container.backupRepository, container.diaryWriter, container.mergeImportRepository, container.applicationScope) }
                 })
-                BackupRoute(vm, entry.arguments?.getString("mode") == "restore") { nav.popBackStack() }
+                BackupRoute(
+                    vm,
+                    restoring = entry.arguments?.getString("mode") == "restore",
+                    driveDestination = entry.arguments?.getString("mode") == "drive",
+                    onBack = { nav.popBackStack() },
+                )
             }
             composable(
                 route = "editor/{date}",

@@ -19,6 +19,13 @@ android {
         buildConfig = true
     }
     buildTypes {
+        debug {
+            // Run instrumentation beside the user's installed diary, with separate storage.
+            if (providers.gradleProperty("pie.deviceTest").orNull == "true") {
+                applicationIdSuffix = ".devicetest"
+                versionNameSuffix = "-device-test"
+            }
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true

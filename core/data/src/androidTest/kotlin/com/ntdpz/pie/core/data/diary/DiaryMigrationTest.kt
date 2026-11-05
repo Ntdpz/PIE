@@ -11,6 +11,38 @@ class DiaryMigrationTest {
     val helper = MigrationTestHelper(InstrumentationRegistry.getInstrumentation(), PieDatabase::class.java)
 
     @Test
+    fun upgradeFrom3To4PreservesTextMediaAndDefaultsToPlainText() {
+        helper.createDatabase("formatting-migration", 3).apply {
+            execSQL("INSERT INTO diary_entries VALUES ('2026-11-03', 'ข้อความ 🙂', 7)")
+            execSQL("INSERT INTO diary_media VALUES ('media', '2026-11-03', 'keep.png', 'image/png', 9)")
+            execSQL("INSERT INTO import_receipts VALUES ('2026-11-03', 'receipt')")
+            close()
+        }
+        helper.runMigrationsAndValidate("formatting-migration", 4, true, DatabaseMigrations.From3To4).apply {
+            query("SELECT text, formatting FROM diary_entries").use {
+                check(it.moveToFirst())
+                assertEquals("ข้อความ 🙂", it.getString(0))
+                assertEquals("[]", it.getString(1))
+            }
+            query("SELECT COUNT(*) FROM diary_media").use { check(it.moveToFirst()); assertEquals(1, it.getInt(0)) }
+            query("SELECT sourceHash FROM import_receipts").use { check(it.moveToFirst()); assertEquals("receipt", it.getString(0)) }
+            close()
+        }
+    }
+
+    @Test
+    fun upgradeFrom1To4PreservesText() {
+        helper.createDatabase("formatting-full-migration", 1).apply {
+            execSQL("INSERT INTO diary_entries VALUES ('2026-11-03', 'old note', 1)")
+            close()
+        }
+        helper.runMigrationsAndValidate(
+            "formatting-full-migration", 4, true,
+            DatabaseMigrations.From1To2, DatabaseMigrations.From2To3, DatabaseMigrations.From3To4,
+        ).close()
+    }
+
+    @Test
     fun upgradeToMediaSchemaPreservesExistingDiary() {
         helper.createDatabase("migration-test", 1).apply {
             execSQL("INSERT INTO diary_entries VALUES ('2026-11-02', 'keep this note', 1)")

@@ -15,7 +15,7 @@ import com.ntdpz.pie.feature.settings.SettingsUiState
 import java.time.LocalDate
 
 @Composable
-fun ReminderScreen(state: SettingsUiState, today: LocalDate, onBack: () -> Unit, onUpdate: (ReminderSettings) -> Unit, onEnable: (Boolean) -> Unit, onTest: () -> Unit, onEditTime: (Int?) -> Unit) {
+fun ReminderScreen(state: SettingsUiState, today: LocalDate, onBack: () -> Unit, onUpdate: (ReminderSettings) -> Unit, onEnable: (Boolean) -> Unit, onEditTime: (Int?) -> Unit) {
     val r = state.settings.reminder
     val colors = MaterialTheme.colorScheme
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -55,7 +55,6 @@ fun ReminderScreen(state: SettingsUiState, today: LocalDate, onBack: () -> Unit,
             }
         }
         if (r.customMode) OutlinedTextField(r.message, { onUpdate(r.copy(message = it)) }, Modifier.fillMaxWidth(), placeholder = { Text("ข้อความของคุณ…") }, maxLines = 4, shape = RoundedCornerShape(16.dp))
-        PiePrimaryButton("ทดสอบแจ้งเตือน", onTest, icon = PieGlyph.Ring, enabled = state.settings.loaded)
         Text(state.message ?: if (state.saved) "บันทึกการตั้งค่าแล้ว" else "กำลังบันทึก…", style = MaterialTheme.typography.labelSmall, color = colors.onSurfaceVariant)
     }
 }

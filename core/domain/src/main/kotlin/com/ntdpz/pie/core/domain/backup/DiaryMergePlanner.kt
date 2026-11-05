@@ -27,7 +27,7 @@ object DiaryMergePlanner {
             val existing = local[incoming.date]
             when {
                 existing == null -> additions += incoming
-                existing.text == incoming.text -> unchanged += incoming.date
+                existing.text == incoming.text && existing.formatting == incoming.formatting -> unchanged += incoming.date
                 existing.text.isEmpty() -> additions += incoming
                 incoming.text.isEmpty() -> unchanged += incoming.date
                 else -> conflicts += DiaryConflict(incoming.date, existing, incoming)
@@ -42,6 +42,10 @@ object DiaryMergePlanner {
         MergeChoice.KeepBoth -> conflict.device.copy(
             text = conflict.device.text + "\n\n──────────\nข้อความจากไฟล์สำรอง\n──────────\n\n" + conflict.backup.text,
             updatedAt = now,
+            formatting = conflict.device.formatting + conflict.backup.formatting.map {
+                val offset = conflict.device.text.length + "\n\n──────────\nข้อความจากไฟล์สำรอง\n──────────\n\n".length
+                it.copy(start = it.start + offset, end = it.end + offset)
+            },
         )
     }
 }

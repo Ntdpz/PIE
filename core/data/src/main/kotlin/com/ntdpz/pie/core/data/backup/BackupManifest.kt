@@ -3,6 +3,7 @@ package com.ntdpz.pie.core.data.backup
 import android.util.JsonReader
 import android.util.JsonWriter
 import com.ntdpz.pie.core.data.diary.DiaryEntity
+import com.ntdpz.pie.core.data.diary.DiaryFormattingJson
 import com.ntdpz.pie.core.data.media.MediaEntity
 import com.ntdpz.pie.core.domain.settings.ReminderSettings
 import java.io.InputStream
@@ -24,7 +25,8 @@ internal object BackupManifestIO {
         writer.name("entries").beginArray()
         manifest.entries.forEach {
             writer.beginObject().name("date").value(it.date).name("text").value(it.text)
-                .name("updatedAt").value(it.updatedAtEpochMillis).endObject()
+                .name("updatedAt").value(it.updatedAtEpochMillis)
+                .name("formatting").value(it.formatting).endObject()
         }
         writer.endArray().name("media").beginArray()
         manifest.media.forEach {
@@ -72,17 +74,20 @@ internal object BackupManifestIO {
     }
 
     private fun readEntry(reader: JsonReader): DiaryEntity {
-        var date: String? = null; var text: String? = null; var updated = 0L
+        var date: String? = null; var text: String? = null; var updated = 0L; var formatting = "[]"
         reader.beginObject()
         while (reader.hasNext()) when (reader.nextName()) {
             "date" -> date = reader.nextString()
             "text" -> text = reader.nextString()
             "updatedAt" -> updated = reader.nextLong()
+            "formatting" -> formatting = reader.nextString()
             else -> reader.skipValue()
         }
         reader.endObject()
         val key = requireNotNull(date).also { require(LocalDate.parse(it).toString() == it) }
-        return DiaryEntity(key, requireNotNull(text), updated)
+        val content = requireNotNull(text)
+        val ranges = DiaryFormattingJson.decode(content, formatting)
+        return DiaryEntity(key, content, updated, DiaryFormattingJson.encode(content, ranges))
     }
 
     private fun readMedia(reader: JsonReader): MediaEntity {

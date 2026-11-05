@@ -24,7 +24,7 @@ class GalleryFlowTest {
     @get:Rule val compose = createAndroidComposeRule<MainActivity>()
     @Test fun lightFeedPreservesMediaRatiosAndReadsFullStoryInline() = exercise(false)
     @Test fun darkFeedPreservesMediaRatiosAndReadsFullStoryInline() = exercise(true)
-    @Test fun videoRequiresPlayAndStopsWhenBackgroundedOrScrolledAway() = exercise(false, video = true)
+    @Test fun videoAutoplaysMutedAndResetsSoundWhenBackgroundedOrScrolledAway() = exercise(false, video = true)
 
     private fun exercise(dark: Boolean, video: Boolean = false) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -72,56 +72,72 @@ class GalleryFlowTest {
                 added += app.mediaRepository.observeMedia(day).first().map { it.id }.filter { it !in before }
             }
             compose.onNode(hasText("ความทรงจำ") and hasClickAction()).performClick()
-            compose.onNodeWithTag("memory-gallery").performScrollToNode(hasText(PieDates.shortEntry(day)))
+            val calendar = compose.onNodeWithContentDescription("เลือกวันจากปฏิทิน")
+            val calendarBounds = calendar.assertIsDisplayed().getUnclippedBoundsInRoot()
+            // Samsung's fractional density can round an exact 48 dp bound below 48f.
+            assertTrue("Calendar touch target must be at least 48 dp wide", (calendarBounds.right - calendarBounds.left).value >= 47.99f)
+            assertTrue("Calendar touch target must be at least 48 dp high", (calendarBounds.bottom - calendarBounds.top).value >= 47.99f)
+            val gallery = compose.onNodeWithTag("memory-gallery")
+            val tileTags = added.map { "memory-tile-$day-$it" }
+            assertEquals(4, tileTags.size)
+            tileTags.forEach { tag ->
+                gallery.performScrollToNode(hasTestTag(tag))
+                compose.onNodeWithTag(tag).assertIsDisplayed()
+            }
+            val firstTile = tileTags.first()
+            gallery.performScrollToNode(hasTestTag(firstTile))
+            val tile = compose.onNodeWithTag(firstTile)
+            val bounds = tile.getUnclippedBoundsInRoot()
+            assertEquals((bounds.right - bounds.left).value, (bounds.bottom - bounds.top).value, 1f)
+            tile.performSemanticsAction(androidx.compose.ui.semantics.SemanticsActions.OnLongClick)
+            compose.onNodeWithTag("memory-hold-preview").assertIsDisplayed()
+            compose.onNodeWithTag("memory-hold-preview").performTouchInput { click() }
+            compose.onNodeWithTag("memory-hold-preview").assertDoesNotExist()
+            tile.performTouchInput { longClick() }
+            compose.onNodeWithTag("memory-hold-preview").assertDoesNotExist()
             saveScreen(if (dark) "gallery-dark" else "gallery-light")
-            compose.onNodeWithText(PieDates.shortEntry(day)).performClick()
+            compose.onNodeWithTag(firstTile).performClick()
             waitTag("memory-photos-$day")
             if (video) {
-                compose.waitUntil(15_000) { compose.onAllNodesWithText("เล่นวิดีโอ").fetchSemanticsNodes().isNotEmpty() }
-                compose.onNodeWithText("เล่นวิดีโอ").performClick()
+                compose.waitUntil(15_000) { compose.onAllNodesWithText("เปิดเสียง").fetchSemanticsNodes().isNotEmpty() }
                 compose.onNodeWithText("เปิดเสียง").performClick()
                 compose.onNodeWithText("ปิดเสียง").assertIsDisplayed()
                 compose.activityRule.scenario.moveToState(androidx.lifecycle.Lifecycle.State.CREATED)
                 compose.activityRule.scenario.moveToState(androidx.lifecycle.Lifecycle.State.RESUMED)
-                compose.onNodeWithText("เล่นวิดีโอ").assertIsDisplayed().performClick()
+                compose.waitUntil(15_000) { compose.onNodeWithText("เปิดเสียง").isDisplayed() }
             } else assertMediaRatio(day, 16f / 9)
             compose.onNodeWithTag("memory-photos-$day").performTouchInput { swipeLeft() }
-            waitCounter("2 / 4")
+            waitCounter("2 จาก 4")
             if (video) compose.onNodeWithText("เปิดเสียง").assertDoesNotExist()
             assertMediaRatio(day, 4f / 3)
             saveScreen(if (dark) "feed-landscape-dark" else "feed-landscape-light")
             compose.onNodeWithTag("memory-photos-$day").performTouchInput { swipeLeft() }
-            waitCounter("3 / 4")
-            assertMediaRatio(day, 9f / 16)
+            waitCounter("3 จาก 4")
+            assertPortraitFillsFeed(day)
             compose.onNodeWithTag("memory-photos-$day").performTouchInput { swipeLeft() }
-            waitCounter("4 / 4")
-            assertMediaRatio(day, 3f / 4)
+            waitCounter("4 จาก 4")
+            assertPortraitFillsFeed(day)
             waitTag("memory-story-$day")
             compose.onNodeWithTag("memory-story-$day").assertTextEquals(fullText)
             compose.onNodeWithText("อ่านต่อ").assertDoesNotExist()
             compose.onNodeWithContentDescription("ปิดเรื่องเล่า").assertDoesNotExist()
-            compose.onNodeWithTag("memory-feed").performTouchInput { swipeUp() }
+            compose.onNodeWithTag("memory-entry-$day").performTouchInput { swipeUp() }
             compose.onNodeWithTag("memory-story-$day").assertTextEquals(fullText)
             saveScreen(if (dark) "feed-reading-dark" else "feed-reading-light")
-            scrollToDay(oldDay)
+            compose.onNodeWithTag("memory-feed").performTouchInput { swipeLeft() }
+            compose.onNodeWithTag("memory-entry-$oldDay").assertDoesNotExist()
+            compose.onNodeWithContentDescription("กลับสู่ความทรงจำ").performClick()
+            val storyTile = "memory-tile-$oldDay-"
+            gallery.performScrollToNode(hasTestTag(storyTile))
+            compose.onNodeWithTag(storyTile).performClick()
             waitTag("memory-story-$oldDay")
             compose.onNodeWithTag("memory-story-$oldDay").assertTextEquals("เรื่องเล่าในวันที่ไม่มีรูป")
             compose.onNodeWithTag("memory-media-$oldDay").assertDoesNotExist()
-            if (video) {
-                scrollToDay(day)
-                repeat(3) { compose.onNodeWithTag("memory-photos-$day").performTouchInput { swipeRight() } }
-                waitCounter("1 / 4")
-                compose.onNodeWithText("เล่นวิดีโอ").performClick()
-                scrollToDay(oldDay)
-                scrollToDay(day)
-                compose.onNodeWithText("เล่นวิดีโอ").assertIsDisplayed()
-                scrollToDay(oldDay)
-            }
             compose.onNodeWithTag("memory-edit-$oldDay").performClick()
             compose.onNode(hasSetTextAction()).assertTextEquals("เรื่องเล่าในวันที่ไม่มีรูป")
             compose.onNodeWithContentDescription("กลับ").performClick()
             compose.onNodeWithContentDescription("กลับสู่ความทรงจำ").performClick()
-            compose.onNodeWithText(PieDates.shortEntry(day)).assertIsDisplayed()
+            compose.onNodeWithTag(storyTile).assertIsDisplayed()
             compose.onNodeWithContentDescription("เลือกวันจากปฏิทิน").performClick()
             compose.onNodeWithText("เลือกวัน").assertIsDisplayed()
             compose.onNodeWithContentDescription("ปิดปฏิทิน").performClick()
@@ -138,19 +154,22 @@ class GalleryFlowTest {
         }
     }
 
-    private fun scrollToDay(day: LocalDate) {
-        compose.onNodeWithTag("memory-feed").performScrollToNode(hasTestTag("memory-edit-$day"))
-        compose.waitForIdle()
-    }
-
     private fun waitTag(tag: String) {
         compose.waitUntil(15_000) { compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty() }
         compose.waitForIdle()
     }
 
     private fun waitCounter(label: String) {
-        compose.waitUntil(15_000) { compose.onAllNodesWithText(label).fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(15_000) { compose.onAllNodes(hasContentDescription("รูปที่ $label") and isSelected()).fetchSemanticsNodes().isNotEmpty() }
         compose.waitForIdle()
+    }
+
+    private fun assertPortraitFillsFeed(day: LocalDate) {
+        compose.waitUntil(15_000) {
+            val media = compose.onNodeWithTag("memory-media-$day").getUnclippedBoundsInRoot()
+            val feed = compose.onNodeWithTag("memory-feed").getUnclippedBoundsInRoot()
+            kotlin.math.abs((media.bottom - media.top - (feed.bottom - feed.top)).value) < 2f
+        }
     }
 
     private fun assertMediaRatio(day: LocalDate, ratio: Float) {
@@ -163,7 +182,7 @@ class GalleryFlowTest {
     private fun saveScreen(name: String) {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, "PIE-R3-$name.png")
+            put(MediaStore.Images.Media.DISPLAY_NAME, "PIE-R3-$name-${System.nanoTime()}.png")
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PIE-r3-tests")
         })!!

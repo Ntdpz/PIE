@@ -73,5 +73,5 @@ internal suspend fun fileDigest(file: File): String {
     return digest.digest().joinToString("") { "%02x".format(it) }
 }
 
-internal fun textDigest(date: String, text: String): String = MessageDigest.getInstance("SHA-256")
-    .digest((date + "\u0000" + text).toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
+internal fun textDigest(date: String, text: String, formatting: String = "[]"): String = MessageDigest.getInstance("SHA-256")
+    .digest((date + "\u0000" + text + if (formatting == "[]") "" else "\u0000" + formatting).toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }

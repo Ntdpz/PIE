@@ -83,7 +83,8 @@ class BackupRoundTripTest {
         val bytes = "fixture image bytes".toByteArray()
         val password = "backup-password".toCharArray()
         try {
-            database.diaryDao().upsert(DiaryEntity("2026-11-02", "ข้อความ 🙂 #test", 123L))
+            val formatting = "[{\"start\":0,\"end\":7,\"format\":\"Bold\"}]"
+            database.diaryDao().upsert(DiaryEntity("2026-11-02", "ข้อความ 🙂 #test", 123L, formatting))
             ownedFile.writeBytes(bytes)
             database.mediaDao().insert(MediaEntity(id, "2026-11-02", name, "image/png", 123L))
             val uri = Uri.fromFile(archive).toString()
@@ -103,6 +104,7 @@ class BackupRoundTripTest {
             assertEquals(0, database.diaryDao().count())
             backups.restore(uri, password)
             assertEquals("ข้อความ 🙂 #test", database.diaryDao().readEntry("2026-11-02")?.text)
+            assertEquals(formatting, database.diaryDao().readEntry("2026-11-02")?.formatting)
             assertEquals(id, database.mediaDao().readAll().single().id)
             assertArrayEquals(bytes, ownedFile.readBytes())
             assertFalse(settings.settings.first().reminder.enabled)

@@ -5,8 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.ntdpz.pie.core.domain.diary.DiaryRepository
 import com.ntdpz.pie.core.domain.diary.DiaryWriter
 import com.ntdpz.pie.core.domain.diary.SaveState
+import com.ntdpz.pie.core.domain.diary.TextFormatRange
+import com.ntdpz.pie.core.domain.diary.TextFormatting
 import com.ntdpz.pie.core.domain.media.DiaryMediaRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,6 +24,7 @@ class EditorViewModel(
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(EditorUiState(date))
     val state = mutableState.asStateFlow()
+    private var loadJob: Job? = null
 
     init {
         load()
@@ -37,12 +41,13 @@ class EditorViewModel(
     }
 
     fun load() {
+        if (loadJob?.isActive == true) return
         if (!mutableState.value.loading && !mutableState.value.loadFailed) return
         mutableState.update { it.copy(loading = true, loadFailed = false) }
-        viewModelScope.launch {
+        loadJob = viewModelScope.launch {
             try {
-                val text = writer.pendingText(date) ?: repository.readEntry(date)?.text.orEmpty()
-                mutableState.update { it.copy(text = text, loading = false) }
+                val entry = writer.pendingEntry(date) ?: repository.readEntry(date)
+                mutableState.update { it.copy(text = entry?.text.orEmpty(), formatting = entry?.formatting.orEmpty(), loading = false) }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {
@@ -52,17 +57,27 @@ class EditorViewModel(
     }
 
     fun onTextChanged(text: String) {
-        if (mutableState.value.loading || mutableState.value.loadFailed || mutableState.value.deleting) return
-        mutableState.update { it.copy(text = text) }
-        writer.submit(date, text)
+        onDocumentChanged(text, TextFormatting.afterEdit(mutableState.value.text, text, mutableState.value.formatting, extendAtEnd = true))
+    }
+
+    fun onDocumentChanged(text: String, formatting: List<TextFormatRange>) {
+        if (!canEdit()) return
+        val normalized = TextFormatting.normalize(text, formatting)
+        mutableState.update { it.copy(text = text, formatting = normalized) }
+        writer.submit(date, text, normalized)
     }
 
     fun retrySave() {
-        writer.submit(date, mutableState.value.text)
+        if (!canEdit() || mutableState.value.saveState !is SaveState.Failed) return
+        writer.submit(date, mutableState.value.text, mutableState.value.formatting)
+    }
+
+    private fun canEdit(): Boolean = mutableState.value.let {
+        !it.loading && !it.loadFailed && !it.deleting && !it.deleted
     }
 
     fun importMedia(uris: List<String>) {
-        if (uris.isEmpty() || mutableState.value.importing) return
+        if (uris.isEmpty() || mutableState.value.importing || !canEdit()) return
         viewModelScope.launch {
             mutableState.update { it.copy(importing = true, message = null) }
             try {
@@ -78,6 +93,7 @@ class EditorViewModel(
     }
 
     fun deleteMedia(id: String) {
+        if (!canEdit() || mutableState.value.importing) return
         viewModelScope.launch {
             try { mediaRepository.deleteMedia(id) }
             catch (cancelled: CancellationException) { throw cancelled }
@@ -86,7 +102,7 @@ class EditorViewModel(
     }
 
     fun deleteEntry() {
-        if (mutableState.value.importing || mutableState.value.deleting) return
+        if (mutableState.value.importing || !canEdit()) return
         mutableState.update { it.copy(deleting = true) }
         viewModelScope.launch {
             val result = writer.delete(date)

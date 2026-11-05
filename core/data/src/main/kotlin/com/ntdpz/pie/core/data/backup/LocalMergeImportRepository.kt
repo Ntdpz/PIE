@@ -36,7 +36,7 @@ internal class LocalMergeImportRepository(
             val currentMedia = database.mediaDao().readAll()
             val receipts = database.importReceiptDao().readAll().toSet()
             val alreadyImported = manifest.entries
-                .filter { ImportReceipt(it.date, textDigest(it.date, it.text)) in receipts }
+                .filter { ImportReceipt(it.date, textDigest(it.date, it.text, it.formatting)) in receipts }
                 .map { LocalDate.parse(it.date) }.toSet()
             val plan = DiaryMergePlanner.preview(
                 existing.map { it.toDomain() },
@@ -104,7 +104,7 @@ internal class LocalMergeImportRepository(
                     targets.forEach { database.mediaDao().insert(it) }
                     prepared.plan.conflicts.filter { choices[it.date] == MergeChoice.UseBackup }.forEach { database.importReceiptDao().deleteForDate(it.date.toString()) }
                     prepared.manifest.entries.filter { LocalDate.parse(it.date) in accepted || LocalDate.parse(it.date) in prepared.plan.unchangedDates }.forEach {
-                        database.importReceiptDao().insert(ImportReceipt(it.date, textDigest(it.date, it.text)))
+                        database.importReceiptDao().insert(ImportReceipt(it.date, textDigest(it.date, it.text, it.formatting)))
                     }
                     database.importReceiptDao().recordHistory(ImportHistory(completedAtMillis = System.currentTimeMillis()))
                 }

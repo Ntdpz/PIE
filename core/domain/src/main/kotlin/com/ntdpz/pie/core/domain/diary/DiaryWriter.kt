@@ -36,13 +36,15 @@ class DiaryWriter(
         }
     }
 
-    fun submit(date: LocalDate, text: String) {
+    fun submit(date: LocalDate, text: String, formatting: List<TextFormatRange> = emptyList()) {
         val revision = revisions.incrementAndGet()
         mutableStates.update { it + (date to SaveState.Saving(revision)) }
-        val draft = Command.Draft(DiaryEntry(date, text, clock.instant()), revision)
+        val draft = Command.Draft(DiaryEntry(date, text, clock.instant(), TextFormatting.normalize(text, formatting)), revision)
         pendingDrafts[date] = draft
         check(commands.trySend(draft).isSuccess) { "Diary writer is unavailable" }
     }
+
+    fun pendingEntry(date: LocalDate): DiaryEntry? = pendingDrafts[date]?.entry
 
     fun pendingText(date: LocalDate): String? = pendingDrafts[date]?.entry?.text
 

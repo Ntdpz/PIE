@@ -23,7 +23,7 @@ object DiaryDataFactory {
             context.applicationContext,
             PieDatabase::class.java,
             "pie.db",
-        ).addMigrations(DatabaseMigrations.From1To2, DatabaseMigrations.From2To3).build()
+        ).addMigrations(DatabaseMigrations.From1To2, DatabaseMigrations.From2To3, DatabaseMigrations.From3To4).build()
         val gate = DatabaseMutationGate(database, context.filesDir)
         return DiaryData(
             RoomDiaryRepository(database.diaryDao(), database.mediaDao(), java.io.File(context.filesDir, "diary-media"), gate),

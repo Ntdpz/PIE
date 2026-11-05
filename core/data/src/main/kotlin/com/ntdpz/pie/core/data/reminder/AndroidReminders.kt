@@ -21,12 +21,7 @@ class AndroidReminders(private val context: Context) {
     fun schedule(settings: ReminderSettings) {
         alarms.cancel(alarmIntent())
         if (!settings.enabled || settings.days.isEmpty() || settings.times.isEmpty()) return
-        val now = ZonedDateTime.now()
-        val next = (0..7).flatMap { offset ->
-            val date = now.toLocalDate().plusDays(offset.toLong())
-            if (date.dayOfWeek.value !in settings.days) emptyList()
-            else settings.times.map { date.atTime(it / 60, it % 60).atZone(now.zone) }
-        }.filter { it.isAfter(now) }.minOrNull() ?: return
+        val next = nextReminderAt(settings, ZonedDateTime.now()) ?: return
         alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, next.toInstant().toEpochMilli(), alarmIntent())
     }
 
@@ -48,3 +43,10 @@ class AndroidReminders(private val context: Context) {
         return true
     }
 }
+
+internal fun nextReminderAt(settings: ReminderSettings, now: ZonedDateTime): ZonedDateTime? =
+    (0..7).flatMap { offset ->
+        val date = now.toLocalDate().plusDays(offset.toLong())
+        if (date.dayOfWeek.value !in settings.days) emptyList()
+        else settings.times.map { date.atTime(it / 60, it % 60).atZone(now.zone) }
+    }.filter { it.isAfter(now) }.minOrNull()

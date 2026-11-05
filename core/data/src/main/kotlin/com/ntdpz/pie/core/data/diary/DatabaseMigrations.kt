@@ -4,6 +4,12 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 internal object DatabaseMigrations {
+    val From3To4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE diary_entries ADD COLUMN formatting TEXT NOT NULL DEFAULT '[]'")
+        }
+    }
+
     val From2To3 = object : Migration(2, 3) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("CREATE TABLE IF NOT EXISTS import_history (id INTEGER NOT NULL, completedAtMillis INTEGER NOT NULL, PRIMARY KEY(id))")

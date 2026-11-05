@@ -37,7 +37,7 @@ class AppearanceTest {
     fun explicitThemeSurvivesRecreationAndCanReturnToLight() {
         compose.waitUntil(20_000) { (compose.onAllNodesWithText("วันนี้เป็นยังไงบ้าง").fetchSemanticsNodes().isNotEmpty() || compose.onAllNodesWithText("กลับมาเล่าต่อได้นะ").fetchSemanticsNodes().isNotEmpty()) }
         compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
-        compose.onNodeWithText("มืด").performClick()
+        compose.onNodeWithText("มืด").performScrollTo().performClick()
         waitTheme(ThemeMode.Dark)
         compose.waitForIdle()
         assertEquals(0xFF1D1B19.toInt(), compose.onRoot().captureToImage().asAndroidBitmap().getPixel(2, 200))
@@ -50,7 +50,7 @@ class AppearanceTest {
         compose.onNode(hasText("ความทรงจำ") and hasClickAction()).performClick()
         saveScreen("calendar-dark")
         compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
-        compose.onNodeWithText("สว่าง").performClick()
+        compose.onNodeWithText("สว่าง").performScrollTo().performClick()
         waitTheme(ThemeMode.Light)
         compose.waitForIdle()
         assertEquals(0xFFF7F3EC.toInt(), compose.onRoot().captureToImage().asAndroidBitmap().getPixel(2, 200))

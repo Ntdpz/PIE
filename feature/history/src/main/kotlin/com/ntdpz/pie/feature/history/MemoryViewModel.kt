@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ntdpz.pie.core.domain.diary.DiaryRepository
 import com.ntdpz.pie.core.domain.media.DiaryMediaRepository
 import java.time.LocalDate
+import com.ntdpz.pie.core.domain.diary.TextFormatRange
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
@@ -15,7 +16,7 @@ data class MemoryUiState(
     val failed: Boolean = false,
 )
 
-data class MemoryEntryState(val text: String = "", val failed: Boolean = false)
+data class MemoryEntryState(val text: String = "", val failed: Boolean = false, val formatting: List<TextFormatRange> = emptyList())
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MemoryViewModel(diary: DiaryRepository, media: DiaryMediaRepository, val initialDate: LocalDate) : ViewModel() {
@@ -32,7 +33,7 @@ class MemoryViewModel(diary: DiaryRepository, media: DiaryMediaRepository, val i
                 if (dates.isEmpty()) flowOf(MemoryUiState(days = days, loading = false))
                 else combine(dates.map { date ->
                     diary.observeEntry(date)
-                        .map { date to MemoryEntryState(it?.text.orEmpty()) }
+                        .map { date to MemoryEntryState(it?.text.orEmpty(), formatting = it?.formatting.orEmpty()) }
                         .catch { error ->
                             if (error is kotlinx.coroutines.CancellationException) throw error
                             emit(date to MemoryEntryState(failed = true))

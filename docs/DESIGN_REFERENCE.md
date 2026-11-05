@@ -2,6 +2,15 @@
 
 ## Current runtime: R3
 
+Google Drive backup adds the approved R4 Expressive settings entry and introduction.
+The user chose Android's document picker instead of direct OAuth. See
+[Drive document backup](DRIVE_DOCUMENT_BACKUP.md) for the supplementary Kalka source,
+implemented behavior and S25 verification limits.
+
+The approved editor direction B adds an icon toolbar, contextual Aa formatting and
+on-device voice typing. See [editor behavior and verification](EDITOR_VOICE_FORMAT.md)
+for the Kalka artboard IDs, persistence changes and device acceptance limits.
+
 The approved Gallery Feed revision is implemented in 0.7.0: natural-height media and full inline prose replace the earlier memory pager/story popup. See [current Feed verification](GALLERY_FEED_V0_7_0.md).
 
 The approved visual system is [DESIGN.md](../DESIGN.md), with editable R3 pages in `design/PIE-Kalka.fig`. Runtime coverage is tracked in [R3 / Gallery](R3_GALLERY_V0_6_0.md). Version 0.6.1 also aligns calendar sheets, PIN options/help, deletion dialogs, reminder time input and Material surface roles with this system. The R2 tokens and Pen IDs below are historical references, not current implementation tokens.

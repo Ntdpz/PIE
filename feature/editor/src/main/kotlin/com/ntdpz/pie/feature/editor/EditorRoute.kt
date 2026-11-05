@@ -18,5 +18,6 @@ fun EditorRoute(viewModel: EditorViewModel, onBack: () -> Unit) {
         onAddMedia = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)) },
         onDeleteEntry = viewModel::deleteEntry,
         onDeleteMedia = viewModel::deleteMedia,
+        onDocumentChanged = viewModel::onDocumentChanged,
     )
 }

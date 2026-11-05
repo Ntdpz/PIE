@@ -59,6 +59,22 @@ class DiaryWriterTest {
     }
 
     @Test
+    fun formattingSurvivesFailedDraftAndRetryInWriteOrder() = runTest {
+        var fail = true
+        val repository = RecordingRepository(beforeWrite = { if (fail) throw IOException("disk") })
+        val writer = DiaryWriter(repository, backgroundScope, clock)
+        val styles = listOf(TextFormatRange(0, 4, TextFormat.Bold))
+        writer.submit(date, "text", styles)
+        runCurrent()
+        assertEquals(styles, writer.pendingEntry(date)?.formatting)
+        fail = false
+        writer.submit(date, "text", styles)
+        runCurrent()
+        assertEquals(styles, repository.writes.last().formatting)
+        assertNull(writer.pendingEntry(date))
+    }
+
+    @Test
     fun writesKeepTheirSelectedDayAcrossMidnight() = runTest {
         val repository = RecordingRepository()
         val writer = DiaryWriter(repository, backgroundScope, clock)

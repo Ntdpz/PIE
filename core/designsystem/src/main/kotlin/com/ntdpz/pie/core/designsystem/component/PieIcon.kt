@@ -24,6 +24,10 @@ enum class PieGlyph(@param:DrawableRes val resource: Int) {
     Storage(R.drawable.ic_hard_drive), Archive(R.drawable.ic_archive), Info(R.drawable.ic_info),
     Eye(R.drawable.ic_eye), EyeOff(R.drawable.ic_eye_off), Delete(R.drawable.ic_delete),
     Plus(R.drawable.ic_plus), Clock(R.drawable.ic_clock_3), Ring(R.drawable.ic_bell_ring),
+    Mic(R.drawable.ic_mic), Stop(R.drawable.ic_square_stop), Undo(R.drawable.ic_undo_2),
+    Heading(R.drawable.ic_heading), Bold(R.drawable.ic_bold), List(R.drawable.ic_list),
+    TextNormal(R.drawable.ic_text), Attach(R.drawable.ic_paperclip),
+    CloudBackup(R.drawable.ic_cloud_upload), ArrowUpRight(R.drawable.ic_arrow_up_right),
     Play(R.drawable.ic_play), Close(R.drawable.ic_x), Trash(R.drawable.ic_trash_2),
 }
 

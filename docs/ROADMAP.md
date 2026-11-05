@@ -8,6 +8,10 @@ R3 UI and Gallery memories are implemented, with a hidden calendar, attachment/d
 
 # Roadmap
 
+## V1 reliability follow-up · 2026-11-03
+
+Editor read/delete guards and six failure-recovery regression tests are implemented. Unit tests, domain tests, lint, Debug build and architecture checks passed. Device/process-death/low-storage acceptance remains open; see [verification and remaining work](V1_EDITOR_RELIABILITY.md).
+
 ## UI Preview 0.2.0
 
 - [x] ปรับ Home 2 states, Editor, Calendar, Settings, PIN, Reminders และ Backup ตาม Pen R2

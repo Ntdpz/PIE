@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.currentStateAsState
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -26,13 +28,13 @@ import coil3.request.ImageRequest
 import com.ntdpz.pie.core.domain.media.DiaryMedia
 
 @Composable
-internal fun MemoryAttachment(item: DiaryMedia, loader: ImageLoader, active: Boolean, onZoom: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+internal fun MemoryAttachment(item: DiaryMedia, loader: ImageLoader, active: Boolean, onZoom: (Boolean) -> Unit, modifier: Modifier = Modifier, fillPhoto: Boolean = false) {
     if (item.isVideo) MemoryVideo(item.uri, loader, active, modifier)
-    else MemoryPhoto(item.uri, loader, active, onZoom, modifier)
+    else MemoryPhoto(item.uri, loader, active, onZoom, modifier, fillPhoto)
 }
 
 @Composable
-private fun MemoryPhoto(uri: String, loader: ImageLoader, active: Boolean, onZoom: (Boolean) -> Unit, modifier: Modifier) {
+private fun MemoryPhoto(uri: String, loader: ImageLoader, active: Boolean, onZoom: (Boolean) -> Unit, modifier: Modifier, fillPhoto: Boolean) {
     var scale by remember(uri) { mutableFloatStateOf(1f) }
     var offset by remember(uri) { mutableStateOf(Offset.Zero) }
     var failed by remember(uri) { mutableStateOf(false) }
@@ -47,7 +49,7 @@ private fun MemoryPhoto(uri: String, loader: ImageLoader, active: Boolean, onZoo
     val context = LocalContext.current
     val request = remember(uri, retry, context) { ImageRequest.Builder(context).data(uri).size(1600, 1600).memoryCacheKey("$uri:$retry").build() }
     Box(modifier) {
-        AsyncImage(request, "ภาพความทรงจำ", imageLoader = loader, contentScale = ContentScale.Fit,
+        AsyncImage(request, "ภาพความทรงจำ", imageLoader = loader, contentScale = if (fillPhoto) ContentScale.Crop else ContentScale.Fit,
             onError = { failed = true }, onSuccess = { failed = false },
             modifier = Modifier.fillMaxSize().graphicsLayer { scaleX = scale; scaleY = scale; translationX = offset.x; translationY = offset.y }
                 .transformable(transform, canPan = { scale > 1.01f })
@@ -60,22 +62,41 @@ private fun MemoryPhoto(uri: String, loader: ImageLoader, active: Boolean, onZoo
 
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-private fun MemoryVideo(uri: String, loader: ImageLoader, active: Boolean, modifier: Modifier) {
-    var playing by remember(uri) { mutableStateOf(false) }
+internal fun MemoryVideo(
+    uri: String,
+    loader: ImageLoader,
+    active: Boolean,
+    modifier: Modifier,
+    preview: Boolean = false,
+    cropPreview: Boolean = preview,
+) {
     var sound by remember(uri) { mutableStateOf(false) }
-    LaunchedEffect(active) { if (!active) { playing = false; sound = false } }
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { playing = false; sound = false }
+    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
+    val canPlay = active && lifecycleState.isAtLeast(Lifecycle.State.RESUMED)
+    LaunchedEffect(active) { if (!active) sound = false }
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { sound = false }
     val context = LocalContext.current
     Box(modifier) {
-        if (!playing || !active) {
-            AsyncImage(uri, "วิดีโอความทรงจำ", imageLoader = loader, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
-            FilledTonalButton(onClick = { playing = true }, Modifier.align(Alignment.Center)) { Text("เล่นวิดีโอ") }
+        if (!canPlay) {
+            AsyncImage(uri, "วิดีโอความทรงจำ", imageLoader = loader, contentScale = if (cropPreview) ContentScale.Crop else ContentScale.Fit, modifier = Modifier.fillMaxSize())
         } else {
-            val player = remember(uri) { ExoPlayer.Builder(context).build().apply { setMediaItem(MediaItem.fromUri(uri)); prepare(); playWhenReady = true; volume = 0f } }
+            val player = remember(uri) { ExoPlayer.Builder(context).build().apply { setMediaItem(MediaItem.fromUri(uri)); prepare(); playWhenReady = true; volume = 0f; if (preview) repeatMode = androidx.media3.common.Player.REPEAT_MODE_ONE } }
             DisposableEffect(player) { onDispose { player.release() } }
             LaunchedEffect(sound) { player.volume = if (sound) 1f else 0f }
-            AndroidView(factory = { PlayerView(it).apply { this.player = player } }, modifier = Modifier.fillMaxSize())
-            FilledTonalButton(onClick = { sound = !sound }, Modifier.align(Alignment.BottomEnd).padding(12.dp)) { Text(if (sound) "ปิดเสียง" else "เปิดเสียง") }
+            AndroidView(
+                factory = {
+                    PlayerView(it).apply {
+                        this.player = player
+                        if (preview) {
+                            useController = false
+                            if (cropPreview) resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                            importantForAccessibility = android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+            if (!preview) FilledTonalButton(onClick = { sound = !sound }, Modifier.align(Alignment.BottomEnd).padding(12.dp)) { Text(if (sound) "ปิดเสียง" else "เปิดเสียง") }
         }
     }
 }

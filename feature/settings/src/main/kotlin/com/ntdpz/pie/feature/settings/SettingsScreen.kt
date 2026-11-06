@@ -69,6 +69,9 @@ fun SettingsScreen(state: SettingsUiState, versionName: String, onAction: (Setti
                     " · " + reminder.times.sorted().joinToString(", ") { "%02d:%02d".format(it / 60, it % 60) }
             } else "ปิดอยู่"
             SettingRow(PieGlyph.Bell, "แจ้งเตือน", summary) { onAction(SettingsAction.Reminders) }
+            SettingRow(PieGlyph.Emoji, "เพื่อนของฉัน · PIE", "แสดง ซ่อน และลดการเคลื่อนไหว") {
+                onAction(SettingsAction.Pet)
+            }
         }
         AppearancePicker(state.settings.themeMode, state.settings.loaded, onThemeChange)
         state.message?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }

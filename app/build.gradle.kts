@@ -20,6 +20,7 @@ android {
     }
     buildTypes {
         debug {
+            manifestPlaceholders["overlayProbeEnabled"] = providers.gradleProperty("pie.deviceTest").orNull == "true"
             // Run instrumentation beside the user's installed diary, with separate storage.
             if (providers.gradleProperty("pie.deviceTest").orNull == "true") {
                 applicationIdSuffix = ".devicetest"
@@ -46,6 +47,7 @@ dependencies {
     implementation(project(":feature:editor"))
     implementation(project(":feature:history"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:pet"))
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)

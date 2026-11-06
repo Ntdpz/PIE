@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $allowed = @{
-    'app' = @(':core:domain', ':core:data', ':core:designsystem', ':feature:home', ':feature:editor', ':feature:history', ':feature:settings')
+    'app' = @(':core:domain', ':core:data', ':core:designsystem', ':feature:home', ':feature:editor', ':feature:history', ':feature:settings', ':feature:pet')
     'core/domain' = @()
     'core/data' = @(':core:domain')
     'core/designsystem' = @()
@@ -9,6 +9,7 @@ $allowed = @{
     'feature/editor' = @(':core:domain', ':core:designsystem')
     'feature/history' = @(':core:domain', ':core:designsystem')
     'feature/settings' = @(':core:domain', ':core:designsystem')
+    'feature/pet' = @(':core:domain', ':core:designsystem')
 }
 $failures = [System.Collections.Generic.List[string]]::new()
 foreach ($module in $allowed.Keys) {
@@ -36,4 +37,4 @@ foreach ($module in $allowed.Keys) {
     }
 }
 if ($failures.Count -gt 0) { throw ($failures -join [Environment]::NewLine) }
-Write-Output 'Architecture boundaries verified for all 8 modules.'
+Write-Output "Architecture boundaries verified for all $($allowed.Count) modules."

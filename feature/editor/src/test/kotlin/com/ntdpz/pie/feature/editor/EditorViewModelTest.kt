@@ -39,6 +39,27 @@ class EditorViewModelTest {
     fun tearDown() = Dispatchers.resetMain()
 
     @Test
+    fun mediaCompletionSignalsOnlyConfirmedMutationsWithTheSelectedDate() = runTest(dispatcher) {
+        val repository = EditorDiaryFixture(date)
+        val media = EditorMediaFixture()
+        val committed = mutableListOf<LocalDate>()
+        val vm = EditorViewModel(date, repository, DiaryWriter(repository, backgroundScope, clock), media, committed::add)
+        runCurrent()
+        assertTrue(committed.isEmpty())
+        media.failWrite = true
+        vm.importMedia(listOf("fixture"))
+        vm.deleteMedia("fixture")
+        runCurrent()
+        assertTrue(committed.isEmpty())
+        media.failWrite = false
+        vm.importMedia(listOf("fixture"))
+        runCurrent()
+        vm.deleteMedia("fixture")
+        runCurrent()
+        assertEquals(listOf(date, date), committed)
+    }
+
+    @Test
     fun failedReadRejectsMutationsAndRetryRestoresExistingText() = runTest(dispatcher) {
         val repository = EditorDiaryFixture(date).apply { failRead = true }
         val media = EditorMediaFixture()
@@ -185,12 +206,15 @@ private class EditorDiaryFixture(date: LocalDate) : DiaryRepository {
 
 private class EditorMediaFixture : DiaryMediaRepository {
     var mutations = 0
+    var failWrite = false
     override fun observeAllMedia() = flowOf(emptyMap<LocalDate, List<DiaryMedia>>())
     override fun observeMedia(date: LocalDate) = flowOf(emptyList<DiaryMedia>())
     override suspend fun importMedia(date: LocalDate, uri: String) {
+        if (failWrite) throw IOException("fixture media failure")
         mutations++
     }
     override suspend fun deleteMedia(id: String) {
+        if (failWrite) throw IOException("fixture media failure")
         mutations++
     }
 }

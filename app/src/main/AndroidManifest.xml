@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
   <application
     android:name=".PieApplication"
     android:allowBackup="false"
@@ -9,6 +12,9 @@
     android:label="@string/app_name"
     android:supportsRtl="true"
     android:theme="@style/Theme.PIE">
+    <service android:name=".PiePetOverlayService" android:exported="false" android:stopWithTask="true" android:foregroundServiceType="specialUse">
+      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="User-started animated companion overlay with draggable character and notification stop action; hides on screen lock and in PIE" />
+    </service>
     <activity
       android:name=".MainActivity"
       android:exported="true"

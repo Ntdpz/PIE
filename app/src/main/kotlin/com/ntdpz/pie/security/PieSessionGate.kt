@@ -23,7 +23,7 @@ import com.ntdpz.pie.di.AppContainer
 import com.ntdpz.pie.feature.settings.pin.*
 
 @Composable
-fun PieSessionGate(container: AppContainer, content: @Composable () -> Unit) {
+fun PieSessionGate(container: AppContainer, content: @Composable (unlocked: Boolean) -> Unit) {
     val session: SessionViewModel = viewModel(factory = viewModelFactory {
         initializer { SessionViewModel(container.settingsRepository) }
     })
@@ -58,7 +58,7 @@ fun PieSessionGate(container: AppContainer, content: @Composable () -> Unit) {
             }
         }
     } else Box(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxSize().then(if (state.locked) Modifier.clearAndSetSemantics { } else Modifier)) { content() }
+        Box(Modifier.fillMaxSize().then(if (state.locked) Modifier.clearAndSetSemantics { } else Modifier)) { content(!state.locked) }
         if (state.locked) Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Box(Modifier.safeDrawingPadding()) { PinRoute(pin, session::unlock) }
         }

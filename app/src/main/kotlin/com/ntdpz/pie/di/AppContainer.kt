@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import java.time.Clock
 import com.ntdpz.pie.core.data.settings.LocalSettingsRepository
+import com.ntdpz.pie.core.data.pet.LocalPetRepository
 import com.ntdpz.pie.core.data.reminder.AndroidReminders
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -17,6 +18,7 @@ class AppContainer(context: Context) {
     val clock: Clock = Clock.systemDefaultZone()
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     val settingsRepository = LocalSettingsRepository(context)
+    val petRepository = LocalPetRepository(context)
     val reminders = AndroidReminders(context)
     private val data = DiaryDataFactory.create(context, settingsRepository)
     val diaryRepository = data.repository

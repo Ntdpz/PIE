@@ -141,6 +141,7 @@ class PenUiFlowTest {
         compose.activityRule.scenario.moveToState(Lifecycle.State.CREATED)
         compose.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
         waitText("พื้นที่ของคุณ")
+        compose.onNodeWithTag("pet-companion").assertDoesNotExist()
         typePin("999999")
         waitText("PIN ไม่ถูกต้อง ลองอีกครั้ง")
         typePin(pin)

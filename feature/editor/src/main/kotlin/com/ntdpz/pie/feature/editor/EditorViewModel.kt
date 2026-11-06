@@ -21,6 +21,7 @@ class EditorViewModel(
     private val repository: DiaryRepository,
     private val writer: DiaryWriter,
     private val mediaRepository: DiaryMediaRepository,
+    private val onMediaCommitted: (LocalDate) -> Unit = {},
 ) : ViewModel() {
     private val mutableState = MutableStateFlow(EditorUiState(date))
     val state = mutableState.asStateFlow()
@@ -82,6 +83,7 @@ class EditorViewModel(
             mutableState.update { it.copy(importing = true, message = null) }
             try {
                 uris.forEach { mediaRepository.importMedia(date, it) }
+                onMediaCommitted(date)
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {
@@ -95,7 +97,10 @@ class EditorViewModel(
     fun deleteMedia(id: String) {
         if (!canEdit() || mutableState.value.importing) return
         viewModelScope.launch {
-            try { mediaRepository.deleteMedia(id) }
+            try {
+                mediaRepository.deleteMedia(id)
+                onMediaCommitted(date)
+            }
             catch (cancelled: CancellationException) { throw cancelled }
             catch (_: Exception) { mutableState.update { it.copy(message = "ลบสื่อไม่สำเร็จ") } }
         }

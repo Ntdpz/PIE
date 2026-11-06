@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <activity
+      android:name="com.ntdpz.pie.OverlayTouchProbeActivity"
+      android:enabled="${overlayProbeEnabled}"
+      android:exported="false"
+      android:process=":overlay_probe"
+      android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+  </application>
+</manifest>

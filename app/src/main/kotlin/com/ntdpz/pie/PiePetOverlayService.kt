@@ -6,4 +6,6 @@ class PiePetOverlayService : PetOverlayService() {
     private val container get() = (application as PieApplication).container
     override val petRepository get() = container.petRepository
     override val preferenceWriteScope get() = container.applicationScope
+    override val overlayStatus get() = container.petOverlayStatus
+    override val notificationImages get() = container.petNotificationImages
 }

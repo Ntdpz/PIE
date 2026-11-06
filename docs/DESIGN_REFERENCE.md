@@ -2,6 +2,16 @@
 
 ## Current runtime: R3
 
+The approved notification identity now uses a head cropped from the actual PET,
+plus tone-compatible reminder artwork from the same pose set. Kalka boards 14–17
+remain on the existing V1.2.0 page. See [notification implementation and limits](PIE_NOTIFICATION_MASCOT_IMPLEMENTATION.md).
+
+The user approved the Companion redesign on 2026-11-06 in the existing
+`design/PIE-V1.2.0-Kalka.fig`, page `V1.2.0 · PIE Companion · 60 / 30 / 10`,
+boards 11–13. Its scoped cream/caramel/rose visual system supplements the existing
+diary screens. See [Companion UI design and handoff](PIE_COMPANION_UI_DESIGN.md)
+for node IDs and [runtime verification](PIE_COMPANION_UI_IMPLEMENTATION.md).
+
 Google Drive backup adds the approved R4 Expressive settings entry and introduction.
 The user chose Android's document picker instead of direct OAuth. See
 [Drive document backup](DRIVE_DOCUMENT_BACKUP.md) for the supplementary Kalka source,

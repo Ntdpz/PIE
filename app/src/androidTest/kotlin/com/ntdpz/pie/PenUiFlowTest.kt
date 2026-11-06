@@ -10,7 +10,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ntdpz.pie.core.data.settings.LocalSettingsRepository
-import com.ntdpz.pie.core.data.reminder.AndroidReminders
 import com.ntdpz.pie.core.domain.settings.ReminderSettings
 import com.ntdpz.pie.core.domain.settings.ReminderMessages
 import java.time.ZonedDateTime
@@ -36,7 +35,7 @@ class PenUiFlowTest {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.cancel(42)
         try {
-            org.junit.Assert.assertTrue(AndroidReminders(context).notifyNow(ReminderSettings(enabled = true)))
+            org.junit.Assert.assertTrue((context.applicationContext as PieApplication).container.reminders.notifyNow(ReminderSettings(enabled = true)))
             compose.waitUntil(5_000) { manager.activeNotifications.any { it.id == 42 } }
         } finally {
             manager.cancel(42)
@@ -51,7 +50,7 @@ class PenUiFlowTest {
             android.Manifest.permission.POST_NOTIFICATIONS,
         )
         val manager = context.getSystemService(NotificationManager::class.java)
-        val reminders = AndroidReminders(context)
+        val reminders = (context.applicationContext as PieApplication).container.reminders
         val settingsRepository = LocalSettingsRepository(context)
         val previousSettings = runBlocking { settingsRepository.settings.first().reminder }
         val scheduled = ZonedDateTime.now().plusMinutes(1)

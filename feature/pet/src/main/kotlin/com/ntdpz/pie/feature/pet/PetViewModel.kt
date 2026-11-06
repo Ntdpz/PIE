@@ -9,6 +9,8 @@ import com.ntdpz.pie.core.domain.pet.PetPosition
 import com.ntdpz.pie.core.domain.pet.PetPreferences
 import com.ntdpz.pie.core.domain.pet.PetRepository
 import com.ntdpz.pie.core.domain.pet.PetSaveCelebration
+import com.ntdpz.pie.core.domain.pet.PetReactions
+import com.ntdpz.pie.core.domain.pet.PetReactionSelection
 import com.ntdpz.pie.core.domain.settings.ReminderMessages
 import java.time.Clock
 import java.time.LocalDate
@@ -28,6 +30,8 @@ data class PetUiState(
     val pose: PetPose = PetPose.Idle,
     val dailyMessage: String = "",
     val error: String? = null,
+    val touchReaction: PetReactionSelection? = null,
+    val showTouchMessage: Boolean = false,
 )
 
 class PetViewModel(
@@ -47,6 +51,7 @@ class PetViewModel(
     val state = mutable.asStateFlow()
     private val changes = Channel<Change>(Channel.UNLIMITED)
     private val celebration = PetSaveCelebration()
+    private val reactions = PetReactions()
     private var loadJob: Job? = null
     private var greetedDate: LocalDate? = null
     private var active = false
@@ -97,6 +102,7 @@ class PetViewModel(
     fun resume() {
         active = true
         lastInteraction = nowMillis()
+        reactions.reset(lastInteraction)
         val date = LocalDate.now(clock)
         mutable.update { it.copy(dailyMessage = ReminderMessages.defaultForDay(date)) }
         if (greetedDate != date) {
@@ -109,7 +115,8 @@ class PetViewModel(
         active = false
         reaction = null
         celebration.dismiss()
-        mutable.update { it.copy(pose = PetPose.Idle) }
+        reactions.reset(nowMillis())
+        mutable.update { it.copy(pose = PetPose.Idle, touchReaction = null) }
     }
 
     fun tick() {
@@ -120,11 +127,41 @@ class PetViewModel(
             mutable.update { it.copy(dailyMessage = ReminderMessages.defaultForDay(date)) }
             react(PetPose.Greeting)
         }
-        val pose = PetBehavior.pose(nowMillis(), lastInteraction, reaction, reactionAt)
+        val now = nowMillis()
+        if ((reaction == PetPose.Tap || reaction == PetPose.Stretch) && mutable.value.touchReaction?.isActive(now) != true) {
+            reaction = null
+        }
+        var pose = PetBehavior.pose(now, lastInteraction, reaction, reactionAt)
+        if (pose == PetPose.Idle && !mutable.value.preferences.reducedMotion) {
+            reactions.quiet(now)?.let { selection ->
+                reaction = PetPose.Stretch
+                reactionAt = now
+                pose = PetPose.Stretch
+                mutable.update { it.copy(touchReaction = selection) }
+            }
+        }
         mutable.update { it.copy(pose = pose) }
     }
 
-    fun tap() = react(PetPose.Tap)
+    fun tap() = respondToTouch(showMessage = true)
+
+    fun screenTouched() {
+        val state = mutable.value
+        if (!active || !state.loaded || !state.preferences.enabled) return
+        val now = nowMillis()
+        if (reaction == PetPose.Saved && now >= reactionAt && now - reactionAt < PetBehavior.ReactionMillis) {
+            lastInteraction = now
+            reactions.reset(now)
+            return
+        }
+        respondToTouch(showMessage = false)
+    }
+
+    private fun respondToTouch(showMessage: Boolean) {
+        val selection = reactions.touch(nowMillis())
+        mutable.update { it.copy(touchReaction = selection, showTouchMessage = showMessage) }
+        react(PetPose.Tap)
+    }
 
     fun beginEditing(date: LocalDate) = celebration.begin(date, saves.value)
 
@@ -144,6 +181,7 @@ class PetViewModel(
         lastInteraction = nowMillis()
         reactionAt = lastInteraction
         reaction = pose
+        if (pose != PetPose.Tap) reactions.reset(lastInteraction)
         mutable.update { it.copy(pose = pose) }
     }
 

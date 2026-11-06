@@ -152,3 +152,15 @@ Gradle unit/domain/lint/APK checks and the nine-module architecture check passed
 The regular APK was installed as an update on S25; isolated test packages are
 removed after verification. Logs: `work/companion-touch-final-build.log` and
 `work/companion-touch-s25-final.log`.
+
+## Reaction expansion — working tree
+
+The later eight-action expansion is described in
+[PIE_PET_REACTION_EXPANSION.md](PIE_PET_REACTION_EXPANSION.md). It adds 64 new
+transparent frames, shared selection/playback, a quiet stretch and live previews.
+Required host checks passed with 74 JVM tests. After S25 reconnected, seven focused
+instrumentation cases passed, including previews of all actions and outside-touch
+no-repeat/click delivery. The regular APK was updated on S25 without clearing user
+data and the live overlay was re-enabled and verified. The test packages were
+removed. Log: `work/pet-reactions-s25.log`. All earlier S25 results above refer to
+the previous runtime. No LD/emulator fallback was used.

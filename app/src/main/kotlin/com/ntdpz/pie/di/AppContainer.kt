@@ -19,7 +19,13 @@ class AppContainer(context: Context) {
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     val settingsRepository = LocalSettingsRepository(context)
     val petRepository = LocalPetRepository(context)
-    val reminders = AndroidReminders(context)
+    val petOverlayStatus = com.ntdpz.pie.feature.pet.overlay.PetOverlayStatus()
+    val petNotificationImages = com.ntdpz.pie.feature.pet.PetNotificationImages(context.resources)
+    val reminders = AndroidReminders(
+        context, com.ntdpz.pie.core.data.reminder.ReminderReceiver::class.java,
+        petNotificationImages.smallIcon, petNotificationImages.color, petNotificationImages::forReaction,
+    )
+    val reminderDelivery = com.ntdpz.pie.core.data.reminder.ReminderDelivery(settingsRepository, reminders)
     private val data = DiaryDataFactory.create(context, settingsRepository)
     val diaryRepository = data.repository
     val mediaRepository = data.media

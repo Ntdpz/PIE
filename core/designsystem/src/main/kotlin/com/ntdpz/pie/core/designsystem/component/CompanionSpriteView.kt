@@ -9,7 +9,7 @@ import android.provider.Settings
 import android.view.View
 
 /** Small native-window sprite renderer. Its owner controls visibility and interaction. */
-class CompanionSpriteView(context: Context, private val atlas: Bitmap) : View(context) {
+class CompanionSpriteView(context: Context, private val atlas: Bitmap, private val reactions: Bitmap) : View(context) {
     var animation: CompanionAnimation = CompanionAnimation.Idle
         set(value) {
             if (field != value) {
@@ -24,9 +24,9 @@ class CompanionSpriteView(context: Context, private val atlas: Bitmap) : View(co
     private var frame = 0
     private var nextFrame = 0
     /** Restart visibly even when another touch arrives during the same reaction. */
-    fun playTouchReaction() {
-        animation = CompanionAnimation.Tap
-        frame = 3
+    fun playReaction(action: CompanionAnimation) {
+        animation = action
+        frame = 0
         restart()
     }
 
@@ -35,20 +35,17 @@ class CompanionSpriteView(context: Context, private val atlas: Bitmap) : View(co
         override fun run() {
             if (!isAttachedToWindow || visibility != VISIBLE) return
             val scale = Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)
+                .takeIf { it.isFinite() && it >= 0f } ?: 1f
             if (reducedMotion || scale <= 0f) {
-                frame = if (animation == CompanionAnimation.Tap) 5 else 0
+                frame = animation.stillFrame
                 invalidate()
                 postDelayed(this, 1_000)
                 return
             }
             frame = nextFrame
             invalidate()
-            val duration = when (animation) {
-                CompanionAnimation.Idle -> intArrayOf(1_000, 1_000, 800, 120, 1_000, 800, 200, 1_000)[frame]
-                CompanionAnimation.Rest -> 1_500
-                else -> 180
-            }
-            if (animation == CompanionAnimation.Idle || animation == CompanionAnimation.Rest || frame < 7) {
+            val duration = animation.frameDuration(frame)
+            if (animation.loops || frame < 7) {
                 nextFrame = (frame + 1) % 8
                 postDelayed(this, (duration * scale).toLong().coerceAtLeast(1))
             }
@@ -68,9 +65,14 @@ class CompanionSpriteView(context: Context, private val atlas: Bitmap) : View(co
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        val scale = minOf(width, height) / 256f
+        val drawWidth = (animation.sourceWidth * scale).toInt()
+        val drawHeight = (animation.sourceHeight * scale).toInt()
+        val left = (width - drawWidth) / 2
         canvas.drawBitmap(
-            atlas, Rect(frame * 192, animation.ordinal * 208, (frame + 1) * 192, (animation.ordinal + 1) * 208),
-            Rect(0, 0, width, height), paint,
+            if (animation.reactionAtlas) reactions else atlas,
+            Rect(frame * animation.sourceWidth, animation.row * animation.sourceHeight, (frame + 1) * animation.sourceWidth, (animation.row + 1) * animation.sourceHeight),
+            Rect(left, height - drawHeight, left + drawWidth, height), paint,
         )
     }
 }

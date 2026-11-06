@@ -261,9 +261,13 @@ internal object ReminderPromptCatalog {
 
     private val groups = listOf(smallJoys, tiredDays, feelings, selfKindness, everydayWork, connections, smallSteps, windingDown)
 
-    val prompts: List<String> = buildList {
+    val entries: List<ReminderPrompt> = buildList {
         for (index in 0 until groups.maxOf { it.size }) {
-            groups.forEach { group -> group.getOrNull(index)?.let { add(it) } }
+            groups.forEachIndexed { toneIndex, group ->
+                group.getOrNull(index)?.let { add(ReminderPrompt(it, ReminderTone.entries[toneIndex])) }
+            }
         }
     }
+
+    val prompts: List<String> = entries.map { it.text }
 }

@@ -21,7 +21,7 @@ interface PetRepository {
     suspend fun setPosition(position: PetPosition)
 }
 
-enum class PetPose { Idle, Tap, Greeting, Saved, Rest }
+enum class PetPose { Idle, Tap, Greeting, Saved, Rest, Stretch }
 
 object PetBehavior {
     const val RestAfterMillis = 45_000L

@@ -26,6 +26,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -37,6 +38,88 @@ class PetViewModelTest {
 
     @Before fun setup() { Dispatchers.setMain(dispatcher) }
     @After fun teardown() { Dispatchers.resetMain() }
+
+    @Test
+    fun screenTouchesReactWithoutMessageButDoNothingWhenHiddenOrPaused() = runTest(dispatcher) {
+        val repository = MemoryPetRepository()
+        val vm = PetViewModel(repository, MutableStateFlow(emptyMap()), clock, { time }, backgroundScope)
+        val store = ViewModelStore().apply { put("pet", vm) }
+        try {
+            runCurrent()
+            vm.resume()
+            val daily = vm.state.value.dailyMessage
+            vm.screenTouched()
+            assertEquals(PetPose.Tap, vm.state.value.pose)
+            assertFalse(vm.state.value.showTouchMessage)
+            assertEquals(daily, vm.state.value.dailyMessage)
+            vm.tap()
+            assertTrue(vm.state.value.showTouchMessage)
+            val selected = vm.state.value.touchReaction
+            repository.preferences.value = repository.preferences.value.copy(enabled = false)
+            runCurrent()
+            vm.screenTouched()
+            assertEquals(selected, vm.state.value.touchReaction)
+            vm.pause()
+            vm.screenTouched()
+            assertEquals(PetPose.Idle, vm.state.value.pose)
+            assertNull(vm.state.value.touchReaction)
+        } finally { store.clear() }
+    }
+
+    @Test
+    fun touchVarietyKeepsDailyMessageAndDoesNotReplayAfterPause() = runTest(dispatcher) {
+        val vm = PetViewModel(MemoryPetRepository(), MutableStateFlow(emptyMap()), clock, { time }, backgroundScope)
+        val store = ViewModelStore().apply { put("pet", vm) }
+        try {
+            runCurrent()
+            vm.resume()
+            val daily = vm.state.value.dailyMessage
+            var previous = vm.state.value.touchReaction
+            repeat(20) {
+                time += 100
+                vm.tap()
+                val selected = vm.state.value.touchReaction!!
+                assertNotEquals(previous?.action, selected.action)
+                assertEquals(daily, vm.state.value.dailyMessage)
+                previous = selected
+            }
+            vm.pause()
+            assertNull(vm.state.value.touchReaction)
+            vm.resume()
+            vm.tick()
+            assertEquals(PetPose.Idle, vm.state.value.pose)
+        } finally { store.clear() }
+    }
+
+    @Test
+    fun quietStretchDoesNotPostponeRestAndReducedMotionSuppressesIt() = runTest(dispatcher) {
+        val repository = MemoryPetRepository()
+        val vm = PetViewModel(repository, MutableStateFlow(emptyMap()), clock, { time }, backgroundScope)
+        val store = ViewModelStore().apply { put("pet", vm) }
+        try {
+            runCurrent()
+            vm.resume()
+            time = 20_000
+            vm.tick()
+            assertEquals(PetPose.Stretch, vm.state.value.pose)
+            time = 22_000
+            vm.tick()
+            assertEquals(PetPose.Idle, vm.state.value.pose)
+            time = 45_000
+            vm.tick()
+            assertEquals(PetPose.Rest, vm.state.value.pose)
+            repository.preferences.value = repository.preferences.value.copy(reducedMotion = true)
+            runCurrent()
+            vm.pause()
+            vm.resume()
+            time = 65_000
+            vm.tick()
+            assertEquals(PetPose.Idle, vm.state.value.pose)
+            time = 90_000
+            vm.tick()
+            assertEquals(PetPose.Rest, vm.state.value.pose)
+        } finally { store.clear() }
+    }
 
     @Test
     fun greetingIsStableTapDoesNotReshuffleAndIdleEventuallyRests() = runTest(dispatcher) {
@@ -114,6 +197,8 @@ class PetViewModelTest {
             runCurrent()
             assertEquals(PetPose.Greeting, vm.state.value.pose)
             vm.finishEditing(date)
+            assertEquals(PetPose.Saved, vm.state.value.pose)
+            vm.screenTouched()
             assertEquals(PetPose.Saved, vm.state.value.pose)
             time = 3_000
             vm.tick()

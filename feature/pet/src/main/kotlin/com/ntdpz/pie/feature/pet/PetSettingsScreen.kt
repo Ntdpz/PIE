@@ -1,34 +1,28 @@
 package com.ntdpz.pie.feature.pet
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
-import com.ntdpz.pie.core.designsystem.component.CompanionAnimation
-import com.ntdpz.pie.core.designsystem.component.CompanionSprite
-import com.ntdpz.pie.core.designsystem.component.PieGlyph
-import com.ntdpz.pie.core.designsystem.component.PieIcon
-import com.ntdpz.pie.core.designsystem.motion.rememberSystemAnimationScale
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ntdpz.pie.core.designsystem.theme.CompanionTheme
+import com.ntdpz.pie.core.designsystem.component.CompanionSpriteGroup
 import com.ntdpz.pie.core.domain.pet.PetPosition
+import com.ntdpz.pie.core.domain.pet.PetReaction
+import kotlinx.coroutines.delay
+
+internal val PreviewActions = listOf(
+    PetReaction.Wink, PetReaction.EarsUp, PetReaction.HeadTilt,
+    PetReaction.Nod, PetReaction.Shy, PetReaction.Cheer,
+    PetReaction.Stretch, PetReaction.Peekaboo, PetReaction.Heart,
+)
 
 @Composable
 fun PetSettingsRoute(
@@ -38,45 +32,37 @@ fun PetSettingsRoute(
     outsideAppControls: @Composable () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { PieIcon(PieGlyph.Back, "กลับ") }
-            Text("เพื่อนของฉัน · PIE", style = MaterialTheme.typography.headlineSmall)
+    val lifecycle by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
+    var allPoses by rememberSaveable { mutableStateOf(false) }
+    var selected by rememberSaveable { mutableStateOf(PetReaction.Wink) }
+    var heroReaction by remember { mutableStateOf<PetReaction?>(null) }
+    var replayKey by remember { mutableLongStateOf(0L) }
+    val motion = motionAllowed && lifecycle.isAtLeast(Lifecycle.State.RESUMED) && !state.preferences.reducedMotion
+    LaunchedEffect(heroReaction, replayKey) {
+        heroReaction?.let { reaction ->
+            delay((0 until 8).sumOf { reaction.animation().frameDuration(it) }.toLong())
+            heroReaction = null
         }
-        CompanionSprite(
-            CompanionAnimation.Idle,
-            motionEnabled = motionAllowed && lifecycleState.isAtLeast(Lifecycle.State.RESUMED) && !state.preferences.reducedMotion,
-            modifier = Modifier.size(160.dp, 174.dp).align(Alignment.CenterHorizontally),
-            durationScale = rememberSystemAnimationScale(),
-        )
-        Text("ลาก PIE ไปไว้ตรงที่ต้องการ แตะเพื่อทักทาย หรือกดค้างเพื่อซ่อนและตั้งค่า")
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("แสดง PIE ในแอป", Modifier.weight(1f))
-            Switch(
-                state.preferences.enabled, viewModel::setEnabled,
-                Modifier.testTag("pet-enabled"), enabled = state.loaded,
-            )
+    }
+    BackHandler(allPoses) { allPoses = false }
+    CompanionTheme {
+        CompanionSpriteGroup {
+            if (allPoses) {
+                PetPoseScreen(
+                    selected = selected, replayKey = replayKey, motionEnabled = motion,
+                    onSelect = { selected = it; replayKey++ }, onBack = { allPoses = false },
+                )
+            } else {
+                PetSettingsScreen(
+                    state = state, preview = heroReaction, replayKey = replayKey, motionEnabled = motion,
+                    onBack = onBack, onEnabled = viewModel::setEnabled,
+                    onReducedMotion = viewModel::setReducedMotion,
+                    onReset = { viewModel.setPosition(PetPosition()) }, onRetry = viewModel::reload,
+                    onTap = { heroReaction = PreviewActions[(replayKey % PreviewActions.size).toInt()]; replayKey++ },
+                    onPreview = { selected = it; replayKey++; allPoses = true },
+                    onAllPoses = { allPoses = true }, outsideAppControls = outsideAppControls,
+                )
+            }
         }
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("ลดการเคลื่อนไหว", Modifier.weight(1f))
-            Switch(
-                state.preferences.reducedMotion, viewModel::setReducedMotion,
-                Modifier.testTag("pet-reduced-motion"), enabled = state.loaded,
-            )
-        }
-        TextButton(onClick = { viewModel.setPosition(PetPosition()) }, enabled = state.loaded) {
-            Text("คืนตำแหน่งเริ่มต้น")
-        }
-        if (!state.loaded && state.error == null) Text("กำลังเปิดการตั้งค่า…")
-        state.error?.let {
-            Text(it, color = MaterialTheme.colorScheme.error)
-            if (!state.loaded) TextButton(onClick = viewModel::reload) { Text("ลองอีกครั้ง") }
-        }
-        outsideAppControls()
-        Text("PIE ในแอปจะหลบระหว่างเขียนหรือปลดล็อก PIN", style = MaterialTheme.typography.bodySmall)
     }
 }

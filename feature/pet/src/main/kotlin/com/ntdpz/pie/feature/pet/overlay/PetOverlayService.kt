@@ -32,6 +32,11 @@ import com.ntdpz.pie.core.designsystem.component.CompanionSpriteView
 import com.ntdpz.pie.core.domain.pet.PetPosition
 import com.ntdpz.pie.core.domain.pet.PetPreferences
 import com.ntdpz.pie.core.domain.pet.PetRepository
+import com.ntdpz.pie.core.domain.pet.PetReactions
+import com.ntdpz.pie.core.domain.pet.PetBehavior
+import com.ntdpz.pie.feature.pet.animation
+import com.ntdpz.pie.feature.pet.label
+import com.ntdpz.pie.feature.pet.PetNotificationImages
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,23 +52,26 @@ import kotlin.math.roundToInt
 abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallbacks {
     protected abstract val petRepository: PetRepository
     protected abstract val preferenceWriteScope: CoroutineScope
+    protected abstract val overlayStatus: PetOverlayStatus
+    protected abstract val notificationImages: PetNotificationImages
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val windows by lazy { getSystemService(WindowManager::class.java) }
     private var sprite: CompanionSpriteView? = null
     private var bitmap: Bitmap? = null
+    private var reactionBitmap: Bitmap? = null
     private var preferences = PetPreferences()
     private var ready = false
     private var attached = false
     private var foreground = true
     private val started = mutableSetOf<Activity>()
     private var lastInteraction = SystemClock.elapsedRealtime()
-    private var tappedAt: Long? = null
+    private val reactions = PetReactions()
     private var dragging = false
     private var receiverRegistered = false
     private val params by lazy {
         WindowManager.LayoutParams(
-            (96 * resources.displayMetrics.density).roundToInt(),
-            (104 * resources.displayMetrics.density).roundToInt(),
+            (128 * resources.displayMetrics.density).roundToInt(),
+            (128 * resources.displayMetrics.density).roundToInt(),
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
@@ -102,10 +110,14 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
         // A startForegroundService request must be acknowledged even if permission
         // was revoked between the UI check and this callback.
         if (!Settings.canDrawOverlays(this)) {
+            overlayStatus.failed("กรุณาอนุญาตให้ PIE แสดงทับแอปอื่นแล้วลองอีกครั้ง")
             stopSelf()
             return START_NOT_STICKY
         }
-        if (bitmap == null && sprite == null) load()
+        if (bitmap == null && sprite == null) {
+            overlayStatus.starting()
+            load()
+        }
         return START_NOT_STICKY
     }
 
@@ -117,9 +129,12 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
             PendingIntent.getActivity(this, 732, it, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
         }
         return Notification.Builder(this, "pie_companion")
-            .setSmallIcon(android.R.drawable.ic_menu_myplaces)
+            .setSmallIcon(notificationImages.smallIcon)
+            .setLargeIcon(notificationImages.head())
+            .setColor(notificationImages.color)
             .setContentTitle("PIE นอกแอปเปิดอยู่")
             .setContentText("น้องจะปรากฏเมื่อออกจาก PIE · กดค้างที่น้องเพื่อปิด")
+            .setStyle(Notification.BigTextStyle().bigText("น้องจะปรากฏเมื่อออกจาก PIE · กดค้างที่น้องเพื่อปิด"))
             .setContentIntent(open)
             .addAction(Notification.Action.Builder(null, "หยุด PIE", stop).build())
             .setOngoing(true).setOnlyAlertOnce(true).setCategory(Notification.CATEGORY_SERVICE).build()
@@ -131,11 +146,14 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
         loading = true
         scope.launch {
             try {
-                val atlas = withContext(Dispatchers.IO) {
-                    requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_companion, BitmapFactory.Options().apply { inScaled = false }))
+                val (atlas, reactionAtlas) = withContext(Dispatchers.IO) {
+                    val options = BitmapFactory.Options().apply { inScaled = false }
+                    requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_companion, options)) to
+                        requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_reactions, options))
                 }
                 bitmap = atlas
-                sprite = CompanionSpriteView(this@PetOverlayService, atlas).apply {
+                reactionBitmap = reactionAtlas
+                sprite = CompanionSpriteView(this@PetOverlayService, atlas, reactionAtlas).apply {
                     contentDescription = "PIE นอกแอป แตะเพื่อทักทาย กดค้างเพื่อปิด"
                     setOnClickListener { reactToTouch() }
                     setOnLongClickListener { stopSelf(); true }
@@ -149,6 +167,7 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                             sprite?.reducedMotion = it.reducedMotion
                             if (!dragging) place(it.position)
                             refreshVisibility()
+                            if (overlayStatus.state.value.phase != PetOverlayPhase.Failed) overlayStatus.running()
                         }
                     } catch (cancelled: CancellationException) {
                         throw cancelled
@@ -160,15 +179,19 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                     refreshVisibility()
                     if (attached) {
                         val now = SystemClock.elapsedRealtime()
+                        var selected = reactions.selection?.takeIf { it.isActive(now) }
+                        if (selected == null && !preferences.reducedMotion && now - lastInteraction < PetBehavior.RestAfterMillis) {
+                            selected = reactions.quiet(now)
+                        }
                         val animation = when {
-                            tappedAt?.let { now - it < 2_400 } == true -> CompanionAnimation.Tap
-                            now - lastInteraction >= 45_000 -> CompanionAnimation.Rest
+                            selected != null -> selected.action.animation()
+                            now - lastInteraction >= PetBehavior.RestAfterMillis -> CompanionAnimation.Rest
                             else -> CompanionAnimation.Idle
                         }
                         sprite?.animation = animation
-                        val description = when (animation) {
-                            CompanionAnimation.Tap -> "ทักทาย"
-                            CompanionAnimation.Rest -> "พัก"
+                        val description = when {
+                            selected != null -> "ทักทาย ${selected.action.label()}"
+                            animation == CompanionAnimation.Rest -> "พัก"
                             else -> "อยู่เป็นเพื่อน"
                         }
                         sprite?.contentDescription = "PIE นอกแอป · $description · กดค้างเพื่อปิด"
@@ -184,7 +207,11 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
     }
 
     private fun refreshVisibility() {
-        if (!Settings.canDrawOverlays(this)) { stopSelf(); return }
+        if (!Settings.canDrawOverlays(this)) {
+            overlayStatus.failed("กรุณาอนุญาตให้ PIE แสดงทับแอปอื่นแล้วลองอีกครั้ง")
+            stopSelf()
+            return
+        }
         val interactive = getSystemService(PowerManager::class.java).isInteractive
         val locked = getSystemService(KeyguardManager::class.java).isKeyguardLocked
         val show = ready && !foreground && interactive && !locked
@@ -195,6 +222,7 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                 windows.addView(view, params)
                 attached = true
                 lastInteraction = SystemClock.elapsedRealtime()
+                reactions.reset(lastInteraction)
             } else if (!show && attached) {
                 windows.removeViewImmediate(view)
                 attached = false
@@ -205,10 +233,10 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
 
     private fun reactToTouch() {
         lastInteraction = SystemClock.elapsedRealtime()
-        tappedAt = lastInteraction
+        val selected = reactions.touch(lastInteraction)
         sprite?.apply {
-            contentDescription = "PIE นอกแอป · ทักทาย · กดค้างเพื่อปิด"
-            playTouchReaction()
+            contentDescription = "PIE นอกแอป · ทักทาย ${selected.action.label()} · กดค้างเพื่อปิด"
+            playReaction(selected.action.animation())
         }
     }
 
@@ -275,6 +303,7 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                         val (maxX, maxY) = bounds()
                         val position = PetPosition(if (maxX > 0) params.x.toFloat() / maxX else 0f, if (maxY > 0) params.y.toFloat() / maxY else 0f)
                         preferences = preferences.copy(position = position)
+                        reactions.reset(lastInteraction)
                         preferenceWriteScope.launch {
                             try { petRepository.setPosition(position) }
                             catch (cancelled: CancellationException) { throw cancelled }
@@ -296,7 +325,11 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
         }
     }
 
-    private fun fail(message: String) { Toast.makeText(this, message, Toast.LENGTH_LONG).show(); stopSelf() }
+    private fun fail(message: String) {
+        overlayStatus.failed(message)
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        stopSelf()
+    }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -322,7 +355,10 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
         sprite = null
         bitmap?.recycle()
         bitmap = null
+        reactionBitmap?.recycle()
+        reactionBitmap = null
         stopForeground(STOP_FOREGROUND_REMOVE)
+        overlayStatus.stopped()
         super.onDestroy()
     }
 }

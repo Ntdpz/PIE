@@ -5,6 +5,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 private val PieLightColors = lightColorScheme(
@@ -67,7 +69,11 @@ private val PieDarkColors = darkColorScheme(
     surfaceTint = Color.Transparent,
 )
 
+val LocalPieDarkTheme = staticCompositionLocalOf { false }
+
 @Composable
 fun PieTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = if (darkTheme) PieDarkColors else PieLightColors, typography = PieTypography, content = content)
+    CompositionLocalProvider(LocalPieDarkTheme provides darkTheme) {
+        MaterialTheme(colorScheme = if (darkTheme) PieDarkColors else PieLightColors, typography = PieTypography, content = content)
+    }
 }

@@ -41,7 +41,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
             PieTheme(darkTheme = dark) {
-                PieSessionGate(container) { unlocked -> PieApp(container, unlocked) }
+                PieSessionGate(container) { unlocked ->
+                    PieApp(container, unlocked)
+                }
             }
         }
     }

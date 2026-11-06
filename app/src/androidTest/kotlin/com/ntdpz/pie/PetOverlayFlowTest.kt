@@ -8,6 +8,12 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.graphics.Rect
 import android.view.accessibility.AccessibilityNodeInfo
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.After
 import org.junit.Assert.assertFalse
@@ -36,6 +42,54 @@ class PetOverlayFlowTest {
     @After
     fun stop() {
         context.stopService(Intent(context, PiePetOverlayService::class.java))
+    }
+
+    @Test
+    fun permissionReturnRequiresGrantAndCancellationDoesNotStart() {
+        assertFalse(Settings.canDrawOverlays(context))
+        val status = (context.applicationContext as PieApplication).container.petOverlayStatus
+        val beforePermission = status.state.value
+        compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
+        compose.onNodeWithText("เพื่อนของฉัน · PIE").performScrollTo().performClick()
+        compose.onNodeWithTag("pet-overlay-action").performScrollTo().performClick()
+        instrumentation.waitForIdleSync()
+        shell("input keyevent KEYCODE_BACK")
+        compose.onNodeWithTag("pet-overlay-action").performScrollTo()
+        assertFalse(Settings.canDrawOverlays(context))
+        org.junit.Assert.assertEquals(beforePermission, status.state.value)
+        try {
+            compose.onNodeWithTag("pet-overlay-action").performClick()
+            instrumentation.waitForIdleSync()
+            shell("appops set ${context.packageName} SYSTEM_ALERT_WINDOW allow")
+            shell("input keyevent KEYCODE_BACK")
+            compose.waitUntil(15_000) {
+                status.state.value.phase == com.ntdpz.pie.feature.pet.overlay.PetOverlayPhase.Running
+            }
+            compose.onNodeWithText("หยุด PIE นอกแอป").performScrollTo().performClick()
+            compose.waitUntil(10_000) {
+                status.state.value.phase == com.ntdpz.pie.feature.pet.overlay.PetOverlayPhase.Off
+            }
+        } finally {
+            context.stopService(Intent(context, PiePetOverlayService::class.java))
+            shell("appops set ${context.packageName} SYSTEM_ALERT_WINDOW deny")
+        }
+    }
+
+    @Test
+    fun companionControlsReflectConfirmedServiceStartAndStop() {
+        assertTrue(Settings.canDrawOverlays(context))
+        compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
+        compose.onNodeWithText("เพื่อนของฉัน · PIE").performScrollTo().performClick()
+        compose.onNodeWithTag("pet-overlay-action").performScrollTo().performClick()
+        val status = (context.applicationContext as PieApplication).container.petOverlayStatus
+        compose.waitUntil(15_000) {
+            status.state.value.phase == com.ntdpz.pie.feature.pet.overlay.PetOverlayPhase.Running
+        }
+        compose.onNodeWithText("หยุด PIE นอกแอป").performScrollTo().performClick()
+        compose.waitUntil(10_000) {
+            status.state.value.phase == com.ntdpz.pie.feature.pet.overlay.PetOverlayPhase.Off
+        }
+        assertFalse(shell("dumpsys activity services ${context.packageName}").contains("isForeground=true"))
     }
 
     @Test
@@ -117,11 +171,15 @@ class PetOverlayFlowTest {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         })
         compose.waitUntil(15_000) { companionNode() != null && probeNode() != null }
+        var previousReaction: String? = null
         repeat(3) { index ->
             compose.waitUntil(6_000) { companionNode()?.contentDescription?.contains("อยู่เป็นเพื่อน") == true }
             val bounds = Rect().also { probeNode()!!.getBoundsInScreen(it) }
             shell("input tap ${bounds.centerX()} ${bounds.centerY()}")
             compose.waitUntil(2_000) { companionNode()?.contentDescription?.contains("ทักทาย") == true }
+            val reaction = companionNode()!!.contentDescription.toString()
+            org.junit.Assert.assertNotEquals(previousReaction, reaction)
+            previousReaction = reaction
             compose.waitUntil(2_000) { probeNode()?.text?.toString()?.equals("Probe touches: ${index + 1}", ignoreCase = true) == true }
         }
         shell("input keyevent KEYCODE_BACK")

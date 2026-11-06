@@ -21,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
@@ -73,7 +77,12 @@ fun PetSessionLifecycle(viewModel: PetViewModel, unlocked: Boolean) {
 }
 
 @Composable
-fun PetCompanionRoute(viewModel: PetViewModel, visible: Boolean, onSettings: () -> Unit) {
+fun PetCompanionRoute(
+    viewModel: PetViewModel,
+    visible: Boolean,
+    onSettings: () -> Unit,
+    onBoundsChanged: (Rect?) -> Unit = {},
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val lifecycleState by lifecycle.currentStateFlow.collectAsStateWithLifecycle()
@@ -81,6 +90,7 @@ fun PetCompanionRoute(viewModel: PetViewModel, visible: Boolean, onSettings: () 
         PetCompanion(
             state, viewModel::tap, viewModel::setPosition,
             onHide = { viewModel.setEnabled(false) }, onSettings = onSettings,
+            onBoundsChanged = onBoundsChanged,
         )
     }
 }
@@ -93,6 +103,7 @@ fun PetCompanion(
     onPosition: (PetPosition) -> Unit,
     onHide: () -> Unit,
     onSettings: () -> Unit,
+    onBoundsChanged: (Rect?) -> Unit = {},
 ) {
     val scale = rememberSystemAnimationScale()
     var menu by remember { mutableStateOf(false) }
@@ -100,14 +111,16 @@ fun PetCompanion(
     var position by remember { mutableStateOf(state.preferences.position) }
     var bubbleHeight by remember { mutableStateOf(0) }
     val savedPosition by rememberUpdatedState(state.preferences.position)
+    val reportBounds by rememberUpdatedState(onBoundsChanged)
+    DisposableEffect(Unit) { onDispose { reportBounds(null) } }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { menu = false }
     LaunchedEffect(state.preferences.position) {
         if (!dragging) position = state.preferences.position
     }
     BoxWithConstraints(Modifier.fillMaxSize().testTag("pet-layer")) {
         val density = LocalDensity.current
-        val width = with(density) { 96.dp.toPx() }
-        val height = with(density) { 104.dp.toPx() }
+        val width = with(density) { 128.dp.toPx() }
+        val height = with(density) { 128.dp.toPx() }
         val maxX = (constraints.maxWidth - width).coerceAtLeast(0f)
         val maxY = (constraints.maxHeight - height).coerceAtLeast(0f)
         val x = position.x * maxX
@@ -118,7 +131,9 @@ fun PetCompanion(
         val gap = with(density) { 8.dp.toPx() }
         val desiredBubbleY = if (y >= bubbleHeight + gap) y - bubbleHeight - gap else y + height
         val bubbleY = desiredBubbleY.coerceIn(0f, (constraints.maxHeight - bubbleHeight).coerceAtLeast(0).toFloat())
-        if (state.error != null || state.pose == PetPose.Greeting || state.pose == PetPose.Tap || state.pose == PetPose.Saved) {
+        if (state.error != null || state.pose == PetPose.Greeting ||
+            (state.pose == PetPose.Tap && state.showTouchMessage) || state.pose == PetPose.Saved
+        ) {
             Surface(
                 Modifier.offset { IntOffset(bubbleX.roundToInt(), bubbleY.roundToInt()) }.width(bubbleWidth)
                     .heightIn(max = maxHeight).onSizeChanged { bubbleHeight = it.height }
@@ -133,16 +148,18 @@ fun PetCompanion(
             }
         }
         Box(
-            Modifier.offset { IntOffset(x.roundToInt(), y.roundToInt()) }.size(96.dp, 104.dp)
+            Modifier.offset { IntOffset(x.roundToInt(), y.roundToInt()) }.size(128.dp)
+                .onGloballyPositioned { reportBounds(it.boundsInRoot()) }
                 .testTag("pet-companion")
                 .semantics(mergeDescendants = true) {
                     contentDescription = "PIE เพื่อนของคุณ"
                     stateDescription = when (state.pose) {
                         PetPose.Idle -> "อยู่เป็นเพื่อน"
-                        PetPose.Tap -> "ส่งหัวใจ"
+                        PetPose.Tap -> state.touchReaction?.action?.label() ?: "ทักทาย"
                         PetPose.Greeting -> "ทักทาย"
                         PetPose.Saved -> "ดีใจกับบันทึกที่เก็บแล้ว"
                         PetPose.Rest -> "พัก"
+                        PetPose.Stretch -> "ยืดเส้น"
                     }
                     customActions = listOf(
                         CustomAccessibilityAction("ซ่อน PIE") { onHide(); true },
@@ -179,14 +196,16 @@ fun PetCompanion(
             CompanionSprite(
                 animation = when (state.pose) {
                     PetPose.Idle -> CompanionAnimation.Idle
-                    PetPose.Tap -> CompanionAnimation.Tap
+                    PetPose.Tap -> state.touchReaction?.action?.animation() ?: CompanionAnimation.Tap
                     PetPose.Greeting -> CompanionAnimation.Greeting
                     PetPose.Saved -> CompanionAnimation.Saved
                     PetPose.Rest -> CompanionAnimation.Rest
+                    PetPose.Stretch -> CompanionAnimation.Stretch
                 },
                 motionEnabled = !state.preferences.reducedMotion && !dragging,
                 modifier = Modifier.fillMaxSize(),
                 durationScale = scale,
+                replayKey = state.touchReaction?.sequence ?: 0,
             )
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                 DropdownMenuItem(text = { Text("ตั้งค่า PIE") }, onClick = { menu = false; onSettings() })

@@ -77,6 +77,13 @@ embedded text; runtime daily messages and status must be accessible text.
 
 ## Canvas arrangement
 
+2026-11-06: added the Companion redesign on this same page, below the existing
+two rows: board 11 (My companion), board 12 (nine-pose explorer), and board 13
+(outside-mode states and UX rationale). See [Companion UI handoff](PIE_COMPANION_UI_DESIGN.md)
+for node IDs, exports, current prepared sprite assets and design verification.
+The earlier artwork-preparation caveats above describe the original proposal;
+these new boards use transparent crops of the current prepared runtime atlases.
+
 The same ten artboards are arranged left to right in two rows of five.
 Top: Today empty, continue, Editor, Gallery, calendar sheet.
 Bottom: Settings, reminders, six-digit PIN, export, dark Today.

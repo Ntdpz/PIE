@@ -1,0 +1,68 @@
+{
+  "ok": true,
+  "atlas": "D:\\Up-Skill\\PIE\\design\\pie-pet\\chatgpt-v2\\final\\spritesheet-extended.png",
+  "encoded_bytes": 3403317,
+  "sha256": "559ea51a5f2537c60dbfbd90dd7261000c8ab2afe3cce438a95f03b621ec6a93",
+  "jump": {
+    "idle_baseline": 202,
+    "jump_baselines": [
+      202,
+      202,
+      170,
+      185,
+      202
+    ],
+    "airborne_lift_pixels": 32,
+    "landing_delta_pixels": 0
+  },
+  "look_registration": {
+    "neutral_center_x": 96.0,
+    "look_centers_x": [
+      95.0,
+      94.5,
+      94.0,
+      92.0,
+      90.5,
+      89.5,
+      91.0,
+      91.5,
+      97.5,
+      99.0,
+      101.5,
+      102.0,
+      101.5,
+      101.5,
+      100.0,
+      97.5
+    ],
+    "look_widths": [
+      134,
+      131,
+      130,
+      126,
+      127,
+      129,
+      128,
+      129,
+      127,
+      124,
+      121,
+      120,
+      121,
+      121,
+      122,
+      121
+    ],
+    "maximum_center_drift_pixels": 6.5,
+    "maximum_width_ratio": 1.1166666666666667
+  },
+  "errors": [],
+  "warnings": [
+    "look direction 157.5 accepted with a reviewed warning",
+    "look direction 202.5 accepted with a reviewed warning",
+    "look direction 337.5 accepted with a reviewed warning",
+    "157.5->180 diff is a local outlier (3422 pixels vs neighbor average 872)",
+    "337.5->000 diff is a local outlier (4191 pixels vs neighbor average 1108)",
+    "337.5->000 sprite area ratio is high (1.19)"
+  ]
+}

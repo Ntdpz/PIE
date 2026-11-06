@@ -24,6 +24,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.ntdpz.pie.core.domain.pet.PetPosition
 import com.ntdpz.pie.core.domain.pet.PetPreferences
 import com.ntdpz.pie.core.domain.pet.PetReaction
+import com.ntdpz.pie.core.domain.pet.PetEdge
 import com.ntdpz.pie.core.domain.settings.ReminderMessages
 import com.ntdpz.pie.core.domain.settings.ThemeMode
 import java.io.File
@@ -63,6 +64,45 @@ class PetCompanionFlowTest {
             repository.setReducedMotion(it.reducedMotion)
             repository.setPosition(it.position)
         }
+    }
+
+    @Test
+    fun allEdgesRenderAndPreviewDoesNotMoveTheCompanion() {
+        waitForPet()
+        PetEdge.entries.forEach { edge ->
+            val position = PetPosition((edge.horizontal + 1) / 2f, (edge.vertical + 1) / 2f)
+            runBlocking { repository.setPosition(position) }
+            compose.waitUntil(8_000) {
+                compose.onAllNodesWithTag("pet-edge-${edge.name}", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+            }
+        }
+        val beforePreview = runBlocking { repository.preferences.first().position }
+        compose.onNode(hasText("ตั้งค่า") and hasClickAction()).performClick()
+        compose.onNodeWithText("เพื่อนของฉัน · PIE").performScrollTo().performClick()
+        compose.onNodeWithTag("pet-all-poses").performScrollTo().performClick()
+        compose.onNodeWithTag("pet-mode-edges").performScrollTo().performClick()
+        PetEdge.entries.filter { it != PetEdge.Center }.forEach { edge ->
+            compose.onNodeWithTag("pet-preview-edge-${edge.name}").performScrollTo().performClick()
+            compose.onNodeWithTag("pet-reaction-preview").performScrollTo().assertIsDisplayed()
+        }
+        assertEquals(beforePreview, runBlocking { repository.preferences.first().position })
+        savePreview("companion-edge-preview.png")
+    }
+
+    @Test
+    fun draggingNearTheLeftEdgeSnapsAndPersists() {
+        runBlocking { repository.setPosition(PetPosition(.05f, .5f)) }
+        waitForPet()
+        compose.onNodeWithTag("pet-companion").performTouchInput {
+            down(center)
+            moveBy(Offset(-32f, 0f))
+            up()
+        }
+        compose.waitUntil(10_000) { runBlocking { repository.preferences.first().position.x == 0f } }
+        compose.waitUntil(8_000) { compose.onAllNodesWithTag("pet-edge-Left", useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty() }
+        compose.activityRule.scenario.recreate()
+        waitForPet()
+        assertEquals(0f, runBlocking { repository.preferences.first().position.x })
     }
 
     @Test

@@ -1,0 +1,127 @@
+{
+  "source_size": [
+    1254,
+    1254
+  ],
+  "not_production_sprites": true,
+  "panel_gutters_visually_checked": true,
+  "panels": [
+    {
+      "position": "top-left",
+      "presentation_panel": [
+        0,
+        0,
+        418,
+        418
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    },
+    {
+      "position": "top",
+      "presentation_panel": [
+        418,
+        0,
+        836,
+        418
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    },
+    {
+      "position": "top-right",
+      "presentation_panel": [
+        836,
+        0,
+        1254,
+        418
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    },
+    {
+      "position": "left",
+      "presentation_panel": [
+        0,
+        418,
+        418,
+        818
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    },
+    {
+      "position": "center",
+      "presentation_panel": [
+        418,
+        418,
+        836,
+        818
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    },
+    {
+      "position": "right",
+      "presentation_panel": [
+        836,
+        418,
+        1254,
+        818
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    },
+    {
+      "position": "bottom-left",
+      "presentation_panel": [
+        0,
+        818,
+        418,
+        1254
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    },
+    {
+      "position": "bottom",
+      "presentation_panel": [
+        418,
+        818,
+        836,
+        1254
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    },
+    {
+      "position": "bottom-right",
+      "presentation_panel": [
+        836,
+        818,
+        1254,
+        1254
+      ],
+      "shared_canvas": [
+        418,
+        436
+      ]
+    }
+  ]
+}

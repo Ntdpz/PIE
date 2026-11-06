@@ -55,6 +55,9 @@ import com.ntdpz.pie.core.designsystem.component.CompanionSprite
 import com.ntdpz.pie.core.designsystem.motion.rememberSystemAnimationScale
 import com.ntdpz.pie.core.domain.pet.PetPose
 import com.ntdpz.pie.core.domain.pet.PetPosition
+import com.ntdpz.pie.core.domain.pet.PetEdge
+import com.ntdpz.pie.core.domain.pet.PetEdges
+import com.ntdpz.pie.core.designsystem.component.CompanionEdge
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
@@ -108,6 +111,7 @@ fun PetCompanion(
     val scale = rememberSystemAnimationScale()
     var menu by remember { mutableStateOf(false) }
     var dragging by remember { mutableStateOf(false) }
+    var settledEdge by remember { mutableStateOf(PetEdge.Center) }
     var position by remember { mutableStateOf(state.preferences.position) }
     var bubbleHeight by remember { mutableStateOf(0) }
     val savedPosition by rememberUpdatedState(state.preferences.position)
@@ -117,6 +121,15 @@ fun PetCompanion(
     LaunchedEffect(state.preferences.position) {
         if (!dragging) position = state.preferences.position
     }
+    LaunchedEffect(position, dragging) {
+        if (dragging) {
+            settledEdge = PetEdge.Center
+        } else {
+            delay(200)
+            settledEdge = PetEdges.at(position, settledEdge)
+        }
+    }
+    val visualEdge = if (!dragging && state.pose in listOf(PetPose.Idle, PetPose.Rest)) settledEdge else PetEdge.Center
     BoxWithConstraints(Modifier.fillMaxSize().testTag("pet-layer")) {
         val density = LocalDensity.current
         val width = with(density) { 128.dp.toPx() }
@@ -182,7 +195,7 @@ fun PetCompanion(
                 .pointerInput(maxX, maxY) {
                     detectDragGestures(
                         onDragStart = { dragging = true; onTap() },
-                        onDragEnd = { onPosition(position); dragging = false },
+                        onDragEnd = { position = PetEdges.snap(position); onPosition(position); dragging = false },
                         onDragCancel = { position = savedPosition; dragging = false },
                     ) { change, amount ->
                         change.consume()
@@ -203,9 +216,11 @@ fun PetCompanion(
                     PetPose.Stretch -> CompanionAnimation.Stretch
                 },
                 motionEnabled = !state.preferences.reducedMotion && !dragging,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().testTag("pet-edge-${visualEdge.name}")
+                    .semantics { contentDescription = "ตำแหน่ง PIE · ${visualEdge.label()}" },
                 durationScale = scale,
                 replayKey = state.touchReaction?.sequence ?: 0,
+                edge = visualEdge.visual(),
             )
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                 DropdownMenuItem(text = { Text("ตั้งค่า PIE") }, onClick = { menu = false; onSettings() })

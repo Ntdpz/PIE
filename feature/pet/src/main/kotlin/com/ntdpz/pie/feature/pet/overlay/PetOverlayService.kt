@@ -29,14 +29,18 @@ import android.view.WindowManager
 import android.widget.Toast
 import com.ntdpz.pie.core.designsystem.component.CompanionAnimation
 import com.ntdpz.pie.core.designsystem.component.CompanionSpriteView
+import com.ntdpz.pie.core.designsystem.component.CompanionEdge
 import com.ntdpz.pie.core.domain.pet.PetPosition
 import com.ntdpz.pie.core.domain.pet.PetPreferences
 import com.ntdpz.pie.core.domain.pet.PetRepository
 import com.ntdpz.pie.core.domain.pet.PetReactions
 import com.ntdpz.pie.core.domain.pet.PetBehavior
+import com.ntdpz.pie.core.domain.pet.PetEdge
+import com.ntdpz.pie.core.domain.pet.PetEdges
 import com.ntdpz.pie.feature.pet.animation
 import com.ntdpz.pie.feature.pet.label
 import com.ntdpz.pie.feature.pet.PetNotificationImages
+import com.ntdpz.pie.feature.pet.visual
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,6 +63,8 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
     private var sprite: CompanionSpriteView? = null
     private var bitmap: Bitmap? = null
     private var reactionBitmap: Bitmap? = null
+    private var edgeBitmap: Bitmap? = null
+    private var currentEdge = PetEdge.Center
     private var preferences = PetPreferences()
     private var ready = false
     private var attached = false
@@ -146,14 +152,18 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
         loading = true
         scope.launch {
             try {
-                val (atlas, reactionAtlas) = withContext(Dispatchers.IO) {
+                val (atlas, reactionAtlas, edgeAtlas) = withContext(Dispatchers.IO) {
                     val options = BitmapFactory.Options().apply { inScaled = false }
-                    requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_companion, options)) to
-                        requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_reactions, options))
+                    Triple(
+                        requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_companion, options)),
+                        requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_reactions, options)),
+                        requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_edges, options)),
+                    )
                 }
                 bitmap = atlas
                 reactionBitmap = reactionAtlas
-                sprite = CompanionSpriteView(this@PetOverlayService, atlas, reactionAtlas).apply {
+                edgeBitmap = edgeAtlas
+                sprite = CompanionSpriteView(this@PetOverlayService, atlas, reactionAtlas, edgeAtlas).apply {
                     contentDescription = "PIE นอกแอป แตะเพื่อทักทาย กดค้างเพื่อปิด"
                     setOnClickListener { reactToTouch() }
                     setOnLongClickListener { stopSelf(); true }
@@ -163,6 +173,7 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                     try {
                         petRepository.preferences.collect {
                             preferences = it
+                            currentEdge = PetEdges.at(it.position, currentEdge)
                             ready = true
                             sprite?.reducedMotion = it.reducedMotion
                             if (!dragging) place(it.position)
@@ -189,12 +200,16 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                             else -> CompanionAnimation.Idle
                         }
                         sprite?.animation = animation
+                        if (!dragging) currentEdge = PetEdges.at(preferences.position, currentEdge)
+                        sprite?.edge = if (!dragging && animation in listOf(CompanionAnimation.Idle, CompanionAnimation.Rest)) {
+                            currentEdge.visual()
+                        } else CompanionEdge.Center
                         val description = when {
                             selected != null -> "ทักทาย ${selected.action.label()}"
                             animation == CompanionAnimation.Rest -> "พัก"
                             else -> "อยู่เป็นเพื่อน"
                         }
-                        sprite?.contentDescription = "PIE นอกแอป · $description · กดค้างเพื่อปิด"
+                        sprite?.contentDescription = "PIE นอกแอป · $description · ตำแหน่ง ${currentEdge.label()} · กดค้างเพื่อปิด"
                     }
                     delay(500)
                 }
@@ -235,6 +250,7 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
         lastInteraction = SystemClock.elapsedRealtime()
         val selected = reactions.touch(lastInteraction)
         sprite?.apply {
+            edge = CompanionEdge.Center
             contentDescription = "PIE นอกแอป · ทักทาย ${selected.action.label()} · กดค้างเพื่อปิด"
             playReaction(selected.action.animation())
         }
@@ -290,6 +306,7 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                         view.removeCallbacks(longPress)
                     }
                     if (dragging) {
+                        sprite?.edge = CompanionEdge.Center
                         val (maxX, maxY) = bounds()
                         params.x = (startX + dx).roundToInt().coerceIn(0, maxX)
                         params.y = (startY + dy).roundToInt().coerceIn(0, maxY)
@@ -301,8 +318,10 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                     lastInteraction = SystemClock.elapsedRealtime()
                     if (dragging) {
                         val (maxX, maxY) = bounds()
-                        val position = PetPosition(if (maxX > 0) params.x.toFloat() / maxX else 0f, if (maxY > 0) params.y.toFloat() / maxY else 0f)
+                        val position = PetEdges.snap(PetPosition(if (maxX > 0) params.x.toFloat() / maxX else 0f, if (maxY > 0) params.y.toFloat() / maxY else 0f))
                         preferences = preferences.copy(position = position)
+                        currentEdge = PetEdges.at(position)
+                        place(position)
                         reactions.reset(lastInteraction)
                         preferenceWriteScope.launch {
                             try { petRepository.setPosition(position) }
@@ -357,6 +376,8 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
         bitmap = null
         reactionBitmap?.recycle()
         reactionBitmap = null
+        edgeBitmap?.recycle()
+        edgeBitmap = null
         stopForeground(STOP_FOREGROUND_REMOVE)
         overlayStatus.stopped()
         super.onDestroy()

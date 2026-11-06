@@ -1,0 +1,88 @@
+{
+  "pairs": [
+    {
+      "pair": "horizontal-1",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "A's nose is left of the face center with more right cheek visible; B's nose and pupils point toward the right."
+    },
+    {
+      "pair": "horizontal-2",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A's muzzle projects right with the left side of the head exposed; B's muzzle projects left and the larger cheek is on the right."
+    },
+    {
+      "pair": "horizontal-3",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "A has a left-projecting muzzle and left-facing profile; B has a right-projecting muzzle and right-facing profile."
+    },
+    {
+      "pair": "horizontal-4",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "A's nose sits at the left face edge; B's nose sits at the right face edge, with both profiles visibly turned."
+    },
+    {
+      "pair": "horizontal-5",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A's muzzle reaches the right edge of the face; B's lowered muzzle projects toward the left."
+    },
+    {
+      "pair": "horizontal-6",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A's nose and narrowed eye alignment are displaced right; B's nose is displaced left beneath its eyes."
+    },
+    {
+      "pair": "horizontal-7",
+      "A": "screen-right",
+      "B": "ambiguous",
+      "reason": "A's lowered nose is shifted right with asymmetric cheek exposure; B looks nearly frontal with a centered nose and no clear horizontal head turn."
+    },
+    {
+      "pair": "vertical-1",
+      "A": "down",
+      "B": "up",
+      "reason": "A's lowered muzzle and upper eyelids indicate a bowed head; B's raised muzzle, upward pupils, and exposed chin indicate upward pitch."
+    },
+    {
+      "pair": "vertical-2",
+      "A": "up",
+      "B": "down",
+      "reason": "A's eyes and muzzle are raised above a broad exposed chin; B's eyes sit under sloping brows with its muzzle lowered toward the collar."
+    },
+    {
+      "pair": "vertical-3",
+      "A": "up",
+      "B": "down",
+      "reason": "A has upward pupils, a raised muzzle, and an exposed underside of the face; B's muzzle and gaze slope downward."
+    },
+    {
+      "pair": "vertical-4",
+      "A": "up",
+      "B": "ambiguous",
+      "reason": "A's eye and muzzle placement show a raised face with the chin exposed; B's side-facing head has no sufficiently clear upward or downward pitch."
+    },
+    {
+      "pair": "vertical-5",
+      "A": "up",
+      "B": "down",
+      "reason": "A's pupils and muzzle are raised with a broad chin beneath them; B's lowered eyes and low muzzle show a bowed head."
+    },
+    {
+      "pair": "vertical-6",
+      "A": "up",
+      "B": "down",
+      "reason": "A has raised pupils and a high muzzle with the chin exposed beneath; B has narrowed lowered eyes, a muzzle near the collar, and a bowed face."
+    },
+    {
+      "pair": "vertical-7",
+      "A": "ambiguous",
+      "B": "down",
+      "reason": "A's side-facing face has no clear vertical pitch; B's muzzle is lowered and the eyes look down beneath the upper lids."
+    }
+  ]
+}

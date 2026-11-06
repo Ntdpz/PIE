@@ -6,10 +6,21 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.provider.Settings
+import android.os.SystemClock
 import android.view.View
+import kotlin.math.sin
 
 /** Small native-window sprite renderer. Its owner controls visibility and interaction. */
-class CompanionSpriteView(context: Context, private val atlas: Bitmap, private val reactions: Bitmap) : View(context) {
+class CompanionSpriteView(
+    context: Context,
+    private val atlas: Bitmap,
+    private val reactions: Bitmap,
+    private val edges: Bitmap,
+) : View(context) {
+    var edge: CompanionEdge = CompanionEdge.Center
+        set(value) { if (field != value) { field = value; edgeStartedAt = SystemClock.uptimeMillis(); invalidate() } }
+    private var edgeStartedAt = 0L
+    private var motionEnabled = true
     var animation: CompanionAnimation = CompanionAnimation.Idle
         set(value) {
             if (field != value) {
@@ -36,6 +47,7 @@ class CompanionSpriteView(context: Context, private val atlas: Bitmap, private v
             if (!isAttachedToWindow || visibility != VISIBLE) return
             val scale = Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f)
                 .takeIf { it.isFinite() && it >= 0f } ?: 1f
+            motionEnabled = !reducedMotion && scale > 0f
             if (reducedMotion || scale <= 0f) {
                 frame = animation.stillFrame
                 invalidate()
@@ -65,6 +77,33 @@ class CompanionSpriteView(context: Context, private val atlas: Bitmap, private v
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (edge != CompanionEdge.Center) {
+            val progress = if (motionEnabled && !reducedMotion) {
+                ((SystemClock.uptimeMillis() - edgeStartedAt) / 180f).coerceIn(0f, 1f)
+            } else 1f
+            val breath = if (motionEnabled && !reducedMotion && animation == CompanionAnimation.Idle) {
+                1f - ((sin(frame * Math.PI / 4) + 1) * .0075).toFloat()
+            } else 1f
+            canvas.save()
+            canvas.clipRect(0, 0, width, height)
+            val horizontal = when (edge) {
+                CompanionEdge.Left, CompanionEdge.TopLeft, CompanionEdge.BottomLeft -> -1
+                CompanionEdge.Right, CompanionEdge.TopRight, CompanionEdge.BottomRight -> 1
+                else -> 0
+            }
+            val vertical = if (edge.anchorY == 0f) -1 else if (edge.anchorY == 1f) 1 else 0
+            canvas.translate(horizontal * width * .06f * (1f - progress), vertical * height * .06f * (1f - progress))
+            canvas.scale(1f, breath, width / 2f, height * edge.anchorY)
+            paint.alpha = (progress * 255).toInt()
+            canvas.drawBitmap(
+                edges, Rect(edge.column * 256, 0, (edge.column + 1) * 256, 256),
+                Rect(0, 0, width, height), paint,
+            )
+            canvas.restore()
+            paint.alpha = 255
+            if (progress < 1f) postInvalidateOnAnimation()
+            return
+        }
         val scale = minOf(width, height) / 256f
         val drawWidth = (animation.sourceWidth * scale).toInt()
         val drawHeight = (animation.sourceHeight * scale).toInt()

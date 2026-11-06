@@ -1,0 +1,88 @@
+{
+  "pairs": [
+    {
+      "pair": "horizontal-1",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "A has its muzzle left of the face center and eyes oriented left; B has its muzzle shifted right and shows rightward head yaw."
+    },
+    {
+      "pair": "horizontal-2",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A's projecting nose and facial opening point right; B's muzzle projects left with the head turned left."
+    },
+    {
+      "pair": "horizontal-3",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "A exposes the leftward facial profile and nose; B exposes the rightward profile and nose."
+    },
+    {
+      "pair": "horizontal-4",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "A's nose projects toward the left edge of its face; B's nose and gaze project right."
+    },
+    {
+      "pair": "horizontal-5",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A has clear rightward muzzle projection; B has clear leftward muzzle projection despite its lowered head."
+    },
+    {
+      "pair": "horizontal-6",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "Both heads are lowered, but A's muzzle sits to the right of its face center and B's sits to the left."
+    },
+    {
+      "pair": "horizontal-7",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A's lowered face and nose angle right; B's nose and eyes angle slightly left, though closer to frontal."
+    },
+    {
+      "pair": "vertical-1",
+      "A": "down",
+      "B": "up",
+      "reason": "A lowers its chin and eyes beneath the brow; B lifts its muzzle and exposes a broad lower face with upward-looking eyes."
+    },
+    {
+      "pair": "vertical-2",
+      "A": "up",
+      "B": "down",
+      "reason": "A's lifted chin and pupils indicate an upward look; B bows its head and directs its eyes downward."
+    },
+    {
+      "pair": "vertical-3",
+      "A": "up",
+      "B": "down",
+      "reason": "A has a raised muzzle, chin, and gaze; B has a compressed lower face and lowered head/gaze."
+    },
+    {
+      "pair": "vertical-4",
+      "A": "up",
+      "B": "ambiguous",
+      "reason": "A's chin is visibly lifted and its eyes look upward. B primarily reads as a rightward sideways look; its vertical pitch is too slight to classify confidently."
+    },
+    {
+      "pair": "vertical-5",
+      "A": "up",
+      "B": "down",
+      "reason": "A lifts the chin with eyes looking high; B lowers the chin beneath a heavier brow and looks downward."
+    },
+    {
+      "pair": "vertical-6",
+      "A": "up",
+      "B": "down",
+      "reason": "The pair crop shows both sprites. A lifts its chin, exposes a broad lower face, and directs its pupils upward. B bows its head, places its muzzle low beneath the brow, compresses the chin area, and directs its eyes downward."
+    },
+    {
+      "pair": "vertical-7",
+      "A": "ambiguous",
+      "B": "down",
+      "reason": "A mainly reads as a leftward profile with near-neutral vertical pitch, without a decisive up/down cue. B's bowed head, lowered muzzle, and downward eyes clearly read down."
+    }
+  ]
+}

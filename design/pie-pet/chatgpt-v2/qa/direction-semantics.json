@@ -1,0 +1,119 @@
+{
+  "directions": [
+    {
+      "label": "000",
+      "expected": "up",
+      "observed": "up",
+      "verdict": "pass",
+      "evidence": "Chin raised; muzzle centered and pupils above eye centers."
+    },
+    {
+      "label": "022.5",
+      "expected": "up-right",
+      "observed": "up-right",
+      "verdict": "pass",
+      "evidence": "Raised chin and pupils shifted slightly screen-right; nose modestly right of face center."
+    },
+    {
+      "label": "045",
+      "expected": "up-right",
+      "observed": "up-right",
+      "verdict": "pass",
+      "evidence": "Raised muzzle points screen-right with exposed cheek on viewer-left."
+    },
+    {
+      "label": "067.5",
+      "expected": "up-right",
+      "observed": "up-right",
+      "verdict": "pass",
+      "evidence": "Pronounced right yaw, elevated pupils and lifted chin."
+    },
+    {
+      "label": "090",
+      "expected": "right",
+      "observed": "right",
+      "verdict": "pass",
+      "evidence": "Clear screen-right muzzle projection and right-facing profile, torso frontal."
+    },
+    {
+      "label": "112.5",
+      "expected": "down-right",
+      "observed": "down-right",
+      "verdict": "pass",
+      "evidence": "Right muzzle projection retained while brow and pupils tilt down."
+    },
+    {
+      "label": "135",
+      "expected": "down-right",
+      "observed": "down-right",
+      "verdict": "pass",
+      "evidence": "Head tucks toward right knee; nose right of body midline."
+    },
+    {
+      "label": "157.5",
+      "expected": "down-right",
+      "observed": "down-right",
+      "verdict": "warning",
+      "evidence": "Right yaw and tucked chin persist; stronger downward than horizontal component."
+    },
+    {
+      "label": "180",
+      "expected": "down",
+      "observed": "down",
+      "verdict": "pass",
+      "evidence": "Head centered and bowed, fringe down and pupils below neutral."
+    },
+    {
+      "label": "202.5",
+      "expected": "down-left",
+      "observed": "down-left",
+      "verdict": "warning",
+      "evidence": "Bowed head with nose slightly left of midline; horizontal component is subtle and requires blind review."
+    },
+    {
+      "label": "225",
+      "expected": "down-left",
+      "observed": "down-left",
+      "verdict": "pass",
+      "evidence": "Left muzzle offset and lowered pupils; right-side clip remains physically on far side."
+    },
+    {
+      "label": "247.5",
+      "expected": "down-left",
+      "observed": "down-left",
+      "verdict": "pass",
+      "evidence": "Pronounced left yaw with chin slightly down and pupils low."
+    },
+    {
+      "label": "270",
+      "expected": "left",
+      "observed": "left",
+      "verdict": "pass",
+      "evidence": "Clear screen-left projecting muzzle and left-facing eyes, torso frontal."
+    },
+    {
+      "label": "292.5",
+      "expected": "up-left",
+      "observed": "up-left",
+      "verdict": "pass",
+      "evidence": "Left projection retained with chin lifting and pupils slightly above neutral."
+    },
+    {
+      "label": "315",
+      "expected": "up-left",
+      "observed": "up-left",
+      "verdict": "pass",
+      "evidence": "Raised chin with muzzle projected screen-left and pupils elevated."
+    },
+    {
+      "label": "337.5",
+      "expected": "up-left",
+      "observed": "up-left",
+      "verdict": "warning",
+      "evidence": "Chin strongly lifted and nose slightly left of face center; horizontal component subtle."
+    }
+  ],
+  "review_notes": [
+    "Visually reviewed labeled final atlas sheet. Cardinal poses clear. Row 10 is modestly smaller than row 9, yielding continuity warnings at both row boundaries. Blind review remains pending."
+  ]
+}

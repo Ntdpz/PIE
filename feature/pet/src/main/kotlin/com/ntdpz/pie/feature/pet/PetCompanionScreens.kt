@@ -2,6 +2,7 @@ package com.ntdpz.pie.feature.pet
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,8 @@ import com.ntdpz.pie.core.designsystem.component.PieGlyph
 import com.ntdpz.pie.core.designsystem.component.PieIcon
 import com.ntdpz.pie.core.designsystem.motion.rememberSystemAnimationScale
 import com.ntdpz.pie.core.domain.pet.PetReaction
+import com.ntdpz.pie.core.domain.pet.PetEdge
+import com.ntdpz.pie.core.designsystem.component.CompanionEdge
 
 @Composable
 internal fun PetSettingsScreen(
@@ -178,6 +181,7 @@ private fun CompanionSwitch(
 internal fun PetPoseScreen(
     selected: PetReaction, replayKey: Long, motionEnabled: Boolean,
     onSelect: (PetReaction) -> Unit, onBack: () -> Unit,
+    edge: PetEdge?, onEdge: (PetEdge?) -> Unit,
 ) {
     Column(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
@@ -191,17 +195,38 @@ internal fun PetPoseScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CompanionSprite(
-                        selected.animation(), motionEnabled,
-                        Modifier.size(184.dp).testTag("pet-reaction-preview")
-                            .semantics { contentDescription = "ตัวอย่าง PIE · ${selected.label()}" },
+                        if (edge == null) selected.animation() else CompanionAnimation.Idle, motionEnabled,
+                        Modifier.size(184.dp)
+                            .then(if (edge != null) Modifier.border(1.dp, MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = .3f)) else Modifier)
+                            .testTag("pet-reaction-preview")
+                            .semantics { contentDescription = "ตัวอย่าง PIE · ${edge?.label() ?: selected.label()}" },
                         durationScale = rememberSystemAnimationScale(), replayKey = replayKey,
+                        edge = edge?.visual() ?: CompanionEdge.Center,
                     )
-                    Text(selected.label(), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                    Text(edge?.label() ?: selected.label(), fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
             Spacer(Modifier.height(16.dp))
-            Text("เลือกท่าที่อยากลอง", style = MaterialTheme.typography.bodyLarge)
-            PreviewActions.chunked(3).forEach { row ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    { onEdge(null) }, Modifier.weight(1f).heightIn(min = 48.dp).testTag("pet-mode-reactions"),
+                    border = BorderStroke(if (edge == null) 2.dp else 1.dp, MaterialTheme.colorScheme.primary),
+                ) { Text("ทักทาย 9 ท่า") }
+                OutlinedButton(
+                    { onEdge(PetEdge.Right) }, Modifier.weight(1f).heightIn(min = 48.dp).testTag("pet-mode-edges"),
+                    border = BorderStroke(if (edge != null) 2.dp else 1.dp, MaterialTheme.colorScheme.primary),
+                ) { Text("เกาะขอบ 8 ท่า") }
+            }
+            Text(if (edge == null) "เลือกท่าที่อยากลอง" else "เลือกขอบหรือมุมที่อยากลอง", style = MaterialTheme.typography.bodyLarge)
+            if (edge != null) {
+                PetEdge.entries.filter { it != PetEdge.Center }.chunked(3).forEach { row ->
+                    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        row.forEach { item -> EdgePoseTile(item, edge == item, { onEdge(item) }, Modifier.weight(1f)) }
+                        repeat(3 - row.size) { Spacer(Modifier.weight(1f)) }
+                    }
+                }
+                Text("ลากน้องไปชิดขอบจอเพื่อใช้ท่านี้จริง", style = MaterialTheme.typography.bodySmall)
+            } else PreviewActions.chunked(3).forEach { row ->
                 Row(
                     Modifier.fillMaxWidth().padding(bottom = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -226,9 +251,33 @@ internal fun PetPoseScreen(
 }
 
 @Composable
+private fun EdgePoseTile(edge: PetEdge, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        modifier.testTag("pet-preview-edge-${edge.name}").selectable(
+            selected, interactionSource = remember { MutableInteractionSource() }, indication = null,
+            role = Role.RadioButton, onClick = onClick,
+        ),
+        shape = RoundedCornerShape(20.dp),
+        color = if (selected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primaryContainer,
+        border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+    ) {
+        Column(
+            Modifier.fillMaxWidth().heightIn(min = 104.dp).padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            CompanionSprite(CompanionAnimation.Idle, false, Modifier.size(72.dp), edge = edge.visual())
+            Text(edge.label(), style = MaterialTheme.typography.bodySmall)
+        }
+    }
+}
+
+@Composable
 private fun PoseTile(reaction: PetReaction, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Surface(
-        modifier.testTag("pet-preview-${reaction.name}").selectable(selected, role = Role.RadioButton, onClick = onClick),
+        modifier.testTag("pet-preview-${reaction.name}").selectable(
+            selected, interactionSource = remember { MutableInteractionSource() }, indication = null,
+            role = Role.RadioButton, onClick = onClick,
+        ),
         shape = RoundedCornerShape(20.dp),
         color = if (selected) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primaryContainer,
         border = if (selected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,

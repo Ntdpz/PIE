@@ -1,0 +1,22 @@
+{
+  "tool": "image_gen.imagegen",
+  "purpose": "Static PIE edge-peeking pose concept, not a ChatGPT Pet or production sprite atlas",
+  "prompt": "Redesign a SCREEN-EDGE PEEKING POSE CONCEPT SHEET for the exact PIE mascot in reference 1. References 2 and 3 demonstrate ONLY the action: a character leaning its head around an edge and gripping that edge with two hands. Do NOT copy their pony/dog identities, colors, style, logos, or costume.\n\nPreserve PIE: pixel-art chibi dog-eared girl, caramel floppy dog ears with pink interiors, charcoal bob with the original small cross hair clip on the same anatomical side, large dark eyes, original dog nose/muzzle, pink polo with navy collar, dark trousers, white shoes. Same face and proportions. Friendly, curious, playful peekaboo personality.\n\nMake ONE square presentation sheet with a clean 3x3 arrangement of NINE miniature portrait SCREEN WINDOWS on a warm cream #FFF4E8 page. Each window is a simple pale cream rectangle with a thin caramel #E6C7A6 straight border. Clear generous gutters. No text, captions, arrows, phone hardware, UI content or decorative icons. The border is important: hands visibly wrap over the border, forearms/body disappear BEHIND the screen edge, and her head pokes INWARD across that edge into the empty screen. These are actual peeking/edge-gripping body poses, not nine seated sprites and not simply different pupil directions. Use only her head, hands and a little upper torso for the eight edge poses; no floating feet. Keep faces unobscured and large enough to compare.\n\nExact placement and action in each window:\nTOP LEFT: peek diagonally from upper-left CORNER into the screen, tilted toward lower-right; one hand grips top border and one grips left border.\nTOP CENTER: playful upside-down peek hanging into the screen from TOP edge, two hands gripping the top edge, body hidden above; unmistakably coming from above.\nTOP RIGHT: peek diagonally from upper-right CORNER into screen toward lower-left; hands grip top and right borders.\nMIDDLE LEFT: reference-like sideways peek from LEFT edge, head leaning right into screen with about 45-60 degree body/head tilt, both hands gripping the left vertical edge at different heights.\nMIDDLE CENTER: canonical seated PIE in the center of the screen, neutral reference only.\nMIDDLE RIGHT: reference-like sideways peek from RIGHT edge, head leaning left into screen with about 45-60 degree tilt, both hands gripping the right vertical edge at different heights.\nBOTTOM LEFT: pop up diagonally from LOWER-LEFT CORNER toward upper-right; hands gripping bottom and left borders.\nBOTTOM CENTER: classic peek over BOTTOM edge: full face rises above bottom border, two hands rest on the bottom border, torso hidden below.\nBOTTOM RIGHT: pop up diagonally from LOWER-RIGHT CORNER toward upper-left; hands gripping bottom and right borders.\n\nUse newly drawn coherent anatomy for each pose, never a flat rotation of the entire original seated sprite. Exactly one PIE per window; exactly two human hands per edge pose. No extra fingers or limbs, no whole body showing on edges, no detached clip, no new facial features. Keep the reference's chunky clean pixel-art rendering and costume. This is a static concept preview, not a production animation atlas.",
+  "canonical_reference": "design/companion-ui/assets/idle.png",
+  "gesture_references": [
+    "User-provided pink pony side-peek image",
+    "User-provided yellow dog edge-peek image"
+  ],
+  "output": "pose-concept.png",
+  "positions": [
+    "top-left",
+    "top",
+    "top-right",
+    "left",
+    "center",
+    "right",
+    "bottom-left",
+    "bottom",
+    "bottom-right"
+  ]
+}

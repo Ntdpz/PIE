@@ -2,6 +2,22 @@ package com.ntdpz.pie.feature.pet
 
 import com.ntdpz.pie.core.designsystem.component.CompanionAnimation
 import com.ntdpz.pie.core.domain.pet.PetReaction
+import com.ntdpz.pie.core.domain.pet.PetEdge
+import com.ntdpz.pie.core.designsystem.component.CompanionEdge
+
+internal fun PetEdge.visual(): CompanionEdge = CompanionEdge.valueOf(name)
+
+internal fun PetEdge.label(): String = when (this) {
+    PetEdge.Center -> "กลางจอ"
+    PetEdge.TopLeft -> "มุมซ้ายบน"
+    PetEdge.Top -> "ขอบบน"
+    PetEdge.TopRight -> "มุมขวาบน"
+    PetEdge.Left -> "ขอบซ้าย"
+    PetEdge.Right -> "ขอบขวา"
+    PetEdge.BottomLeft -> "มุมซ้ายล่าง"
+    PetEdge.Bottom -> "ขอบล่าง"
+    PetEdge.BottomRight -> "มุมขวาล่าง"
+}
 
 internal fun PetReaction.animation(): CompanionAnimation = when (this) {
     PetReaction.Heart -> CompanionAnimation.Tap

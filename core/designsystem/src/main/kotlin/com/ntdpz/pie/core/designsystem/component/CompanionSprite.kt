@@ -2,6 +2,7 @@ package com.ntdpz.pie.core.designsystem.component
 
 import android.graphics.BitmapFactory
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -36,7 +38,7 @@ import kotlinx.coroutines.withContext
 
 private sealed interface SpriteImage {
     data object Loading : SpriteImage
-    data class Ready(val normal: ImageBitmap, val reactions: ImageBitmap) : SpriteImage
+    data class Ready(val normal: ImageBitmap, val reactions: ImageBitmap, val edges: ImageBitmap) : SpriteImage
     data object Failed : SpriteImage
 }
 
@@ -59,6 +61,7 @@ private fun rememberSpriteImage(): State<SpriteImage> {
                 SpriteImage.Ready(
                     BitmapFactory.decodeResource(resources, R.drawable.pie_companion, options).asImageBitmap(),
                     BitmapFactory.decodeResource(resources, R.drawable.pie_reactions, options).asImageBitmap(),
+                    BitmapFactory.decodeResource(resources, R.drawable.pie_edges, options).asImageBitmap(),
                 )
             }
         } catch (cancelled: CancellationException) {
@@ -78,10 +81,18 @@ fun CompanionSprite(
     durationScale: Float = 1f,
     replayKey: Long = 0,
     characterScale: Float = 1f,
+    edge: CompanionEdge = CompanionEdge.Center,
 ) {
     val image = LocalSpriteImage.current ?: rememberSpriteImage().value
     var frame by remember(animation, replayKey) { mutableIntStateOf(0) }
     val animated = motionEnabled && durationScale > 0f
+    val entry = remember { Animatable(1f) }
+    LaunchedEffect(edge, animated, durationScale) {
+        if (edge != CompanionEdge.Center && animated) {
+            entry.snapTo(0f)
+            entry.animateTo(1f, tween((180 * durationScale).toInt().coerceAtLeast(1)))
+        } else entry.snapTo(1f)
+    }
     LaunchedEffect(animation, animated, durationScale, replayKey) {
         if (!animated) {
             frame = animation.stillFrame
@@ -106,20 +117,34 @@ fun CompanionSprite(
         SpriteImage.Loading -> CircularProgressIndicator(modifier)
         SpriteImage.Failed -> Text("เปิดภาพ PIE ไม่สำเร็จ", modifier)
         is SpriteImage.Ready -> Canvas(
-            modifier.graphicsLayer {
+            modifier.clipToBounds().graphicsLayer {
                 scaleY = breathing
-                transformOrigin = TransformOrigin(0.5f, 1f)
+                transformOrigin = TransformOrigin(0.5f, edge.anchorY)
             },
         ) {
             val scale = minOf(size.width, size.height) / 256f * characterScale
-            val drawWidth = (animation.sourceWidth * scale).toInt()
-            val drawHeight = (animation.sourceHeight * scale).toInt()
+            val peeking = edge != CompanionEdge.Center
+            val sourceWidth = if (peeking) 256 else animation.sourceWidth
+            val sourceHeight = if (peeking) 256 else animation.sourceHeight
+            val drawWidth = (sourceWidth * scale).toInt()
+            val drawHeight = (sourceHeight * scale).toInt()
+            val horizontal = when (edge) {
+                CompanionEdge.Left, CompanionEdge.TopLeft, CompanionEdge.BottomLeft -> -1
+                CompanionEdge.Right, CompanionEdge.TopRight, CompanionEdge.BottomRight -> 1
+                else -> 0
+            }
+            val vertical = if (!peeking) 0 else if (edge.anchorY == 0f) -1 else if (edge.anchorY == 1f) 1 else 0
+            val shift = (1f - entry.value) * minOf(size.width, size.height) * .06f
             drawImage(
-                image = if (animation.reactionAtlas) loaded.reactions else loaded.normal,
-                srcOffset = IntOffset(frame * animation.sourceWidth, animation.row * animation.sourceHeight),
-                srcSize = IntSize(animation.sourceWidth, animation.sourceHeight),
-                dstOffset = IntOffset((size.width.toInt() - drawWidth) / 2, size.height.toInt() - drawHeight),
+                image = if (peeking) loaded.edges else if (animation.reactionAtlas) loaded.reactions else loaded.normal,
+                srcOffset = if (peeking) IntOffset(edge.column * 256, 0) else IntOffset(frame * sourceWidth, animation.row * sourceHeight),
+                srcSize = IntSize(sourceWidth, sourceHeight),
+                dstOffset = IntOffset(
+                    (size.width.toInt() - drawWidth) / 2 + (horizontal * shift).toInt(),
+                    size.height.toInt() - drawHeight + (vertical * shift).toInt(),
+                ),
                 dstSize = IntSize(drawWidth, drawHeight),
+                alpha = if (peeking) entry.value else 1f,
                 filterQuality = FilterQuality.None,
             )
         }

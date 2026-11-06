@@ -2,6 +2,10 @@
 
 ## Current runtime: R3
 
+Approved Companion board 18 now supplies eight edge/corner grip poses for the
+in-app and outside-app PET. See [edge-peeking implementation and verification](PIE_EDGE_PEEK_IMPLEMENTATION.md)
+and [approved Kalka concept](PIE_EDGE_PEEK_DESIGN.md).
+
 The approved notification identity now uses a head cropped from the actual PET,
 plus tone-compatible reminder artwork from the same pose set. Kalka boards 14–17
 remain on the existing V1.2.0 page. See [notification implementation and limits](PIE_NOTIFICATION_MASCOT_IMPLEMENTATION.md).

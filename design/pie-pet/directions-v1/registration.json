@@ -1,0 +1,173 @@
+{
+  "source_size": [
+    1254,
+    1254
+  ],
+  "transparent_column_gutters": [
+    0,
+    432,
+    817,
+    1254
+  ],
+  "transparent_row_gutters": [
+    0,
+    405,
+    822,
+    1254
+  ],
+  "poses": [
+    {
+      "position": "top-left",
+      "source_region": [
+        0,
+        0,
+        432,
+        405
+      ],
+      "alpha_bbox": [
+        94,
+        16,
+        385,
+        383
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    },
+    {
+      "position": "top",
+      "source_region": [
+        432,
+        0,
+        817,
+        405
+      ],
+      "alpha_bbox": [
+        50,
+        16,
+        338,
+        383
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    },
+    {
+      "position": "top-right",
+      "source_region": [
+        817,
+        0,
+        1254,
+        405
+      ],
+      "alpha_bbox": [
+        48,
+        16,
+        341,
+        383
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    },
+    {
+      "position": "left",
+      "source_region": [
+        0,
+        405,
+        432,
+        822
+      ],
+      "alpha_bbox": [
+        90,
+        24,
+        361,
+        394
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    },
+    {
+      "position": "center",
+      "source_region": [
+        432,
+        405,
+        817,
+        822
+      ],
+      "alpha_bbox": [
+        48,
+        24,
+        332,
+        395
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    },
+    {
+      "position": "right",
+      "source_region": [
+        817,
+        405,
+        1254,
+        822
+      ],
+      "alpha_bbox": [
+        75,
+        24,
+        346,
+        394
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    },
+    {
+      "position": "bottom-left",
+      "source_region": [
+        0,
+        822,
+        432,
+        1254
+      ],
+      "alpha_bbox": [
+        87,
+        24,
+        369,
+        395
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    },
+    {
+      "position": "bottom",
+      "source_region": [
+        432,
+        822,
+        817,
+        1254
+      ],
+      "alpha_bbox": [
+        48,
+        25,
+        338,
+        395
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    },
+    {
+      "position": "bottom-right",
+      "source_region": [
+        817,
+        822,
+        1254,
+        1254
+      ],
+      "alpha_bbox": [
+        66,
+        25,
+        350,
+        395
+      ],
+      "shared_scale": 0.5,
+      "baseline": 248
+    }
+  ]
+}

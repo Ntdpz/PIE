@@ -16,6 +16,7 @@ import com.ntdpz.pie.core.designsystem.theme.CompanionTheme
 import com.ntdpz.pie.core.designsystem.component.CompanionSpriteGroup
 import com.ntdpz.pie.core.domain.pet.PetPosition
 import com.ntdpz.pie.core.domain.pet.PetReaction
+import com.ntdpz.pie.core.domain.pet.PetEdge
 import kotlinx.coroutines.delay
 
 internal val PreviewActions = listOf(
@@ -35,6 +36,7 @@ fun PetSettingsRoute(
     val lifecycle by LocalLifecycleOwner.current.lifecycle.currentStateFlow.collectAsStateWithLifecycle()
     var allPoses by rememberSaveable { mutableStateOf(false) }
     var selected by rememberSaveable { mutableStateOf(PetReaction.Wink) }
+    var previewEdge by rememberSaveable { mutableStateOf<PetEdge?>(null) }
     var heroReaction by remember { mutableStateOf<PetReaction?>(null) }
     var replayKey by remember { mutableLongStateOf(0L) }
     val motion = motionAllowed && lifecycle.isAtLeast(Lifecycle.State.RESUMED) && !state.preferences.reducedMotion
@@ -50,7 +52,8 @@ fun PetSettingsRoute(
             if (allPoses) {
                 PetPoseScreen(
                     selected = selected, replayKey = replayKey, motionEnabled = motion,
-                    onSelect = { selected = it; replayKey++ }, onBack = { allPoses = false },
+                    onSelect = { selected = it; previewEdge = null; replayKey++ }, onBack = { allPoses = false },
+                    edge = previewEdge, onEdge = { previewEdge = it; replayKey++ },
                 )
             } else {
                 PetSettingsScreen(
@@ -59,7 +62,7 @@ fun PetSettingsRoute(
                     onReducedMotion = viewModel::setReducedMotion,
                     onReset = { viewModel.setPosition(PetPosition()) }, onRetry = viewModel::reload,
                     onTap = { heroReaction = PreviewActions[(replayKey % PreviewActions.size).toInt()]; replayKey++ },
-                    onPreview = { selected = it; replayKey++; allPoses = true },
+                    onPreview = { selected = it; previewEdge = null; replayKey++; allPoses = true },
                     onAllPoses = { allPoses = true }, outsideAppControls = outsideAppControls,
                 )
             }

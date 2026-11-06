@@ -1,0 +1,88 @@
+{
+  "pairs": [
+    {
+      "pair": "horizontal-1",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "A's muzzle and nose sit left of the face center; B's muzzle and nose project to the right."
+    },
+    {
+      "pair": "horizontal-2",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A shows a right-projecting muzzle with more cheek visible on its left; B shows the inverse, with its nose toward the left edge of the face."
+    },
+    {
+      "pair": "horizontal-3",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "A's nose projects left and the right cheek occupies more width; B's nose projects right and the left cheek occupies more width."
+    },
+    {
+      "pair": "horizontal-4",
+      "A": "screen-left",
+      "B": "screen-right",
+      "reason": "The lowered muzzle in A points left; the strongly profiled muzzle in B points right."
+    },
+    {
+      "pair": "horizontal-5",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A's nose is near the right boundary of its face; B's lowered nose is left of its face center."
+    },
+    {
+      "pair": "horizontal-6",
+      "A": "screen-right",
+      "B": "screen-left",
+      "reason": "A's lowered muzzle projects right with the cheek extending left; B's lowered muzzle projects left with the cheek extending right."
+    },
+    {
+      "pair": "horizontal-7",
+      "A": "screen-right",
+      "B": "ambiguous",
+      "reason": "A's lowered nose clearly projects right. B is nearly frontal, with only a small leftward nose offset and no clear lateral gaze."
+    },
+    {
+      "pair": "vertical-1",
+      "A": "down",
+      "B": "up",
+      "reason": "A's eyes are lowered beneath heavy brows and the muzzle is tucked toward the chest; B exposes a broad underside of the face with eyes and muzzle lifted."
+    },
+    {
+      "pair": "vertical-2",
+      "A": "up",
+      "B": "down",
+      "reason": "A's pupils and nose are lifted with a broad visible chin below; B's brow overhangs lowered eyes and its muzzle is tucked downward."
+    },
+    {
+      "pair": "vertical-3",
+      "A": "up",
+      "B": "down",
+      "reason": "A has raised pupils and an elevated muzzle above a long visible lower cheek; B has lowered eyelids and a chin tucked toward the collar."
+    },
+    {
+      "pair": "vertical-4",
+      "A": "up",
+      "B": "ambiguous",
+      "reason": "A's visible eye looks upward and its projecting muzzle is raised. B's eye and muzzle read mainly as a level side turn, without a decisive vertical gaze."
+    },
+    {
+      "pair": "vertical-5",
+      "A": "up",
+      "B": "down",
+      "reason": "A has lifted pupils and an exposed underside of the face; B's brows compress the lowered eyes and its muzzle sits close to the collar."
+    },
+    {
+      "pair": "vertical-6",
+      "A": "up",
+      "B": "down",
+      "reason": "In the isolated original crop, A has raised pupils and an elevated muzzle with a broad lower cheek exposed. B is visible: its eyes sit low beneath heavy brows and its lowered muzzle and chin tuck toward the collar."
+    },
+    {
+      "pair": "vertical-7",
+      "A": "ambiguous",
+      "B": "down",
+      "reason": "A reads as a mostly level leftward face with no decisive vertical gaze; B has a lowered muzzle and eyes shaded by downward brows."
+    }
+  ]
+}

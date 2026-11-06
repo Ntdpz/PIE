@@ -1,0 +1,12 @@
+{
+  "id": "pet_6aede7ac2ba08191b88f3fb8a3b366e4",
+  "name": "PIE",
+  "description": "สาวน้อยหูสุนัขพิกเซลอาร์ต ผมบ๊อบสีชาร์โคล เสื้อชมพู เพื่อนร่วมงานร่าเริง พร้อม 9 แอนิเมชันและมุมมอง 16 ทิศ",
+  "is_custom": true,
+  "is_active": false,
+  "verified_in_list": true,
+  "created_date": "2026-11-06",
+  "atlas_sha256": "559ea51a5f2537c60dbfbd90dd7261000c8ab2afe3cce438a95f03b621ec6a93",
+  "library_synced": false,
+  "artifact_storage": "Project directory; Library tools unavailable"
+}

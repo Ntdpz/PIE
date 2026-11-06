@@ -1,0 +1,108 @@
+{
+  "source": "design\\pie-pet\\edge-peek-v1\\runtime\\source-cutouts.png",
+  "top_clip_repair": "design\\pie-pet\\edge-peek-v1\\runtime\\top-clip-repaired.png",
+  "gutters": [
+    [
+      0,
+      437,
+      876,
+      1321
+    ],
+    [
+      0,
+      386,
+      791,
+      1191
+    ]
+  ],
+  "poses": [
+    {
+      "edge": "TopLeft",
+      "column": 0,
+      "bounds": [
+        0,
+        0,
+        148,
+        159
+      ],
+      "shared_scale": 0.46
+    },
+    {
+      "edge": "Top",
+      "column": 1,
+      "bounds": [
+        55,
+        0,
+        200,
+        126
+      ],
+      "shared_scale": 0.46
+    },
+    {
+      "edge": "TopRight",
+      "column": 2,
+      "bounds": [
+        108,
+        0,
+        256,
+        159
+      ],
+      "shared_scale": 0.46
+    },
+    {
+      "edge": "Left",
+      "column": 3,
+      "bounds": [
+        0,
+        53,
+        148,
+        203
+      ],
+      "shared_scale": 0.46
+    },
+    {
+      "edge": "Right",
+      "column": 4,
+      "bounds": [
+        107,
+        53,
+        256,
+        203
+      ],
+      "shared_scale": 0.46
+    },
+    {
+      "edge": "BottomLeft",
+      "column": 5,
+      "bounds": [
+        0,
+        107,
+        146,
+        256
+      ],
+      "shared_scale": 0.46
+    },
+    {
+      "edge": "Bottom",
+      "column": 6,
+      "bounds": [
+        54,
+        131,
+        202,
+        256
+      ],
+      "shared_scale": 0.46
+    },
+    {
+      "edge": "BottomRight",
+      "column": 7,
+      "bounds": [
+        107,
+        108,
+        256,
+        256
+      ],
+      "shared_scale": 0.46
+    }
+  ]
+}

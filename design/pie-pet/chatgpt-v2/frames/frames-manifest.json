@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "chroma_key": {
+    "hex": "#00FFFF",
+    "rgb": [
+      0,
+      255,
+      255
+    ],
+    "threshold": 96.0
+  },
+  "rows": [
+    {
+      "state": "running",
+      "frames": [
+        "D:\\Up-Skill\\PIE\\design\\pie-pet\\chatgpt-v2\\frames\\running\\00.png",
+        "D:\\Up-Skill\\PIE\\design\\pie-pet\\chatgpt-v2\\frames\\running\\01.png",
+        "D:\\Up-Skill\\PIE\\design\\pie-pet\\chatgpt-v2\\frames\\running\\02.png",
+        "D:\\Up-Skill\\PIE\\design\\pie-pet\\chatgpt-v2\\frames\\running\\03.png",
+        "D:\\Up-Skill\\PIE\\design\\pie-pet\\chatgpt-v2\\frames\\running\\04.png",
+        "D:\\Up-Skill\\PIE\\design\\pie-pet\\chatgpt-v2\\frames\\running\\05.png"
+      ],
+      "method": "components"
+    }
+  ]
+}

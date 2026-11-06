@@ -24,6 +24,7 @@ import org.junit.Test
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import com.ntdpz.pie.core.domain.pet.PetPosition
+import com.ntdpz.pie.core.domain.pet.PetEdge
 
 /** Permissions are configured before instrumentation; revocation can kill its process. */
 class PetOverlayFlowTest {
@@ -42,6 +43,37 @@ class PetOverlayFlowTest {
     @After
     fun stop() {
         context.stopService(Intent(context, PiePetOverlayService::class.java))
+    }
+
+    @Test
+    fun nativeOverlaySelectsEveryEdgeAndReturnsToNormalReaction() {
+        assertTrue(Settings.canDrawOverlays(context))
+        val repository = (context.applicationContext as PieApplication).container.petRepository
+        val previous = runBlocking { repository.preferences.first() }
+        try {
+            runBlocking { repository.setReducedMotion(true) }
+            compose.runOnIdle { context.startForegroundService(Intent(context, PiePetOverlayService::class.java)) }
+            context.startActivity(Intent().apply {
+                component = ComponentName(context.packageName, OverlayTouchProbeActivity::class.java.name)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+            compose.waitUntil(15_000) { companionNode() != null }
+            val names = listOf("กลางจอ", "มุมซ้ายบน", "ขอบบน", "มุมขวาบน", "ขอบซ้าย", "ขอบขวา", "มุมซ้ายล่าง", "ขอบล่าง", "มุมขวาล่าง")
+            PetEdge.entries.forEachIndexed { index, edge ->
+                runBlocking { repository.setPosition(PetPosition((edge.horizontal + 1) / 2f, (edge.vertical + 1) / 2f)) }
+                compose.waitUntil(10_000) {
+                    companionNode()?.contentDescription?.contains("ตำแหน่ง ${names[index]}") == true
+                }
+            }
+            assertTrue(companionNode()!!.performAction(AccessibilityNodeInfo.ACTION_CLICK))
+            compose.waitUntil(2_000) { companionNode()?.contentDescription?.contains("ทักทาย") == true }
+            compose.waitUntil(6_000) { companionNode()?.contentDescription?.contains("อยู่เป็นเพื่อน") == true }
+        } finally {
+            runBlocking {
+                repository.setPosition(previous.position)
+                repository.setReducedMotion(previous.reducedMotion)
+            }
+        }
     }
 
     @Test

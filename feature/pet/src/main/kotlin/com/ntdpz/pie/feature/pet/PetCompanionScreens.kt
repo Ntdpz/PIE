@@ -213,7 +213,7 @@ internal fun PetPoseScreen(
                     border = BorderStroke(if (edge == null) 2.dp else 1.dp, MaterialTheme.colorScheme.primary),
                 ) { Text("ทักทาย 9 ท่า") }
                 OutlinedButton(
-                    { onEdge(PetEdge.Right) }, Modifier.weight(1f).heightIn(min = 48.dp).testTag("pet-mode-edges"),
+                    { onEdge(edge ?: PetEdge.Right) }, Modifier.weight(1f).heightIn(min = 48.dp).testTag("pet-mode-edges"),
                     border = BorderStroke(if (edge != null) 2.dp else 1.dp, MaterialTheme.colorScheme.primary),
                 ) { Text("เกาะขอบ 8 ท่า") }
             }

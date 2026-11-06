@@ -15,8 +15,10 @@ class CompanionSpriteView(
     context: Context,
     private val atlas: Bitmap,
     private val reactions: Bitmap,
-    private val edges: Bitmap,
 ) : View(context) {
+    /** Supplied lazily by the owner the first time an edge pose is needed. */
+    var edges: Bitmap? = null
+        set(value) { if (field !== value) { field = value; edgeStartedAt = SystemClock.uptimeMillis(); invalidate() } }
     var edge: CompanionEdge = CompanionEdge.Center
         set(value) { if (field != value) { field = value; edgeStartedAt = SystemClock.uptimeMillis(); invalidate() } }
     private var edgeStartedAt = 0L
@@ -77,7 +79,8 @@ class CompanionSpriteView(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (edge != CompanionEdge.Center) {
+        val edges = edges
+        if (edge != CompanionEdge.Center && edges != null) {
             val progress = if (motionEnabled && !reducedMotion) {
                 ((SystemClock.uptimeMillis() - edgeStartedAt) / 180f).coerceIn(0f, 1f)
             } else 1f
@@ -86,13 +89,7 @@ class CompanionSpriteView(
             } else 1f
             canvas.save()
             canvas.clipRect(0, 0, width, height)
-            val horizontal = when (edge) {
-                CompanionEdge.Left, CompanionEdge.TopLeft, CompanionEdge.BottomLeft -> -1
-                CompanionEdge.Right, CompanionEdge.TopRight, CompanionEdge.BottomRight -> 1
-                else -> 0
-            }
-            val vertical = if (edge.anchorY == 0f) -1 else if (edge.anchorY == 1f) 1 else 0
-            canvas.translate(horizontal * width * .06f * (1f - progress), vertical * height * .06f * (1f - progress))
+            canvas.translate(edge.horizontal * width * .06f * (1f - progress), edge.vertical * height * .06f * (1f - progress))
             canvas.scale(1f, breath, width / 2f, height * edge.anchorY)
             paint.alpha = (progress * 255).toInt()
             canvas.drawBitmap(

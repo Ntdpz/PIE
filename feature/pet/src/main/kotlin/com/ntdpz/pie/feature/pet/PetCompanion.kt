@@ -126,10 +126,11 @@ fun PetCompanion(
             settledEdge = PetEdge.Center
         } else {
             delay(200)
-            settledEdge = PetEdges.at(position, settledEdge)
+            settledEdge = PetEdges.at(position)
         }
     }
-    val visualEdge = if (!dragging && state.pose in listOf(PetPose.Idle, PetPose.Rest)) settledEdge else PetEdge.Center
+    // Edge poses are awake stills; resting keeps its own sleeping animation so sight and TalkBack agree.
+    val visualEdge = if (!dragging && state.pose == PetPose.Idle) settledEdge else PetEdge.Center
     BoxWithConstraints(Modifier.fillMaxSize().testTag("pet-layer")) {
         val density = LocalDensity.current
         val width = with(density) { 128.dp.toPx() }

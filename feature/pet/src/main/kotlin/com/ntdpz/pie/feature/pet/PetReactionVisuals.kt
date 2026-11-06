@@ -5,9 +5,20 @@ import com.ntdpz.pie.core.domain.pet.PetReaction
 import com.ntdpz.pie.core.domain.pet.PetEdge
 import com.ntdpz.pie.core.designsystem.component.CompanionEdge
 
-internal fun PetEdge.visual(): CompanionEdge = CompanionEdge.valueOf(name)
+internal fun PetEdge.visual(): CompanionEdge = when (this) {
+    PetEdge.Center -> CompanionEdge.Center
+    PetEdge.TopLeft -> CompanionEdge.TopLeft
+    PetEdge.Top -> CompanionEdge.Top
+    PetEdge.TopRight -> CompanionEdge.TopRight
+    PetEdge.Left -> CompanionEdge.Left
+    PetEdge.Right -> CompanionEdge.Right
+    PetEdge.BottomLeft -> CompanionEdge.BottomLeft
+    PetEdge.Bottom -> CompanionEdge.Bottom
+    PetEdge.BottomRight -> CompanionEdge.BottomRight
+}
 
-internal fun PetEdge.label(): String = when (this) {
+/** Public so device tests read the same text TalkBack hears. */
+fun PetEdge.label(): String = when (this) {
     PetEdge.Center -> "กลางจอ"
     PetEdge.TopLeft -> "มุมซ้ายบน"
     PetEdge.Top -> "ขอบบน"

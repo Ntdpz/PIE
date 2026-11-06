@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import com.ntdpz.pie.core.domain.pet.PetPosition
 import com.ntdpz.pie.core.domain.pet.PetEdge
+import com.ntdpz.pie.feature.pet.label
 
 /** Permissions are configured before instrumentation; revocation can kill its process. */
 class PetOverlayFlowTest {
@@ -58,11 +59,10 @@ class PetOverlayFlowTest {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             })
             compose.waitUntil(15_000) { companionNode() != null }
-            val names = listOf("กลางจอ", "มุมซ้ายบน", "ขอบบน", "มุมขวาบน", "ขอบซ้าย", "ขอบขวา", "มุมซ้ายล่าง", "ขอบล่าง", "มุมขวาล่าง")
-            PetEdge.entries.forEachIndexed { index, edge ->
+            PetEdge.entries.forEach { edge ->
                 runBlocking { repository.setPosition(PetPosition((edge.horizontal + 1) / 2f, (edge.vertical + 1) / 2f)) }
                 compose.waitUntil(10_000) {
-                    companionNode()?.contentDescription?.contains("ตำแหน่ง ${names[index]}") == true
+                    companionNode()?.contentDescription?.contains("ตำแหน่ง ${edge.label()}") == true
                 }
             }
             assertTrue(companionNode()!!.performAction(AccessibilityNodeInfo.ACTION_CLICK))

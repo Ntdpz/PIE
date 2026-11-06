@@ -146,24 +146,46 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
             .setOngoing(true).setOnlyAlertOnce(true).setCategory(Notification.CATEGORY_SERVICE).build()
     }
 
+    private var edgeLoading = false
+
+    /** Decodes the edge atlas once, the first time PIE settles on an edge. */
+    private fun ensureEdgeAtlas() {
+        if (edgeBitmap != null || edgeLoading) return
+        edgeLoading = true
+        scope.launch {
+            try {
+                val edges = withContext(Dispatchers.IO) {
+                    val options = BitmapFactory.Options().apply { inScaled = false }
+                    requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_edges, options))
+                }
+                edgeBitmap = edges
+                sprite?.edges = edges
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                // The normal pose keeps drawing; an edge pose is cosmetic and is retried next tick.
+            } finally {
+                edgeLoading = false
+            }
+        }
+    }
+
     private var loading = false
     private fun load() {
         if (loading) return
         loading = true
         scope.launch {
             try {
-                val (atlas, reactionAtlas, edgeAtlas) = withContext(Dispatchers.IO) {
+                val (atlas, reactionAtlas) = withContext(Dispatchers.IO) {
                     val options = BitmapFactory.Options().apply { inScaled = false }
-                    Triple(
+                    Pair(
                         requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_companion, options)),
                         requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_reactions, options)),
-                        requireNotNull(BitmapFactory.decodeResource(resources, com.ntdpz.pie.core.designsystem.R.drawable.pie_edges, options)),
                     )
                 }
                 bitmap = atlas
                 reactionBitmap = reactionAtlas
-                edgeBitmap = edgeAtlas
-                sprite = CompanionSpriteView(this@PetOverlayService, atlas, reactionAtlas, edgeAtlas).apply {
+                sprite = CompanionSpriteView(this@PetOverlayService, atlas, reactionAtlas).apply {
                     contentDescription = "PIE นอกแอป แตะเพื่อทักทาย กดค้างเพื่อปิด"
                     setOnClickListener { reactToTouch() }
                     setOnLongClickListener { stopSelf(); true }
@@ -173,7 +195,7 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                     try {
                         petRepository.preferences.collect {
                             preferences = it
-                            currentEdge = PetEdges.at(it.position, currentEdge)
+                            currentEdge = PetEdges.at(it.position)
                             ready = true
                             sprite?.reducedMotion = it.reducedMotion
                             if (!dragging) place(it.position)
@@ -200,10 +222,10 @@ abstract class PetOverlayService : Service(), Application.ActivityLifecycleCallb
                             else -> CompanionAnimation.Idle
                         }
                         sprite?.animation = animation
-                        if (!dragging) currentEdge = PetEdges.at(preferences.position, currentEdge)
-                        sprite?.edge = if (!dragging && animation in listOf(CompanionAnimation.Idle, CompanionAnimation.Rest)) {
-                            currentEdge.visual()
-                        } else CompanionEdge.Center
+                        // Edge poses are awake stills; resting keeps its own sleeping animation.
+                        val edge = if (!dragging && animation == CompanionAnimation.Idle) currentEdge.visual() else CompanionEdge.Center
+                        if (edge != CompanionEdge.Center) ensureEdgeAtlas()
+                        sprite?.edge = edge
                         val description = when {
                             selected != null -> "ทักทาย ${selected.action.label()}"
                             animation == CompanionAnimation.Rest -> "พัก"

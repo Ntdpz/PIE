@@ -59,3 +59,16 @@ Sources, prompts, generated rows, QA, previews and stable identity are retained
 under `design/pie-pet/chatgpt-v2/`. Library tools were unavailable, so these
 artifacts have **not** been synchronized to ChatGPT Library. No Git commit/push
 was performed for this implementation.
+
+## 0.7.1 review fixes
+
+Version is now 0.7.1, code 14. Fixes from the edge-peek code review: snapping and
+the visible edge use one stateless threshold, so an edge pose is never shown away
+from the edge; the Compose fade starts transparent and is not replayed by motion
+toggles; the edge-mode button keeps the chosen edge; resting keeps its sleeping
+animation at edges; the edge atlas is decoded on first use; edge directions live
+on `CompanionEdge`; `PetEdge.visual()` is an exhaustive `when`; the overlay
+ticker no longer recomputes the edge; the overlay test reads `PetEdge.label()`.
+
+Three edge device cases passed on S25 (`work/pet-edges-fix-s25.log`). Reduced
+motion was on in the overlay case, so the fade fixes were not checked visually.

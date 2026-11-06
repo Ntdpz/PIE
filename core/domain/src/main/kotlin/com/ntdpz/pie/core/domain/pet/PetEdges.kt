@@ -5,17 +5,21 @@ enum class PetEdge(val horizontal: Int, val vertical: Int) {
     Left(-1, 0), Right(1, 0), BottomLeft(-1, 1), Bottom(0, 1), BottomRight(1, 1),
 }
 
-/** Relative draggable-area coordinates; no screen size, Android context or persistence. */
+/**
+ * Relative draggable-area coordinates; no screen size, Android context or persistence.
+ * Stateless on purpose: the in-app companion and the overlay share one saved position, so
+ * both must derive the same edge from it without remembering their own previous edge.
+ */
 object PetEdges {
-    private const val Enter = 0.08f
-    private const val Leave = 0.14f
+    private const val Snap = 0.08f
 
-    fun at(position: PetPosition, previous: PetEdge = PetEdge.Center): PetEdge {
-        val horizontal = axis(position.x, previous.horizontal)
-        val vertical = axis(position.y, previous.vertical)
+    fun at(position: PetPosition): PetEdge {
+        val horizontal = axis(position.x)
+        val vertical = axis(position.y)
         return PetEdge.entries.first { it.horizontal == horizontal && it.vertical == vertical }
     }
 
+    /** Every snapped position resolves through [at] to the edge it was snapped to. */
     fun snap(position: PetPosition): PetPosition {
         val edge = at(position)
         return PetPosition(
@@ -24,11 +28,9 @@ object PetEdges {
         )
     }
 
-    private fun axis(value: Float, previous: Int): Int = when {
-        previous == -1 && value <= Leave -> -1
-        previous == 1 && value >= 1f - Leave -> 1
-        value <= Enter -> -1
-        value >= 1f - Enter -> 1
+    private fun axis(value: Float): Int = when {
+        value <= Snap -> -1
+        value >= 1f - Snap -> 1
         else -> 0
     }
 }

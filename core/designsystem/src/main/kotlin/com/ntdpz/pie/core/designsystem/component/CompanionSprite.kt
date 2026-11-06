@@ -1,5 +1,6 @@
 package com.ntdpz.pie.core.designsystem.component
 
+import android.content.res.Resources
 import android.graphics.BitmapFactory
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Animatable
@@ -16,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,17 +40,47 @@ import kotlinx.coroutines.withContext
 
 private sealed interface SpriteImage {
     data object Loading : SpriteImage
-    data class Ready(val normal: ImageBitmap, val reactions: ImageBitmap, val edges: ImageBitmap) : SpriteImage
+    data class Ready(val normal: ImageBitmap, val reactions: ImageBitmap) : SpriteImage
     data object Failed : SpriteImage
 }
 
-private val LocalSpriteImage = staticCompositionLocalOf<SpriteImage?> { null }
+/** The edge atlas is decoded only once a sprite actually needs an edge pose. */
+private class EdgeAtlas(private val resources: Resources) {
+    var image by mutableStateOf<ImageBitmap?>(null)
+        private set
+    var failed by mutableStateOf(false)
+        private set
+    private var loading = false
 
-/** Decode one atlas pair for a screen containing several previews. */
+    /** Main-thread only, so concurrent sprites in one group share a single decode. */
+    suspend fun load() {
+        if (loading || image != null || failed) return
+        loading = true
+        try {
+            image = withContext(Dispatchers.IO) {
+                val options = BitmapFactory.Options().apply { inScaled = false }
+                BitmapFactory.decodeResource(resources, R.drawable.pie_edges, options).asImageBitmap()
+            }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            failed = true
+        } finally {
+            loading = false
+        }
+    }
+}
+
+private val LocalSpriteImage = staticCompositionLocalOf<SpriteImage?> { null }
+private val LocalEdgeAtlas = staticCompositionLocalOf<EdgeAtlas?> { null }
+
+/** Decode one atlas set for a screen containing several previews. */
 @Composable
 fun CompanionSpriteGroup(content: @Composable () -> Unit) {
     val image by rememberSpriteImage()
-    CompositionLocalProvider(LocalSpriteImage provides image, content = content)
+    val resources = LocalContext.current.resources
+    val edges = remember(resources) { EdgeAtlas(resources) }
+    CompositionLocalProvider(LocalSpriteImage provides image, LocalEdgeAtlas provides edges, content = content)
 }
 
 @Composable
@@ -61,7 +93,6 @@ private fun rememberSpriteImage(): State<SpriteImage> {
                 SpriteImage.Ready(
                     BitmapFactory.decodeResource(resources, R.drawable.pie_companion, options).asImageBitmap(),
                     BitmapFactory.decodeResource(resources, R.drawable.pie_reactions, options).asImageBitmap(),
-                    BitmapFactory.decodeResource(resources, R.drawable.pie_edges, options).asImageBitmap(),
                 )
             }
         } catch (cancelled: CancellationException) {
@@ -84,14 +115,21 @@ fun CompanionSprite(
     edge: CompanionEdge = CompanionEdge.Center,
 ) {
     val image = LocalSpriteImage.current ?: rememberSpriteImage().value
+    val resources = LocalContext.current.resources
+    val edgeAtlas = LocalEdgeAtlas.current ?: remember(resources) { EdgeAtlas(resources) }
     var frame by remember(animation, replayKey) { mutableIntStateOf(0) }
     val animated = motionEnabled && durationScale > 0f
-    val entry = remember { Animatable(1f) }
-    LaunchedEffect(edge, animated, durationScale) {
-        if (edge != CompanionEdge.Center && animated) {
-            entry.snapTo(0f)
-            entry.animateTo(1f, tween((180 * durationScale).toInt().coerceAtLeast(1)))
-        } else entry.snapTo(1f)
+    val wantsEdge = edge != CompanionEdge.Center
+    LaunchedEffect(edgeAtlas, wantsEdge) { if (wantsEdge) edgeAtlas.load() }
+    val edgeImage = edgeAtlas.image.takeIf { wantsEdge }
+    // Created with the new edge so its first frame is already transparent; no one-frame flash.
+    val entry = remember(edge) { Animatable(if (wantsEdge && animated) 0f else 1f) }
+    // Keyed on the edge (via entry), not on motion: toggling motion finishes the fade, never replays it.
+    LaunchedEffect(entry, edgeImage != null, animated) {
+        // Hold the fade until the atlas arrives; the normal pose is drawn meanwhile.
+        if (edgeImage == null && wantsEdge && !edgeAtlas.failed) return@LaunchedEffect
+        if (animated) entry.animateTo(1f, tween((180 * durationScale).toInt().coerceAtLeast(1)))
+        else entry.snapTo(1f)
     }
     LaunchedEffect(animation, animated, durationScale, replayKey) {
         if (!animated) {
@@ -123,20 +161,17 @@ fun CompanionSprite(
             },
         ) {
             val scale = minOf(size.width, size.height) / 256f * characterScale
-            val peeking = edge != CompanionEdge.Center
+            val edges = edgeImage
+            val peeking = edges != null
             val sourceWidth = if (peeking) 256 else animation.sourceWidth
             val sourceHeight = if (peeking) 256 else animation.sourceHeight
             val drawWidth = (sourceWidth * scale).toInt()
             val drawHeight = (sourceHeight * scale).toInt()
-            val horizontal = when (edge) {
-                CompanionEdge.Left, CompanionEdge.TopLeft, CompanionEdge.BottomLeft -> -1
-                CompanionEdge.Right, CompanionEdge.TopRight, CompanionEdge.BottomRight -> 1
-                else -> 0
-            }
-            val vertical = if (!peeking) 0 else if (edge.anchorY == 0f) -1 else if (edge.anchorY == 1f) 1 else 0
+            val horizontal = if (peeking) edge.horizontal else 0
+            val vertical = if (peeking) edge.vertical else 0
             val shift = (1f - entry.value) * minOf(size.width, size.height) * .06f
             drawImage(
-                image = if (peeking) loaded.edges else if (animation.reactionAtlas) loaded.reactions else loaded.normal,
+                image = if (edges != null) edges else if (animation.reactionAtlas) loaded.reactions else loaded.normal,
                 srcOffset = if (peeking) IntOffset(edge.column * 256, 0) else IntOffset(frame * sourceWidth, animation.row * sourceHeight),
                 srcSize = IntSize(sourceWidth, sourceHeight),
                 dstOffset = IntOffset(

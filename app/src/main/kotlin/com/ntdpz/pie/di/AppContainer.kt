@@ -2,6 +2,7 @@ package com.ntdpz.pie.di
 
 import android.content.Context
 import com.ntdpz.pie.core.data.DiaryDataFactory
+import com.ntdpz.pie.core.domain.diary.DeviceLocalClock
 import com.ntdpz.pie.core.domain.diary.DiaryWriter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +16,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class AppContainer(context: Context) {
-    val clock: Clock = Clock.systemDefaultZone()
+    val clock: Clock = DeviceLocalClock
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     val settingsRepository = LocalSettingsRepository(context)
     val petRepository = LocalPetRepository(context)
